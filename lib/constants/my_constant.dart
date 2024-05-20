@@ -9,9 +9,6 @@ Color blueAccentColor = Colors.blueAccent;
 Color whiteColor = Colors.white;
 Color closeIconColor = Colors.redAccent;
 
-
-
-
 /// Icon Size ///
 const double iconSize = 15;
 const double largeIconSize = 20;

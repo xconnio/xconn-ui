@@ -4,7 +4,6 @@ import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/kwargs_provider.dart";
 import "package:xconn_ui/constants/my_constant.dart";
 
-
 class DynamicKeyValuePairs extends StatelessWidget {
   const DynamicKeyValuePairs({super.key});
 
@@ -39,7 +38,10 @@ class TableWidget extends StatefulWidget {
 
 class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
-      Map<String, String> rowData, int index, TableDataProvider tableProvider,) {
+    Map<String, String> rowData,
+    int index,
+    TableDataProvider tableProvider,
+  ) {
     return TableRow(
       children: [
         _buildTableCell(
@@ -72,7 +74,10 @@ class _TableWidgetState extends State<TableWidget> {
         ),
         _buildTableCell(
           IconButton(
-            icon: Icon(Icons.delete, color: closeIconColor,),
+            icon: Icon(
+              Icons.delete,
+              color: closeIconColor,
+            ),
             onPressed: () {
               setState(() {
                 tableProvider.removeRow(index);
@@ -110,16 +115,33 @@ class _TableWidgetState extends State<TableWidget> {
             color: Colors.grey[300],
           ),
           children: [
-            _buildTableCell(const Text("Key",
-                style: TextStyle(fontWeight: FontWeight.bold),),),
-            _buildTableCell(const Text("Value",
-                style: TextStyle(fontWeight: FontWeight.bold),),),
-            _buildTableCell(const Text("",
-                style: TextStyle(fontWeight: FontWeight.bold),),),
+            _buildTableCell(
+              const Text(
+                "Key",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            _buildTableCell(
+              const Text(
+                "Value",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            _buildTableCell(
+              const Text(
+                "",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
-        ...widget.tableData.asMap().entries.map((entry) => _buildTableRow(
-            entry.value, entry.key, Provider.of<TableDataProvider>(context),),),
+        ...widget.tableData.asMap().entries.map(
+              (entry) => _buildTableRow(
+                entry.value,
+                entry.key,
+                Provider.of<TableDataProvider>(context),
+              ),
+            ),
       ],
     );
   }

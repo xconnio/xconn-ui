@@ -3,8 +3,6 @@ import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/args_provider.dart";
 import "package:xconn_ui/constants/my_constant.dart";
 
-
-
 class ArgsTextFormFields extends StatelessWidget {
   const ArgsTextFormFields({super.key});
 
@@ -43,8 +41,11 @@ class ArgsTextFormFields extends StatelessWidget {
                 trailing: InkWell(
                   hoverColor: Colors.blue.shade200,
                   onTap: () => model.removeController(index),
-                  child: Icon(Icons.delete, color: closeIconColor,),),
-
+                  child: Icon(
+                    Icons.delete,
+                    color: closeIconColor,
+                  ),
+                ),
               );
             },
           ),

@@ -32,9 +32,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     _tabController.addListener(_handleTabSelection);
   }
 
-
   // TODO HANDLE TABS SELECTION
-  void _handleTabSelection(){
+  void _handleTabSelection() {
     setState(() {});
   }
 
@@ -61,7 +60,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   @override
   void dispose() {
-    _tabController..removeListener(_handleTabSelection)
+    _tabController
+      ..removeListener(_handleTabSelection)
       ..dispose();
     super.dispose();
   }
@@ -85,36 +85,33 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ],
         bottom: _tabNames.isNotEmpty
             ? PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            indicatorColor: blueAccentColor,
-            indicatorWeight: 1,
-            tabs: _tabNames
-                .asMap()
-                .entries
-                .map((entry) =>
-                _buildTabWithDeleteButton(entry.key, entry.value),)
-                .toList(),
-          ),
-        )
+                preferredSize: const Size.fromHeight(kToolbarHeight),
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  indicatorColor: blueAccentColor,
+                  indicatorWeight: 1,
+                  tabs: _tabNames
+                      .asMap()
+                      .entries
+                      .map(
+                        (entry) => _buildTabWithDeleteButton(entry.key, entry.value),
+                      )
+                      .toList(),
+                ),
+              )
             : null,
       ),
       drawer: const Drawer(),
       body: _tabNames.isNotEmpty
           ? Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: TabBarView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: _tabController,
-          children: _tabContents
-              .asMap()
-              .entries
-              .map((entry) => _buildTab(entry.key))
-              .toList(),
-        ),
-      )
+              padding: const EdgeInsets.only(top: 10),
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _tabController,
+                children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
+              ),
+            )
           : const Center(child: Text("No Tabs")),
     );
   }
@@ -169,10 +166,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   SizedBox(
                     width: 100,
                     child: DropdownButton<String>(
-                      value: _tabData[index].selectedValue.isEmpty
-                          ? null
-                          : _tabData[index].selectedValue,
-                      hint: Text("Actions", style: TextStyle(color: dropDownTextColor),),
+                      value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
+                      hint: Text(
+                        "Actions",
+                        style: TextStyle(color: dropDownTextColor),
+                      ),
                       items: <String>[
                         "Register",
                         "Subscribe",
@@ -181,7 +179,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                       ].map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value, style: TextStyle(color: dropDownTextColor),),
+                          child: Text(
+                            value,
+                            style: TextStyle(color: dropDownTextColor),
+                          ),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
@@ -237,9 +238,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownButton<String>(
-                    value: _tabData[index].selectedSerializer.isEmpty
-                        ? null
-                        : _tabData[index].selectedSerializer,
+                    value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
                     hint: const Text("Serializers"),
                     items: <String>[
                       "JSON",
