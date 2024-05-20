@@ -2,7 +2,7 @@ import "package:flutter/cupertino.dart";
 
 class TableDataProvider extends ChangeNotifier {
   final List<Map<String, String>> _tableData = [
-    {"key": "", "value": ""}
+    {"key": "", "value": ""},
   ];
 
   List<Map<String, String>> get tableData => _tableData;
