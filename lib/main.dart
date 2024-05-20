@@ -2,7 +2,6 @@ import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/args_provider.dart";
 import "package:xconn_ui/Providers/kwargs_provider.dart";
-import "package:xconn_ui/Providers/protocols_calling_provider.dart";
 import "package:xconn_ui/responsive/responsive_layout.dart";
 import "package:xconn_ui/screens/desktop/desktop_home.dart";
 import "package:xconn_ui/screens/mobile/mobile_home.dart";
@@ -21,7 +20,6 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => ArgsProvider()),
         ChangeNotifierProvider(create: (context) => TableDataProvider()),
-        ChangeNotifierProvider(create: (context) => ProtocolsCallingProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

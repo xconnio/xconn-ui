@@ -42,7 +42,6 @@ class _TableWidgetState extends State<TableWidget> {
     int index,
     TableDataProvider tableProvider,
   ) {
-    print("nenanena");
     return TableRow(
       children: [
         _buildTableCell(
