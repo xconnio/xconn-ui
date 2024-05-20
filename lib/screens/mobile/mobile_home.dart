@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/args_provider.dart";
@@ -5,6 +6,8 @@ import "package:xconn_ui/Providers/kwargs_provider.dart";
 import "package:xconn_ui/constants/my_constant.dart";
 import "package:xconn_ui/utils/args_screen.dart";
 import "package:xconn_ui/utils/kwargs_screen.dart";
+
+import "../../Providers/protocols_calling_provider.dart";
 
 class TabData {
   String selectedValue = "";
@@ -24,6 +27,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   final List<String> _tabNames = ["Tab 1"];
   final List<String> _tabContents = ["Content for Tab 1"];
   final List<TabData> _tabData = [TabData()];
+  final TextEditingController linkController = TextEditingController();
+  final TextEditingController realmController = TextEditingController();
 
   @override
   void initState() {
@@ -37,26 +42,56 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     setState(() {});
   }
 
+  // void _addTab() {
+  //   setState(() {
+  //     int newIndex = _tabNames.length + 1;
+  //     _tabNames.add("Tab $newIndex");
+  //     _tabContents.add("Content for Tab $newIndex");
+  //     _tabData.add(TabData());
+  //     _tabController = TabController(length: _tabNames.length, vsync: this);
+  //     _tabController.addListener(_handleTabSelection);
+  //   });
+  // }
+
+  // void _removeTab(int index) {
+  //   setState(() {
+  //     _tabNames.removeAt(index);
+  //     _tabContents.removeAt(index);
+  //     _tabData.removeAt(index);
+  //     _tabController = TabController(length: _tabNames.length, vsync: this);
+  //     _tabController.addListener(_handleTabSelection);
+  //   });
+  // }
+
+
   void _addTab() {
     setState(() {
       int newIndex = _tabNames.length + 1;
       _tabNames.add("Tab $newIndex");
       _tabContents.add("Content for Tab $newIndex");
       _tabData.add(TabData());
-      _tabController = TabController(length: _tabNames.length, vsync: this);
-      _tabController.addListener(_handleTabSelection);
+      if (_tabController == null || _tabController.length != _tabNames.length) {
+        _tabController = TabController(length: _tabNames.length, vsync: this);
+        _tabController.addListener(_handleTabSelection);
+      }
     });
   }
+
+
 
   void _removeTab(int index) {
     setState(() {
       _tabNames.removeAt(index);
       _tabContents.removeAt(index);
       _tabData.removeAt(index);
-      _tabController = TabController(length: _tabNames.length, vsync: this);
-      _tabController.addListener(_handleTabSelection);
+
+      if (_tabController.length != _tabNames.length) {
+        _tabController = TabController(length: _tabNames.length, vsync: this);
+        _tabController.addListener(_handleTabSelection);
+      }
     });
   }
+
 
   @override
   void dispose() {
@@ -149,6 +184,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget _buildTab(int index) {
+    var provider = Provider.of<ProtocolsCallingProvider>(context, listen: false);
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
@@ -210,6 +246,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   ),
                   Expanded(
                     child: TextFormField(
+                      controller: linkController,
                       decoration: const InputDecoration(
                         hintText: "Enter URL or paste text",
                         labelText: "Enter URL or paste text",
@@ -262,6 +299,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 ),
                 Expanded(
                   child: TextFormField(
+                    controller: realmController,
                     decoration: InputDecoration(
                       hintText: "Enter realm here",
                       labelText: "Enter realm here",
@@ -554,7 +592,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 110),
             child: MaterialButton(
-              onPressed: () {},
+              onPressed: () async {
+                await provider.connect(_tabData[index].selectedSerializer, linkController.text, realmController.text,
+                    _tabData[index].selectedValue, _tabData[index].sendButtonText,);
+              },
               color: Colors.blueAccent,
               minWidth: 200,
               shape: RoundedRectangleBorder(
@@ -576,5 +617,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ],
       ),
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<TextEditingController>('linkController', linkController));
+    properties.add(DiagnosticsProperty<TextEditingController>('realmController', realmController));
   }
 }

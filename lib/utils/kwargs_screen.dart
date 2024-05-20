@@ -42,6 +42,7 @@ class _TableWidgetState extends State<TableWidget> {
     int index,
     TableDataProvider tableProvider,
   ) {
+    print("nenanena");
     return TableRow(
       children: [
         _buildTableCell(
@@ -79,9 +80,8 @@ class _TableWidgetState extends State<TableWidget> {
               color: closeIconColor,
             ),
             onPressed: () {
-              setState(() {
-                tableProvider.removeRow(index);
-              });
+              tableProvider.removeRow(index);
+              // setState(() {});
             },
           ),
         ),
@@ -92,7 +92,6 @@ class _TableWidgetState extends State<TableWidget> {
   TableCell _buildTableCell(Widget child) {
     return TableCell(
       child: Container(
-        // padding: const EdgeInsets.all(8),
         alignment: Alignment.center,
         height: 50,
         child: child,
@@ -105,9 +104,9 @@ class _TableWidgetState extends State<TableWidget> {
     return Table(
       border: TableBorder.all(color: Colors.grey),
       columnWidths: const {
-        0: FixedColumnWidth(150), // Width for Key column
-        1: FixedColumnWidth(150), // Width for Value column
-        2: FixedColumnWidth(50), // Width for Actions column
+        0: FixedColumnWidth(150),
+        1: FixedColumnWidth(150),
+        2: FixedColumnWidth(50),
       },
       children: [
         TableRow(
