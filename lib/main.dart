@@ -24,6 +24,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          primarySwatch: Colors.blue,
+          fontFamily: "Arial",
           useMaterial3: true,
         ),
         home: const ResponsiveLayout(

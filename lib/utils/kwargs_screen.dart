@@ -48,9 +48,10 @@ class _TableWidgetState extends State<TableWidget> {
           TextFormField(
             initialValue: rowData["key"],
             onChanged: (newValue) {
-              setState(() {
-                rowData["key"] = newValue;
-              });
+              // setState(() {
+              //   rowData["key"] = newValue;
+              // });
+              rowData["key"] = newValue;
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -62,9 +63,10 @@ class _TableWidgetState extends State<TableWidget> {
           TextFormField(
             initialValue: rowData["value"],
             onChanged: (newValue) {
-              setState(() {
-                rowData["value"] = newValue;
-              });
+              rowData["value"] = newValue;
+              // setState(() {
+              //   rowData["value"] = newValue;
+              // });
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
