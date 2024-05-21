@@ -2,15 +2,25 @@ import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/kwargs_provider.dart";
-import "package:xconn_ui/constants/my_constant.dart";
 
 class DynamicKeyValuePairs extends StatelessWidget {
   const DynamicKeyValuePairs({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TableDataProvider>(
+    return Consumer<KwargsProvider>(
       builder: (context, tableProvider, _) {
+        // Extract key-value pairs from tableProvider.tableData
+        Map<String, dynamic> kWarValues = {};
+
+        for (final map in tableProvider.tableData) {
+          String key = map["key"];
+          dynamic value = map["value"];
+          if (key.isNotEmpty) {
+            kWarValues[key] = value;
+          }
+        }
+
         return SizedBox(
           height: 200,
           child: SingleChildScrollView(
@@ -24,7 +34,7 @@ class DynamicKeyValuePairs extends StatelessWidget {
 
 class TableWidget extends StatefulWidget {
   const TableWidget(this.tableData, {super.key});
-  final List<Map<String, String>> tableData;
+  final List<Map<String, dynamic>> tableData;
 
   @override
   State<TableWidget> createState() => _TableWidgetState();
@@ -32,25 +42,22 @@ class TableWidget extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(IterableProperty<Map<String, String>>("tableData", tableData));
+    properties.add(IterableProperty<Map<String, dynamic>>("tableData", tableData));
   }
 }
 
 class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
-    Map<String, String> rowData,
-    int index,
-    TableDataProvider tableProvider,
-  ) {
+      Map<String, dynamic> rowData,
+      int index,
+      KwargsProvider kWarProvider,
+      ) {
     return TableRow(
       children: [
         _buildTableCell(
           TextFormField(
             initialValue: rowData["key"],
             onChanged: (newValue) {
-              // setState(() {
-              //   rowData["key"] = newValue;
-              // });
               rowData["key"] = newValue;
             },
             decoration: const InputDecoration(
@@ -64,9 +71,6 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData["value"],
             onChanged: (newValue) {
               rowData["value"] = newValue;
-              // setState(() {
-              //   rowData["value"] = newValue;
-              // });
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -76,13 +80,12 @@ class _TableWidgetState extends State<TableWidget> {
         ),
         _buildTableCell(
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.delete,
-              color: closeIconColor,
+              color: Colors.red,
             ),
             onPressed: () {
-              tableProvider.removeRow(index);
-              // setState(() {});
+              kWarProvider.removeRow(index);
             },
           ),
         ),
@@ -137,11 +140,11 @@ class _TableWidgetState extends State<TableWidget> {
         ),
         ...widget.tableData.asMap().entries.map(
               (entry) => _buildTableRow(
-                entry.value,
-                entry.key,
-                Provider.of<TableDataProvider>(context),
-              ),
-            ),
+            entry.value,
+            entry.key,
+            Provider.of<KwargsProvider>(context, listen: false),
+          ),
+        ),
       ],
     );
   }

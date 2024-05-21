@@ -3,15 +3,10 @@ import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/args_provider.dart";
 import "package:xconn_ui/Providers/kwargs_provider.dart";
-import "package:xconn_ui/constants/my_constant.dart";
+import "package:xconn_ui/constants.dart";
 import "package:xconn_ui/utils/args_screen.dart";
 import "package:xconn_ui/utils/kwargs_screen.dart";
-
-class TabData {
-  String selectedValue = "";
-  String selectedSerializer = "";
-  String sendButtonText = "Send";
-}
+import "package:xconn_ui/utils/tab_data_class.dart";
 
 class MobileHomeScaffold extends StatefulWidget {
   const MobileHomeScaffold({super.key});
@@ -27,6 +22,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   final List<TabData> _tabData = [TabData()];
   final TextEditingController linkController = TextEditingController();
   final TextEditingController realmController = TextEditingController();
+  final TextEditingController topicProcedureController = TextEditingController();
 
   @override
   void initState() {
@@ -35,31 +31,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     _tabController.addListener(_handleTabSelection);
   }
 
-  // TODO HANDLE TABS SELECTION
+  // HANDLE TABS SELECTION
   void _handleTabSelection() {
     setState(() {});
   }
-
-  // void _addTab() {
-  //   setState(() {
-  //     int newIndex = _tabNames.length + 1;
-  //     _tabNames.add("Tab $newIndex");
-  //     _tabContents.add("Content for Tab $newIndex");
-  //     _tabData.add(TabData());
-  //     _tabController = TabController(length: _tabNames.length, vsync: this);
-  //     _tabController.addListener(_handleTabSelection);
-  //   });
-  // }
-
-  // void _removeTab(int index) {
-  //   setState(() {
-  //     _tabNames.removeAt(index);
-  //     _tabContents.removeAt(index);
-  //     _tabData.removeAt(index);
-  //     _tabController = TabController(length: _tabNames.length, vsync: this);
-  //     _tabController.addListener(_handleTabSelection);
-  //   });
-  // }
 
   void _addTab() {
     setState(() {
@@ -145,6 +120,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
+  // Delete Tab
   Widget _buildTabWithDeleteButton(int index, String tabName) {
     final isSelected = _tabController.index == index;
     return GestureDetector(
@@ -177,8 +153,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
+  // Main Build Tab
   Widget _buildTab(int index) {
-    // var provider = Provider.of<ProtocolsCallingProvider>(context, listen: false);
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
@@ -218,16 +194,31 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                       onChanged: (String? newValue) {
                         setState(() {
                           _tabData[index].selectedValue = newValue!;
-                          if (newValue == "Subscribe") {
-                            _tabData[index].sendButtonText = "Subscribe";
-                          } else if (newValue == "Register") {
-                            _tabData[index].sendButtonText = "Register";
-                          } else if (newValue == "Call") {
-                            _tabData[index].sendButtonText = "Call";
-                          } else if (newValue == "Publish") {
-                            _tabData[index].sendButtonText = "Publish";
-                          } else {
-                            _tabData[index].sendButtonText = "Send";
+                          switch (newValue) {
+                            case "Subscribe":
+                              {
+                                _tabData[index].sendButtonText = "Subscribe";
+                                break;
+                              }
+                            case "Register":
+                              {
+                                _tabData[index].sendButtonText = "Register";
+                                break;
+                              }
+                            case "Call":
+                              {
+                                _tabData[index].sendButtonText = "Call";
+                                break;
+                              }
+                            case "Publish":
+                              {
+                                _tabData[index].sendButtonText = "Publish";
+                                break;
+                              }
+                            default:
+                              {
+                                _tabData[index].sendButtonText = "Send";
+                              }
                           }
                         });
                       },
@@ -310,257 +301,24 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           const SizedBox(
             height: 20,
           ),
-          if (_tabData[index].sendButtonText == "Publish") ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Enter topic here",
-                  labelText: "Enter topic here",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.all(10),
-                ),
-              ),
-            ),
-          ] else if (_tabData[index].sendButtonText == "Call") ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Enter procedure here",
-                  labelText: "Enter procedure here",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.all(10),
-                ),
-              ),
-            ),
-          ] else if (_tabData[index].sendButtonText == "Register") ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Enter procedure here",
-                  labelText: "Enter procedure here",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.all(10),
-                ),
-              ),
-            ),
-          ] else if (_tabData[index].sendButtonText == "Subscribe") ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Enter topic here",
-                  labelText: "Enter topic here",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.all(10),
-                ),
-              ),
-            ),
-          ] else ...[
-            Container(),
-          ],
+
+          // Topic Procedure TextFormFields
+          buildTopicProcedure(_tabData[index].sendButtonText),
+
           const SizedBox(
             height: 20,
           ),
-          if (_tabData[index].sendButtonText == "Publish") ...[
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                "Args",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Provider.of<ArgsProvider>(
-                                context,
-                                listen: false,
-                              ).addController();
-                            },
-                            icon: const Icon(
-                              Icons.add_box_sharp,
-                              size: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const ArgsTextFormFields(),
-              ],
-            ),
-          ] else if (_tabData[index].sendButtonText == "Call") ...[
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                "Args",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Provider.of<ArgsProvider>(
-                                context,
-                                listen: false,
-                              ).addController();
-                            },
-                            icon: const Icon(
-                              Icons.add_box_sharp,
-                              size: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const ArgsTextFormFields(),
-              ],
-            ),
-          ],
+
+          // Args
+          buildArgs(_tabData[index].sendButtonText),
+
           const SizedBox(
             height: 20,
           ),
-          if (_tabData[index].sendButtonText == "Publish") ...[
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Kwargs",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Provider.of<TableDataProvider>(
-                            context,
-                            listen: false,
-                          ).addRow({
-                            "key": "",
-                            "value": "",
-                          });
-                        },
-                        icon: const Icon(
-                          Icons.add_box_sharp,
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const DynamicKeyValuePairs(),
-              ],
-            ),
-          ] else if (_tabData[index].sendButtonText == "Call") ...[
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Kwargs",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Provider.of<TableDataProvider>(
-                            context,
-                            listen: false,
-                          ).addRow({
-                            "key": "",
-                            "value": "",
-                          });
-                        },
-                        icon: const Icon(
-                          Icons.add_box_sharp,
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const DynamicKeyValuePairs(),
-              ],
-            ),
-          ] else ...[
-            Container(),
-          ],
+
+          // K-Wargs
+          buildKwargs(_tabData[index].sendButtonText),
+
           const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.only(left: 25),
@@ -586,7 +344,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 110),
             child: MaterialButton(
-              onPressed: () async {},
+              onPressed: () {},
               color: Colors.blueAccent,
               minWidth: 200,
               shape: RoundedRectangleBorder(
@@ -610,11 +368,290 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
+  // Topic and Procedure TextFormFields Widget
+  Widget buildTopicProcedure(String sendButtonText) {
+    switch (sendButtonText) {
+      case "Publish":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: TextFormField(
+            controller: topicProcedureController,
+            decoration: InputDecoration(
+              hintText: "Enter topic here",
+              labelText: "Enter topic here",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.all(10),
+            ),
+          ),
+        );
+
+      case "Call":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: TextFormField(
+            controller: topicProcedureController,
+            decoration: InputDecoration(
+              hintText: "Enter procedure here",
+              labelText: "Enter procedure here",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.all(10),
+            ),
+          ),
+        );
+
+      case "Register":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: TextFormField(
+            controller: topicProcedureController,
+            decoration: InputDecoration(
+              hintText: "Enter procedure here",
+              labelText: "Enter procedure here",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.all(10),
+            ),
+          ),
+        );
+
+      case "Subscribe":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: TextFormField(
+            controller: topicProcedureController,
+            decoration: InputDecoration(
+              hintText: "Enter topic here",
+              labelText: "Enter topic here",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.all(10),
+            ),
+          ),
+        );
+
+      default:
+        return Container();
+    }
+  }
+
+  // Build Args Widget
+  Widget buildArgs(String argsSendButton) {
+    switch (argsSendButton) {
+      case "Publish":
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Args",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Provider.of<ArgsProvider>(
+                            context,
+                            listen: false,
+                          ).addController();
+                        },
+                        icon: const Icon(
+                          Icons.add_box_sharp,
+                          size: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const ArgsTextFormFields(),
+          ],
+        );
+
+      case "Call":
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Args",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Provider.of<ArgsProvider>(
+                            context,
+                            listen: false,
+                          ).addController();
+                        },
+                        icon: const Icon(
+                          Icons.add_box_sharp,
+                          size: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const ArgsTextFormFields(),
+          ],
+        );
+
+      default:
+        return Container();
+    }
+  }
+
+  // BUILD Kwargs Widget
+  Widget buildKwargs(String kWargSendButton) {
+    switch (kWargSendButton) {
+      case "Publish":
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Kwargs",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Provider.of<KwargsProvider>(
+                        context,
+                        listen: false,
+                      ).addRow({
+                        "key": "",
+                        "value": "",
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.add_box_sharp,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const DynamicKeyValuePairs(),
+          ],
+        );
+
+      case "Call":
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Kwargs",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Provider.of<KwargsProvider>(
+                        context,
+                        listen: false,
+                      ).addRow({
+                        "key": "",
+                        "value": "",
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.add_box_sharp,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const DynamicKeyValuePairs(),
+          ],
+        );
+
+      default:
+        return Container();
+    }
+  }
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty<TextEditingController>("linkController", linkController))
-      ..add(DiagnosticsProperty<TextEditingController>("realmController", realmController));
+      ..add(
+        DiagnosticsProperty<TextEditingController>("realmController", realmController),
+      )
+      ..add(
+        DiagnosticsProperty<TextEditingController>("topicProcedureController", topicProcedureController),
+      );
   }
 }

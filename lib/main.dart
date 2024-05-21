@@ -3,9 +3,7 @@ import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/args_provider.dart";
 import "package:xconn_ui/Providers/kwargs_provider.dart";
 import "package:xconn_ui/responsive/responsive_layout.dart";
-import "package:xconn_ui/screens/desktop/desktop_home.dart";
 import "package:xconn_ui/screens/mobile/mobile_home.dart";
-import "package:xconn_ui/screens/tablet/tablet_home.dart";
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ArgsProvider()),
-        ChangeNotifierProvider(create: (context) => TableDataProvider()),
+        ChangeNotifierProvider(create: (context) => KwargsProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -30,8 +28,8 @@ class MyApp extends StatelessWidget {
         ),
         home: const ResponsiveLayout(
           mobileScaffold: MobileHomeScaffold(),
-          tabletScaffold: TabletHomeScaffold(),
-          desktopScaffold: DesktopHomeScaffold(),
+          tabletScaffold: MobileHomeScaffold(),
+          desktopScaffold: MobileHomeScaffold(),
         ),
       ),
     );

@@ -1,11 +1,11 @@
 import "package:flutter/cupertino.dart";
 
-class TableDataProvider extends ChangeNotifier {
-  final List<Map<String, String>> _tableData = [
+class KwargsProvider extends ChangeNotifier {
+  final List<Map<String, dynamic>> _tableData = [
     {"key": "", "value": ""},
   ];
 
-  List<Map<String, String>> get tableData => _tableData;
+  List<Map<String, dynamic>> get tableData => _tableData;
 
   void addRow(Map<String, String> rowData) {
     _tableData.add(rowData);
