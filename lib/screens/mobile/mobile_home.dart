@@ -260,9 +260,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
                     hint: const Text("Serializers"),
                     items: <String>[
-                      "JSON",
-                      "CBOR",
-                      "MsgPack",
+                      jsonSerializer,
+                      cborSerializer,
+                      msgPackSerializer,
                     ].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,

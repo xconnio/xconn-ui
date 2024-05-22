@@ -13,3 +13,8 @@ Color closeIconColor = Colors.redAccent;
 const double iconSize = 15;
 const double largeIconSize = 20;
 const double horizontalPadding = 10;
+
+/// Serializers ///
+const jsonSerializer = "JSON";
+const cborSerializer = "CBOR";
+const msgPackSerializer = "MsgPack";
