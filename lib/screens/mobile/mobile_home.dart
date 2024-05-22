@@ -1,4 +1,3 @@
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:xconn_ui/Providers/args_provider.dart";
@@ -20,9 +19,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   final List<String> _tabNames = ["Tab 1"];
   final List<String> _tabContents = ["Content for Tab 1"];
   final List<TabData> _tabData = [TabData()];
-  final TextEditingController linkController = TextEditingController();
-  final TextEditingController realmController = TextEditingController();
-  final TextEditingController topicProcedureController = TextEditingController();
 
   @override
   void initState() {
@@ -53,6 +49,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     setState(() {
       _tabNames.removeAt(index);
       _tabContents.removeAt(index);
+      _tabData[index].disposeControllers();
       _tabData.removeAt(index);
 
       if (_tabController.length != _tabNames.length) {
@@ -231,7 +228,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   ),
                   Expanded(
                     child: TextFormField(
-                      controller: linkController,
+                      controller: _tabData[index].linkController,
                       decoration: const InputDecoration(
                         hintText: "Enter URL or paste text",
                         labelText: "Enter URL or paste text",
@@ -265,7 +262,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     items: <String>[
                       "JSON",
                       "CBOR",
-                      "Msg Pack",
+                      "MsgPack",
                     ].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -284,7 +281,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 ),
                 Expanded(
                   child: TextFormField(
-                    controller: realmController,
+                    controller: _tabData[index].realmController,
                     decoration: InputDecoration(
                       hintText: "Enter realm here",
                       labelText: "Enter realm here",
@@ -303,7 +300,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           ),
 
           // Topic Procedure TextFormFields
-          buildTopicProcedure(_tabData[index].sendButtonText),
+          buildTopicProcedure(_tabData[index].topicProcedureController, _tabData[index].sendButtonText),
 
           const SizedBox(
             height: 20,
@@ -320,6 +317,13 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           buildKwargs(_tabData[index].sendButtonText),
 
           const SizedBox(height: 20),
+
+          // Send Button
+          sendButton(_tabData[index].sendButtonText),
+
+          const SizedBox(
+            height: 50,
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 25),
             child: Align(
@@ -339,28 +343,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             ),
           ),
           const SizedBox(
-            height: 50,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 110),
-            child: MaterialButton(
-              onPressed: () {},
-              color: Colors.blueAccent,
-              minWidth: 200,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _tabData[index].sendButtonText,
-                style: TextStyle(
-                  color: whiteColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
             height: 40,
           ),
         ],
@@ -368,14 +350,106 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
+  // Send Button Widget
+  Widget sendButton(String sendButton) {
+    switch (sendButton) {
+      case "Publish":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 110),
+          child: MaterialButton(
+            onPressed: () {},
+            color: Colors.blueAccent,
+            minWidth: 200,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              sendButton,
+              style: TextStyle(
+                color: whiteColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+
+      case "Subscribe":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 110),
+          child: MaterialButton(
+            onPressed: () {},
+            color: Colors.blueAccent,
+            minWidth: 200,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              sendButton,
+              style: TextStyle(
+                color: whiteColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+
+      case "Call":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 110),
+          child: MaterialButton(
+            onPressed: () {},
+            color: Colors.blueAccent,
+            minWidth: 200,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              sendButton,
+              style: TextStyle(
+                color: whiteColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+
+      case "Register":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 110),
+          child: MaterialButton(
+            onPressed: () {},
+            color: Colors.blueAccent,
+            minWidth: 200,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              sendButton,
+              style: TextStyle(
+                color: whiteColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+
+      default:
+        return Container();
+    }
+  }
+
   // Topic and Procedure TextFormFields Widget
-  Widget buildTopicProcedure(String sendButtonText) {
+  Widget buildTopicProcedure(TextEditingController controller, String sendButtonText) {
     switch (sendButtonText) {
       case "Publish":
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: TextFormField(
-            controller: topicProcedureController,
+            controller: controller,
             decoration: InputDecoration(
               hintText: "Enter topic here",
               labelText: "Enter topic here",
@@ -391,7 +465,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: TextFormField(
-            controller: topicProcedureController,
+            controller: controller,
             decoration: InputDecoration(
               hintText: "Enter procedure here",
               labelText: "Enter procedure here",
@@ -407,7 +481,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: TextFormField(
-            controller: topicProcedureController,
+            controller: controller,
             decoration: InputDecoration(
               hintText: "Enter procedure here",
               labelText: "Enter procedure here",
@@ -423,7 +497,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: TextFormField(
-            controller: topicProcedureController,
+            controller: controller,
             decoration: InputDecoration(
               hintText: "Enter topic here",
               labelText: "Enter topic here",
@@ -640,18 +714,5 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       default:
         return Container();
     }
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty<TextEditingController>("linkController", linkController))
-      ..add(
-        DiagnosticsProperty<TextEditingController>("realmController", realmController),
-      )
-      ..add(
-        DiagnosticsProperty<TextEditingController>("topicProcedureController", topicProcedureController),
-      );
   }
 }

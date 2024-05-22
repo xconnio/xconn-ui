@@ -48,10 +48,10 @@ class TableWidget extends StatefulWidget {
 
 class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
-      Map<String, dynamic> rowData,
-      int index,
-      KwargsProvider kWarProvider,
-      ) {
+    Map<String, dynamic> rowData,
+    int index,
+    KwargsProvider kWarProvider,
+  ) {
     return TableRow(
       children: [
         _buildTableCell(
@@ -140,11 +140,11 @@ class _TableWidgetState extends State<TableWidget> {
         ),
         ...widget.tableData.asMap().entries.map(
               (entry) => _buildTableRow(
-            entry.value,
-            entry.key,
-            Provider.of<KwargsProvider>(context, listen: false),
-          ),
-        ),
+                entry.value,
+                entry.key,
+                Provider.of<KwargsProvider>(context, listen: false),
+              ),
+            ),
       ],
     );
   }
