@@ -406,7 +406,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   // SEND BUTTON WIDGET
-  Widget sendButton(String sendButton, int index) {
+  Widget sendButton(String sendButton, int index, [Session? session, Object? unregister]) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     switch (sendButton) {
       case "Publish":
@@ -441,6 +441,14 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     duration: Duration(seconds: 3),
                   ),
                 );
+                setState(() {
+                  _tabData[index].linkController.clear();
+                  _tabData[index].realmController.clear();
+                  _tabData[index].topicProcedureController.clear();
+                  _argsProviders[index].controllers.clear();
+                  _kwargsProviders[index].tableData.clear();
+                  _tabData[index].selectedSerializer = "";
+                });
               } on Exception catch (error) {
                 scaffoldMessenger.showSnackBar(
                   SnackBar(
@@ -471,33 +479,30 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           padding: const EdgeInsets.symmetric(horizontal: 110),
           child: MaterialButton(
             onPressed: () async {
-              try {
-                Map<String, dynamic> kWarValues = {};
-                for (final map in _kwargsProviders[index].tableData) {
-                  String key = map["key"];
-                  dynamic value = map["value"];
-                  kWarValues[key] = value;
-                }
-                var session = await connect(
-                  _tabData[index].linkController.text,
-                  _tabData[index].realmController.text,
-                  _tabData[index].selectedSerializer,
-                );
-                await session.subscribe(_tabData[index].topicProcedureController.text, (event) {});
-                scaffoldMessenger.showSnackBar(
-                  const SnackBar(
-                    content: Text("Subscribe Successful"),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              } on Exception catch (error) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text("Subscribe Error: $error"),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-              }
+              await _subscribe(index);
+            },
+            color: Colors.blueAccent,
+            minWidth: 200,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              sendButton,
+              style: TextStyle(
+                color: whiteColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+
+      case "UnSubscribe":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 110),
+          child: MaterialButton(
+            onPressed: () async {
+              await _unSubscribe(index, session, unregister);
             },
             color: Colors.blueAccent,
             minWidth: 200,
@@ -597,8 +602,84 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           ),
         );
 
+      case "UnRegister":
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 110),
+          child: MaterialButton(
+            onPressed: () async {
+              await _unRegister(index, session, unregister);
+            },
+            color: Colors.blueAccent,
+            minWidth: 200,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              sendButton,
+              style: TextStyle(
+                color: whiteColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+
       default:
         return Container();
+    }
+  }
+
+  // UNREGISTER
+  Future<void> _unRegister(int index, Session? session, var reg) async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    try {
+      await session?.unregister(reg);
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("UnRegister Successfully"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      setState(() {
+        _tabData[index].sendButtonText = "send";
+        _tabData[index].selectedSerializer = "";
+        _tabData[index].selectedValue = "";
+        Provider.of<InvocationProvider>(context, listen: false).results.clear();
+      });
+    } on Exception catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  // UNSUBSCRIBE
+  Future<void> _unSubscribe(int index, Session? session, var sub) async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    try {
+      await session?.unsubscribe(sub);
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("UnSubscribe Successfully"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      setState(() {
+        _tabData[index].sendButtonText = "send";
+        _tabData[index].selectedSerializer = "";
+        _tabData[index].selectedValue = "";
+      });
+    } on Exception catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -614,7 +695,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
       Future.delayed(const Duration(seconds: 2), () async {
         try {
-          await session.register(
+          var registration = await session.register(
             _tabData[index].topicProcedureController.text,
             (invocation) {
               String result = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
@@ -632,6 +713,16 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               duration: Duration(seconds: 3),
             ),
           );
+
+          setState(() {
+            var unregister = _tabData[index].sendButtonText = "UnRegister";
+            Future.delayed(const Duration(seconds: 1), () {
+              sendButton(unregister, index, session, registration);
+              _tabData[index].linkController.clear();
+              _tabData[index].realmController.clear();
+              _tabData[index].selectedSerializer = "";
+            });
+          });
         } on Exception catch (error) {
           scaffoldMessenger.showSnackBar(
             SnackBar(
@@ -646,6 +737,48 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         SnackBar(
           content: Text("Connection Error: $error"),
           duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  // SUBSCRIBE
+  Future<void> _subscribe(int index) async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    try {
+      Map<String, dynamic> kWarValues = {};
+      for (final map in _kwargsProviders[index].tableData) {
+        String key = map["key"];
+        dynamic value = map["value"];
+        kWarValues[key] = value;
+      }
+      var session = await connect(
+        _tabData[index].linkController.text,
+        _tabData[index].realmController.text,
+        _tabData[index].selectedSerializer,
+      );
+      var sub = await session.subscribe(_tabData[index].topicProcedureController.text, (event) {});
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("Subscribe Successful"),
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      setState(() {
+        var unregister = _tabData[index].sendButtonText = "UnSubscribe";
+        Future.delayed(const Duration(seconds: 1), () {
+          sendButton(unregister, index, session, sub);
+          _tabData[index].linkController.clear();
+          _tabData[index].realmController.clear();
+          _tabData[index].selectedSerializer = "";
+        });
+      });
+    } on Exception catch (error) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text("Subscribe Error: $error"),
+          duration: const Duration(seconds: 3),
         ),
       );
     }
