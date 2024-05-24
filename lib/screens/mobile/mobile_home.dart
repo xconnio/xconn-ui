@@ -48,8 +48,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   void _addTab() {
     setState(() {
-      int newIndex = _tabNames.length; // Start index from 0
-      _tabNames.add("Tab ${newIndex + 1}"); // Increment for display
+      int newIndex = _tabNames.length;
+      _tabNames.add("Tab ${newIndex + 1}");
       _tabContents.add("Content for Tab ${newIndex + 1}");
       _tabData.add(TabData());
       _argsProviders.add(ArgsProvider());
@@ -58,7 +58,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabController = TabController(length: _tabNames.length, vsync: this);
         _tabController.addListener(_handleTabSelection);
       }
-      _tabController.index = newIndex; // Set index to newly created tab
+      _tabController.index = newIndex;
     });
   }
 
@@ -328,16 +328,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           // Topic Procedure TextFormFields
           buildTopicProcedure(_tabData[index].topicProcedureController, _tabData[index].sendButtonText),
 
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
 
           // Args
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
 
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
 
           // K-Wargs
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
@@ -347,9 +343,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           // Send Button
           sendButton(_tabData[index].sendButtonText, index),
 
-          const SizedBox(
-            height: 50,
-          ),
+          const SizedBox(height: 50),
+
           Padding(
             padding: const EdgeInsets.only(left: 25),
             child: Align(
@@ -435,8 +430,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   _tabData[index].realmController.text,
                   _tabData[index].selectedSerializer,
                 );
-                await session.publish(_tabData[index].topicProcedureController.text,
-                    args: argsData, kwargs: formattedResult,);
+                await session.publish(
+                  _tabData[index].topicProcedureController.text,
+                  args: argsData,
+                  kwargs: formattedResult,
+                );
                 scaffoldMessenger.showSnackBar(
                   const SnackBar(
                     content: Text("Publish Successful"),
@@ -444,7 +442,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   ),
                 );
               } on Exception catch (error) {
-                // Show error message
                 scaffoldMessenger.showSnackBar(
                   SnackBar(
                     content: Text("Publish Error: $error"),
