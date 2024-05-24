@@ -18,3 +18,6 @@ build-apk:
 
 tests:
 	flutter test
+
+build-web:
+	flutter build web --release
