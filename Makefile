@@ -21,3 +21,6 @@ tests:
 
 build-web:
 	flutter build web --release
+
+build-web-ci:
+	flutter build web --release --base-href "/wick-web/"
