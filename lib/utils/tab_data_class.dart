@@ -7,6 +7,7 @@ class TabData {
     realmController.addListener(_realmControllerListener);
     topicProcedureController.addListener(_topicProcedureControllerListener);
   }
+
   String selectedValue = "";
   String selectedSerializer = "";
   String sendButtonText = "Send";

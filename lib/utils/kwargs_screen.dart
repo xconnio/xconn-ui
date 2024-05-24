@@ -5,10 +5,12 @@ import "package:xconn_ui/providers/kwargs_provider.dart";
 
 class DynamicKeyValuePairs extends StatefulWidget {
   const DynamicKeyValuePairs({required this.provider, super.key});
+
   final KwargsProvider provider;
 
   @override
   State<DynamicKeyValuePairs> createState() => _DynamicKeyValuePairsState();
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -21,9 +23,7 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
   Widget build(BuildContext context) {
     return Consumer<KwargsProvider>(
       builder: (context, tableProvider, _) {
-        // Extract key-value pairs from tableProvider.tableData
         Map<String, dynamic> kWarValues = {};
-
         for (final map in tableProvider.tableData) {
           String key = map["key"];
           dynamic value = map["value"];
@@ -66,14 +66,6 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
                               "value": "",
                             });
                           });
-                          // Provider.of<KwargsProvider>(
-                          //   context,
-                          //   listen: false,
-                          // ).
-                          // addRow({
-                          //   "key": "",
-                          //   "value": "",
-                          // });
                         },
                         icon: const Icon(
                           Icons.add_box_sharp,
@@ -101,6 +93,7 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
 
 class TableWidget extends StatefulWidget {
   const TableWidget(this.tableData, this.provider, {super.key});
+
   final List<Map<String, dynamic>> tableData;
   final KwargsProvider provider;
 
@@ -110,8 +103,9 @@ class TableWidget extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties..add(IterableProperty<Map<String, dynamic>>("tableData", tableData))
-    ..add(DiagnosticsProperty<KwargsProvider>("provider", provider));
+    properties
+      ..add(IterableProperty<Map<String, dynamic>>("tableData", tableData))
+      ..add(DiagnosticsProperty<KwargsProvider>("provider", provider));
   }
 }
 
@@ -119,7 +113,6 @@ class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
     Map<String, dynamic> rowData,
     int index,
-    // KwargsProvider kWarProvider,
   ) {
     return TableRow(
       children: [
@@ -213,7 +206,6 @@ class _TableWidgetState extends State<TableWidget> {
               (entry) => _buildTableRow(
                 entry.value,
                 entry.key,
-                // Provider.of<KwargsProvider>(context, listen: false),
               ),
             ),
       ],

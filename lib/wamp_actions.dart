@@ -28,10 +28,6 @@ Future<Session> connect(
   var serializer = _getSerializer(serializerStr);
   Client client;
 
-  // print("serializer $serializerStr");
-  // print("serializer $serializer");
-
-
   if (ticket != null) {
     client = Client(serializer: serializer, authenticator: TicketAuthenticator(ticket, authid ?? ""));
   } else if (secret != null) {
@@ -47,7 +43,6 @@ Future<Session> connect(
 
 Future<Registration> register(Session session, String procedure) {
   return session.register(procedure, (Invocation inv) {
-
     return Result();
   });
 }

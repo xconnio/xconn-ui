@@ -46,7 +46,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-
   void _addTab() {
     setState(() {
       int newIndex = _tabNames.length; // Start index from 0
@@ -62,8 +61,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       _tabController.index = newIndex; // Set index to newly created tab
     });
   }
-
-
 
   // REMOVE TABS
   void _removeTab(int index) {
@@ -81,12 +78,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       }
     });
   }
-
-
-
-
-
-
 
   @override
   void dispose() {
@@ -381,9 +372,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           Consumer<InvocationProvider>(
             builder: (context, registrationResult, _) {
               List<String> results = registrationResult.results;
-              // Filter results based on the current tab index
               List<String> tabResults = results.where((result) => result.startsWith("$index:")).toList();
-
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: tabResults.map((result) {
@@ -441,21 +430,27 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   kWarValues[key] = value;
                 }
                 Map<String, dynamic> formattedResult = kWarValues;
-                var session = await connect(_tabData[index].linkController.text, _tabData[index].realmController.text,
-                  _tabData[index].selectedSerializer,);
-                await session.publish(_tabData[index].topicProcedureController.text, args: argsData, kwargs: formattedResult);
-
-                // Show success message
-                scaffoldMessenger.showSnackBar(const SnackBar(
-                  content: Text("Publish Successful"),
-                  duration: Duration(seconds: 3),
-                ),);
+                var session = await connect(
+                  _tabData[index].linkController.text,
+                  _tabData[index].realmController.text,
+                  _tabData[index].selectedSerializer,
+                );
+                await session.publish(_tabData[index].topicProcedureController.text,
+                    args: argsData, kwargs: formattedResult,);
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text("Publish Successful"),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
               } on Exception catch (error) {
                 // Show error message
-                scaffoldMessenger.showSnackBar(SnackBar(
-                  content: Text("Publish Error: $error"),
-                  duration: const Duration(seconds: 3),
-                ),);
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text("Publish Error: $error"),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
               }
             },
             color: Colors.blueAccent,
@@ -480,30 +475,31 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           child: MaterialButton(
             onPressed: () async {
               try {
-                // Args
-                // List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
                 Map<String, dynamic> kWarValues = {};
                 for (final map in _kwargsProviders[index].tableData) {
                   String key = map["key"];
                   dynamic value = map["value"];
                   kWarValues[key] = value;
                 }
-                // Map<String, dynamic> formattedResult = kWarValues;
-                var session = await connect(_tabData[index].linkController.text, _tabData[index].realmController.text,
-                  _tabData[index].selectedSerializer,);
+                var session = await connect(
+                  _tabData[index].linkController.text,
+                  _tabData[index].realmController.text,
+                  _tabData[index].selectedSerializer,
+                );
                 await session.subscribe(_tabData[index].topicProcedureController.text, (event) {});
-
-                // Show success message
-                scaffoldMessenger.showSnackBar(const SnackBar(
-                  content: Text("Subscribe Successful"),
-                  duration: Duration(seconds: 3),
-                ),);
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text("Subscribe Successful"),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
               } on Exception catch (error) {
-
-                scaffoldMessenger.showSnackBar(SnackBar(
-                  content: Text("Subscribe Error: $error"),
-                  duration: const Duration(seconds: 3),
-                ),);
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text("Subscribe Error: $error"),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
               }
             },
             color: Colors.blueAccent,
@@ -528,7 +524,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           child: MaterialButton(
             onPressed: () async {
               try {
-                // Args
                 List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
                 Map<String, dynamic> kWarValues = {};
                 for (final map in _kwargsProviders[index].tableData) {
@@ -537,34 +532,33 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   kWarValues[key] = value;
                 }
                 Map<String, dynamic> formattedResult = kWarValues;
-                // print("vvv $formattedResult");
-
                 var session = await connect(
                   _tabData[index].linkController.text,
                   _tabData[index].realmController.text,
                   _tabData[index].selectedSerializer,
                 );
 
-                Future.delayed(const Duration(seconds: 1), (){
+                Future.delayed(const Duration(seconds: 1), () {
                   session.call(_tabData[index].topicProcedureController.text, args: argsData, kwargs: formattedResult);
                   _tabData[index].linkController.clear();
                   _tabData[index].realmController.clear();
                   _tabData[index].selectedSerializer = "";
                   _argsProviders[index].controllers.clear();
                   _kwargsProviders[index].tableData.clear();
-
                 });
-
-                // Show success message
-                scaffoldMessenger.showSnackBar(const SnackBar(
-                  content: Text("Call Successful"),
-                  duration: Duration(seconds: 3),
-                ),);
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text("Call Successful"),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
               } on Exception catch (error) {
-                scaffoldMessenger.showSnackBar(SnackBar(
-                  content: Text("Call Error: $error"),
-                  duration: const Duration(seconds: 3),
-                ),);
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text("Call Error: $error"),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
               }
             },
             color: Colors.blueAccent,
@@ -588,7 +582,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           padding: const EdgeInsets.symmetric(horizontal: 110),
           child: MaterialButton(
             onPressed: () async {
-                await _registerAndStoreResult(index);
+              await _registerAndStoreResult(index);
             },
             color: Colors.blueAccent,
             minWidth: 200,
@@ -625,8 +619,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         try {
           await session.register(
             _tabData[index].topicProcedureController.text,
-                (invocation) {
-              // Modify the result string format as per your requirement
+            (invocation) {
               String result = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
               Provider.of<InvocationProvider>(context, listen: false).addResult(result, index);
               return Result(
@@ -636,25 +629,28 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               );
             },
           );
-
-          // If registration succeeds, show success toast
-          scaffoldMessenger.showSnackBar(const SnackBar(
-            content: Text("Registration Successful"),
-            duration: Duration(seconds: 3),
-          ),);
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(
+              content: Text("Registration Successful"),
+              duration: Duration(seconds: 3),
+            ),
+          );
         } on Exception catch (error) {
-
-          scaffoldMessenger.showSnackBar(SnackBar(
-            content: Text("Registration Error: $error"),
-            duration: const Duration(seconds: 2),
-          ),);
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text("Registration Error: $error"),
+              duration: const Duration(seconds: 2),
+            ),
+          );
         }
       });
     } on Exception catch (error) {
-      scaffoldMessenger.showSnackBar(SnackBar(
-        content: Text("Connection Error: $error"),
-        duration: const Duration(seconds: 2),
-      ),);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text("Connection Error: $error"),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 

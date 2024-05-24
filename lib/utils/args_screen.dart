@@ -5,10 +5,12 @@ import "package:xconn_ui/providers/args_provider.dart";
 
 class ArgsTextFormFields extends StatefulWidget {
   const ArgsTextFormFields({required this.provider, super.key});
+
   final ArgsProvider provider;
 
   @override
   State<ArgsTextFormFields> createState() => _ArgsTextFormFieldsState();
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
