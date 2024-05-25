@@ -21,7 +21,7 @@ jobs:
         run: make install
 
       - name: Build web app
-        run: make build-web
+        run: make build-web-ci
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -31,4 +31,4 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy static site to S3 bucket
-        run: aws s3 cp ./build/web/ s3://${{ secrets.AWS_BUCKET }}/wick-web --delete
+        run: aws s3 cp ./build/web/ s3://${{ secrets.AWS_BUCKET }}/wick-web
