@@ -1,5 +1,4 @@
 import "package:flutter/cupertino.dart";
-import "package:xconn/exports.dart";
 
 class TabData {
   TabData() {
@@ -14,7 +13,6 @@ class TabData {
   TextEditingController linkController = TextEditingController();
   TextEditingController realmController = TextEditingController();
   TextEditingController topicProcedureController = TextEditingController();
-  Future<Registration>? registration;
 
   void disposeControllers() {
     linkController.dispose();
