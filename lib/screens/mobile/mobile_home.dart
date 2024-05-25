@@ -693,45 +693,34 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].selectedSerializer,
       );
 
-      Future.delayed(const Duration(seconds: 2), () async {
-        try {
-          var registration = await session.register(
-            _tabData[index].topicProcedureController.text,
-            (invocation) {
-              String result = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
-              Provider.of<InvocationProvider>(context, listen: false).addInvocation(result, index);
-              return Result();
-            },
-          );
-          scaffoldMessenger.showSnackBar(
-            const SnackBar(
-              content: Text("Registration Successful"),
-              duration: Duration(seconds: 3),
-            ),
-          );
+      var registration = await session.register(
+        _tabData[index].topicProcedureController.text,
+        (invocation) {
+          String result = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
+          Provider.of<InvocationProvider>(context, listen: false).addInvocation(result, index);
+          return Result();
+        },
+      );
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("Registration Successful"),
+          duration: Duration(seconds: 3),
+        ),
+      );
 
-          setState(() {
-            var unregister = _tabData[index].sendButtonText = "UnRegister";
-            Future.delayed(const Duration(seconds: 1), () {
-              sendButton(unregister, index, session, registration);
-              _tabData[index].linkController.clear();
-              _tabData[index].realmController.clear();
-              _tabData[index].selectedSerializer = "";
-            });
-          });
-        } on Exception catch (error) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text("Registration Error: $error"),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
+      setState(() {
+        var unregister = _tabData[index].sendButtonText = "UnRegister";
+        Future.delayed(const Duration(seconds: 1), () {
+          sendButton(unregister, index, session, registration);
+          _tabData[index].linkController.clear();
+          _tabData[index].realmController.clear();
+          _tabData[index].selectedSerializer = "";
+        });
       });
     } on Exception catch (error) {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text("Connection Error: $error"),
+          content: Text(error.toString()),
           duration: const Duration(seconds: 2),
         ),
       );
