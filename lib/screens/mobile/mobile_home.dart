@@ -366,7 +366,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
           Consumer<InvocationProvider>(
             builder: (context, registrationResult, _) {
-              List<String> results = registrationResult.results;
+              List<String> results = registrationResult.invocations;
               List<String> tabResults = results.where((result) => result.startsWith("$index:")).toList();
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -645,7 +645,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].sendButtonText = "send";
         _tabData[index].selectedSerializer = "";
         _tabData[index].selectedValue = "";
-        Provider.of<InvocationProvider>(context, listen: false).results.clear();
+        Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
       });
     } on Exception catch (e) {
       scaffoldMessenger.showSnackBar(
@@ -699,12 +699,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             _tabData[index].topicProcedureController.text,
             (invocation) {
               String result = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
-              Provider.of<InvocationProvider>(context, listen: false).addResult(result, index);
-              return Result(
-                args: invocation.args,
-                kwargs: invocation.kwargs,
-                details: invocation.details,
-              );
+              Provider.of<InvocationProvider>(context, listen: false).addInvocation(result, index);
+              return Result();
             },
           );
           scaffoldMessenger.showSnackBar(

@@ -1,14 +1,12 @@
 import "package:flutter/cupertino.dart";
 
 class InvocationProvider extends ChangeNotifier {
-  final List<String> _results = [];
+  final List<String> _invocations = [];
 
-  List<String> get results => _results;
+  List<String> get invocations => _invocations;
 
-  void addResult(String result, int index) {
-    if (!_results.contains(result)) {
-      _results.add(result);
-      notifyListeners();
-    }
+  void addInvocation(String result, int index) {
+    _invocations.add(result);
+    notifyListeners();
   }
 }
