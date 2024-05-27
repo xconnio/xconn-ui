@@ -288,9 +288,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
                     hint: const Text("Serializers"),
                     items: <String>[
-                      "JSON",
-                      "CBOR",
-                      "MsgPack",
+                      jsonSerializer,
+                      cborSerializer,
+                      msgPackSerializer,
                     ].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -732,7 +732,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].topicProcedureController.text,
         (invocation) {
           String invocations = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
-          Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations, index);
+          Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations);
           return Result();
         },
       );
@@ -777,7 +777,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       );
       var subscription = await session.subscribe(_tabData[index].topicProcedureController.text, (event) {
         String events = "$index: args=${event.args}, kwargs=${event.kwargs}";
-        Provider.of<EventProvider>(context, listen: false).addEvents(events, index);
+        Provider.of<EventProvider>(context, listen: false).addEvents(events);
       });
       scaffoldMessenger.showSnackBar(
         const SnackBar(
@@ -825,7 +825,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       var calls =
           await session.call(_tabData[index].topicProcedureController.text, args: argsData, kwargs: formattedResult);
       String result = "$index: args=${calls.args}, kwargs=${calls.kwargs}";
-      resultProvider.addResult(result, index);
+      resultProvider.addResult(result);
       _tabData[index].linkController.clear();
       _tabData[index].realmController.clear();
       _tabData[index].selectedSerializer = "";
