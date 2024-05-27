@@ -5,8 +5,8 @@ class InvocationProvider extends ChangeNotifier {
 
   List<String> get invocations => _invocations;
 
-  void addInvocation(String result, int index) {
-    _invocations.add(result);
+  void addInvocation(String invocation, int index) {
+    _invocations.add(invocation);
     notifyListeners();
   }
 }

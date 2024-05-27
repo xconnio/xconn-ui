@@ -1,10 +1,12 @@
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:xconn_ui/providers/args_provider.dart";
+import "package:xconn_ui/providers/event_provider.dart";
 import "package:xconn_ui/providers/invocation_provider.dart";
 import "package:xconn_ui/providers/kwargs_provider.dart";
+import "package:xconn_ui/providers/result_provider.dart";
 import "package:xconn_ui/responsive/responsive_layout.dart";
-import "package:xconn_ui/screens/mobile/mobile_home.dart";
+import "package:xconn_ui/screens/mobile/splash_screen.dart";
 
 void main() {
   runApp(const MyApp());
@@ -20,6 +22,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ArgsProvider()),
         ChangeNotifierProvider(create: (context) => KwargsProvider()),
         ChangeNotifierProvider(create: (context) => InvocationProvider()),
+        ChangeNotifierProvider(create: (context) => EventProvider()),
+        ChangeNotifierProvider(create: (context) => ResultProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -29,9 +33,9 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const ResponsiveLayout(
-          mobileScaffold: MobileHomeScaffold(),
-          tabletScaffold: MobileHomeScaffold(),
-          desktopScaffold: MobileHomeScaffold(),
+          mobileScaffold: SplashScreen(),
+          tabletScaffold: SplashScreen(),
+          desktopScaffold: SplashScreen(),
         ),
       ),
     );

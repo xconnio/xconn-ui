@@ -3,8 +3,10 @@ import "package:provider/provider.dart";
 import "package:xconn/exports.dart";
 import "package:xconn_ui/constants.dart";
 import "package:xconn_ui/providers/args_provider.dart";
+import "package:xconn_ui/providers/event_provider.dart";
 import "package:xconn_ui/providers/invocation_provider.dart";
 import "package:xconn_ui/providers/kwargs_provider.dart";
+import "package:xconn_ui/providers/result_provider.dart";
 import "package:xconn_ui/utils/args_screen.dart";
 import "package:xconn_ui/utils/kwargs_screen.dart";
 import "package:xconn_ui/utils/tab_data_class.dart";
@@ -286,9 +288,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
                     hint: const Text("Serializers"),
                     items: <String>[
-                      jsonSerializer,
-                      cborSerializer,
-                      msgPackSerializer,
+                      "JSON",
+                      "CBOR",
+                      "MsgPack",
                     ].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -345,32 +347,101 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
           const SizedBox(height: 50),
 
-          Padding(
-            padding: const EdgeInsets.only(left: 25),
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: SizedBox(
-                height: 30,
-                width: MediaQuery.of(context).size.width,
-                child: Text(
-                  "Result",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor,
+          if (_tabData[index].sendButtonText == "Publish")
+            Container()
+          else
+            Padding(
+              padding: const EdgeInsets.only(left: 25),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  height: 30,
+                  width: MediaQuery.of(context).size.width,
+                  child: Text(
+                    "Result",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: blackColor,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
           Consumer<InvocationProvider>(
-            builder: (context, registrationResult, _) {
-              List<String> results = registrationResult.invocations;
-              List<String> tabResults = results.where((result) => result.startsWith("$index:")).toList();
+            builder: (context, invocationResult, _) {
+              List<String> results = invocationResult.invocations;
+              List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: tabResults.map((result) {
+                children: invocationRslt.map((invocation) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          invocation,
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: blackColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+          Consumer<EventProvider>(
+            builder: (context, eventResult, _) {
+              List<String> results = eventResult.events;
+              List<String> eventRslt = results.where((result) => result.startsWith("$index:")).toList();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: eventRslt.map((event) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          event,
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: blackColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+          Consumer<ResultProvider>(
+            builder: (context, callResult, _) {
+              List<String> results = callResult.results;
+              List<String> callRslt = results.where((result) => result.startsWith("$index:")).toList();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: callRslt.map((result) {
                   return Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
@@ -525,43 +596,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           padding: const EdgeInsets.symmetric(horizontal: 110),
           child: MaterialButton(
             onPressed: () async {
-              try {
-                List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-                Map<String, dynamic> kWarValues = {};
-                for (final map in _kwargsProviders[index].tableData) {
-                  String key = map["key"];
-                  dynamic value = map["value"];
-                  kWarValues[key] = value;
-                }
-                Map<String, dynamic> formattedResult = kWarValues;
-                var session = await connect(
-                  _tabData[index].linkController.text,
-                  _tabData[index].realmController.text,
-                  _tabData[index].selectedSerializer,
-                );
-
-                Future.delayed(const Duration(seconds: 1), () {
-                  session.call(_tabData[index].topicProcedureController.text, args: argsData, kwargs: formattedResult);
-                  _tabData[index].linkController.clear();
-                  _tabData[index].realmController.clear();
-                  _tabData[index].selectedSerializer = "";
-                  _argsProviders[index].controllers.clear();
-                  _kwargsProviders[index].tableData.clear();
-                });
-                scaffoldMessenger.showSnackBar(
-                  const SnackBar(
-                    content: Text("Call Successful"),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              } on Exception catch (error) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text("Call Error: $error"),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-              }
+              await _call(index);
             },
             color: Colors.blueAccent,
             minWidth: 200,
@@ -696,26 +731,24 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       var registration = await session.register(
         _tabData[index].topicProcedureController.text,
         (invocation) {
-          String result = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
-          Provider.of<InvocationProvider>(context, listen: false).addInvocation(result, index);
+          String invocations = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
+          Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations, index);
           return Result();
         },
       );
       scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text("Registration Successful"),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
 
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
-        Future.delayed(const Duration(seconds: 1), () {
-          sendButton(unregister, index, session, registration);
-          _tabData[index].linkController.clear();
-          _tabData[index].realmController.clear();
-          _tabData[index].selectedSerializer = "";
-        });
+        sendButton(unregister, index, session, registration);
+        _tabData[index].linkController.clear();
+        _tabData[index].realmController.clear();
+        _tabData[index].selectedSerializer = "";
       });
     } on Exception catch (error) {
       scaffoldMessenger.showSnackBar(
@@ -742,28 +775,74 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].realmController.text,
         _tabData[index].selectedSerializer,
       );
-      var sub = await session.subscribe(_tabData[index].topicProcedureController.text, (event) {});
+      var subscription = await session.subscribe(_tabData[index].topicProcedureController.text, (event) {
+        String events = "$index: args=${event.args}, kwargs=${event.kwargs}";
+        Provider.of<EventProvider>(context, listen: false).addEvents(events, index);
+      });
       scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text("Subscribe Successful"),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
 
       setState(() {
-        var unregister = _tabData[index].sendButtonText = "UnSubscribe";
-        Future.delayed(const Duration(seconds: 1), () {
-          sendButton(unregister, index, session, sub);
-          _tabData[index].linkController.clear();
-          _tabData[index].realmController.clear();
-          _tabData[index].selectedSerializer = "";
-        });
+        var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";
+        sendButton(unsubscribe, index, session, subscription);
+        _tabData[index].linkController.clear();
+        _tabData[index].realmController.clear();
+        _tabData[index].selectedSerializer = "";
       });
     } on Exception catch (error) {
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text("Subscribe Error: $error"),
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  // CALL
+  Future<void> _call(int index) async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    var resultProvider = Provider.of<ResultProvider>(context, listen: false);
+    try {
+      List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+      Map<String, dynamic> kWarValues = {};
+      for (final map in _kwargsProviders[index].tableData) {
+        String key = map["key"];
+        dynamic value = map["value"];
+        kWarValues[key] = value;
+      }
+      Map<String, dynamic> formattedResult = kWarValues;
+      var session = await connect(
+        _tabData[index].linkController.text,
+        _tabData[index].realmController.text,
+        _tabData[index].selectedSerializer,
+      );
+
+      var calls =
+          await session.call(_tabData[index].topicProcedureController.text, args: argsData, kwargs: formattedResult);
+      String result = "$index: args=${calls.args}, kwargs=${calls.kwargs}";
+      resultProvider.addResult(result, index);
+      _tabData[index].linkController.clear();
+      _tabData[index].realmController.clear();
+      _tabData[index].selectedSerializer = "";
+      _argsProviders[index].controllers.clear();
+      _kwargsProviders[index].tableData.clear();
+
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("Call Successful"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } on Exception catch (error) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text("Call Error: $error"),
+          duration: const Duration(seconds: 2),
         ),
       );
     }

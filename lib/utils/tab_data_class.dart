@@ -2,7 +2,6 @@ import "package:flutter/cupertino.dart";
 
 class TabData {
   TabData();
-
   String selectedValue = "";
   String selectedSerializer = "";
   String sendButtonText = "Send";
