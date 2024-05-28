@@ -72,7 +72,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "XConn",
+          "Wick",
           style: TextStyle(color: homeAppBarTextColor, fontSize: 15),
         ),
         actions: [
