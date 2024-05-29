@@ -1,14 +1,12 @@
 import "package:flutter/cupertino.dart";
 
 class TabData {
-  TabData() {
-    linkController.addListener(_linkControllerListener);
-    realmController.addListener(_realmControllerListener);
-    topicProcedureController.addListener(_topicProcedureControllerListener);
-  }
+  TabData();
+
   String selectedValue = "";
   String selectedSerializer = "";
   String sendButtonText = "Send";
+  List<String>? callRslt = [];
   TextEditingController linkController = TextEditingController();
   TextEditingController realmController = TextEditingController();
   TextEditingController topicProcedureController = TextEditingController();
@@ -18,10 +16,4 @@ class TabData {
     realmController.dispose();
     topicProcedureController.dispose();
   }
-
-  void _linkControllerListener() {}
-
-  void _realmControllerListener() {}
-
-  void _topicProcedureControllerListener() {}
 }

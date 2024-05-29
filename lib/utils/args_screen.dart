@@ -1,26 +1,74 @@
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:provider/provider.dart";
-import "package:xconn_ui/Providers/args_provider.dart";
 import "package:xconn_ui/constants.dart";
+import "package:xconn_ui/providers/args_provider.dart";
 
-class ArgsTextFormFields extends StatelessWidget {
-  const ArgsTextFormFields({super.key});
+class ArgsTextFormFields extends StatefulWidget {
+  const ArgsTextFormFields({required this.provider, super.key});
+
+  final ArgsProvider provider;
 
   @override
+  State<ArgsTextFormFields> createState() => _ArgsTextFormFieldsState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<ArgsProvider>("provider", provider));
+  }
+}
+
+class _ArgsTextFormFieldsState extends State<ArgsTextFormFields> {
+  @override
   Widget build(BuildContext context) {
-    return Consumer<ArgsProvider>(
-      builder: (context, model, _) {
-        return SizedBox(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    "Args",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    widget.provider.addController();
+                  });
+                },
+                icon: const Icon(
+                  Icons.add_box_sharp,
+                  size: 24,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
           height: 120,
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: model.controllers.length,
+            itemCount: widget.provider.controllers.length,
             itemBuilder: (context, index) {
               return ListTile(
                 title: SizedBox(
                   height: 45,
                   child: TextFormField(
-                    controller: model.controllers[index],
+                    controller: widget.provider.controllers[index],
                     decoration: InputDecoration(
                       labelText: "Enter args here",
                       labelStyle: TextStyle(color: blackColor),
@@ -40,7 +88,11 @@ class ArgsTextFormFields extends StatelessWidget {
                 ),
                 trailing: InkWell(
                   hoverColor: Colors.blue.shade200,
-                  onTap: () => model.removeController(index),
+                  onTap: () {
+                    setState(() {
+                      widget.provider.removeController(index);
+                    });
+                  },
                   child: Icon(
                     Icons.delete,
                     color: closeIconColor,
@@ -49,8 +101,14 @@ class ArgsTextFormFields extends StatelessWidget {
               );
             },
           ),
-        );
-      },
+        ),
+      ],
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<ArgsProvider>("provider", widget.provider));
   }
 }
