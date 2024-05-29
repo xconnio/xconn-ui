@@ -21,7 +21,7 @@ class MobileHomeScaffold extends StatefulWidget {
 
 class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _tabNames = ["Tab 1"];
+  final List<String> _tabNames = ["Tab"];
   final List<String> _tabContents = ["Content for Tab 1"];
   final List<TabData> _tabData = [TabData()];
   final List<ArgsProvider> _argsProviders = [];
@@ -51,7 +51,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   void _addTab() {
     setState(() {
       int newIndex = _tabNames.length;
-      _tabNames.add("Tab ${newIndex + 1}");
+      _tabNames.add("Tab ");
       _tabContents.add("Content for Tab ${newIndex + 1}");
       _tabData.add(TabData());
       _argsProviders.add(ArgsProvider());
@@ -347,27 +347,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
           const SizedBox(height: 50),
 
-          if (_tabData[index].sendButtonText == "Publish")
-            Container()
-          else
-            Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                  height: 30,
-                  width: MediaQuery.of(context).size.width,
-                  child: Text(
-                    "Result",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: blackColor,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          resultText(_tabData[index].sendButtonText),
 
           Consumer<InvocationProvider>(
             builder: (context, invocationResult, _) {
@@ -438,10 +418,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           Consumer<ResultProvider>(
             builder: (context, callResult, _) {
               List<String> results = callResult.results;
-              List<String> callRslt = results.where((result) => result.startsWith("$index:")).toList();
+              _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: callRslt.map((result) {
+                children: _tabData[index].callRslt!.map((result) {
                   return Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
@@ -468,12 +448,121 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               );
             },
           ),
+
           const SizedBox(
             height: 20,
           ),
         ],
       ),
     );
+  }
+
+  // RESULT TEXT
+  Widget resultText(String buttonText) {
+    switch (buttonText) {
+      case "Register":
+        return Padding(
+          padding: const EdgeInsets.only(left: 25),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              height: 30,
+              width: MediaQuery.of(context).size.width,
+              child: Text(
+                "Invocation",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ),
+        );
+
+      case "UnRegister":
+        return Padding(
+          padding: const EdgeInsets.only(left: 25),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              height: 30,
+              width: MediaQuery.of(context).size.width,
+              child: Text(
+                "Invocation",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ),
+        );
+
+      case "Call":
+        return Padding(
+          padding: const EdgeInsets.only(left: 25),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              height: 30,
+              width: MediaQuery.of(context).size.width,
+              child: Text(
+                "Result",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ),
+        );
+
+      case "Subscribe":
+        return Padding(
+          padding: const EdgeInsets.only(left: 25),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              height: 30,
+              width: MediaQuery.of(context).size.width,
+              child: Text(
+                "Event",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ),
+        );
+
+      case "UnSubscribe":
+        return Padding(
+          padding: const EdgeInsets.only(left: 25),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              height: 30,
+              width: MediaQuery.of(context).size.width,
+              child: Text(
+                "Event",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: blackColor,
+                ),
+              ),
+            ),
+          ),
+        );
+
+      default:
+        return Container();
+    }
   }
 
   // SEND BUTTON WIDGET
@@ -803,7 +892,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // CALL
   Future<void> _call(int index) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     var resultProvider = Provider.of<ResultProvider>(context, listen: false);
@@ -821,6 +909,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].realmController.text,
         _tabData[index].selectedSerializer,
       );
+
+      setState(() {
+        resultProvider.results.clear();
+      });
 
       var calls =
           await session.call(_tabData[index].topicProcedureController.text, args: argsData, kwargs: formattedResult);
@@ -848,7 +940,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // BUILD TOPIC PROCEDURE WIDGET
   Widget buildTopicProcedure(TextEditingController controller, String sendButtonText) {
     switch (sendButtonText) {
       case "Publish":
@@ -920,7 +1011,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // BUILD ARGS WIDGET
   Widget buildArgs(String argsSendButton, ArgsProvider argsProvider) {
     switch (argsSendButton) {
       case "Publish":
@@ -938,7 +1028,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // BUILD KWARGS WIDGET
   Widget buildKwargs(String kWargSendButton, KwargsProvider kwargsProvider) {
     switch (kWargSendButton) {
       case "Publish":

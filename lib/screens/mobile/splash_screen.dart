@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     Timer(
       const Duration(seconds: 3),
-      () async => Navigator.push(
+      () async => Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const MobileHomeScaffold(),

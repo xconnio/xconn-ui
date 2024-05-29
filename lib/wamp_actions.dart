@@ -40,21 +40,3 @@ Future<Session> connect(
 
   return client.connect(url, realm);
 }
-
-Future<Registration> register(Session session, String procedure) {
-  return session.register(procedure, (Invocation inv) {
-    return Result();
-  });
-}
-
-Future<Result> call(Session session, String procedure, {List? args, Map<String, dynamic>? kwargs}) {
-  return session.call(procedure, args: args, kwargs: kwargs);
-}
-
-Future<Subscription> subscribe(Session session, String topic) {
-  return session.subscribe(topic, (Event event) {});
-}
-
-Future<void>? publish(Session session, String topic, {List? args, Map<String, dynamic>? kwargs}) {
-  return session.publish(topic, args: args, kwargs: kwargs);
-}
