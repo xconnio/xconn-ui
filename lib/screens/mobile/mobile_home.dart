@@ -11,7 +11,7 @@ import "package:xconn_ui/providers/session_states_provider.dart";
 import "package:xconn_ui/utils/args_screen.dart";
 import "package:xconn_ui/utils/kwargs_screen.dart";
 import "package:xconn_ui/utils/tab_data_class.dart";
-import "package:xconn_ui/wamp_actions.dart";
+import "package:xconn_ui/wamp_util.dart";
 
 class MobileHomeScaffold extends StatefulWidget {
   const MobileHomeScaffold({super.key});
