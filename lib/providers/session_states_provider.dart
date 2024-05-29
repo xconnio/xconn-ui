@@ -20,9 +20,8 @@ class SessionStateProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setUnSubscribe(Object? unsubscribe){
+  void setUnSubscribe(Object? unsubscribe) {
     _unSubscribe = unsubscribe;
     notifyListeners();
   }
-
 }

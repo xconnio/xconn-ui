@@ -566,7 +566,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-
   Widget sendButton(String sendButton, int index) {
     var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -832,8 +831,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
       );
 
-    sessionProvider..setSession(session)
-    ..setUnregister(registration);
+      sessionProvider
+        ..setSession(session)
+        ..setUnregister(registration);
 
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
@@ -878,8 +878,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
       );
 
-      sessionProvider..setSession(session)
-      ..setUnSubscribe(subscription);
+      sessionProvider
+        ..setSession(session)
+        ..setUnSubscribe(subscription);
 
       setState(() {
         var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";
