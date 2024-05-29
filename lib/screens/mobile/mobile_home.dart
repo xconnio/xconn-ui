@@ -7,6 +7,7 @@ import "package:xconn_ui/providers/event_provider.dart";
 import "package:xconn_ui/providers/invocation_provider.dart";
 import "package:xconn_ui/providers/kwargs_provider.dart";
 import "package:xconn_ui/providers/result_provider.dart";
+import "package:xconn_ui/providers/session_states_provider.dart";
 import "package:xconn_ui/utils/args_screen.dart";
 import "package:xconn_ui/utils/kwargs_screen.dart";
 import "package:xconn_ui/utils/tab_data_class.dart";
@@ -565,8 +566,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // SEND BUTTON WIDGET
-  Widget sendButton(String sendButton, int index, [Session? session, Object? unregister]) {
+
+  Widget sendButton(String sendButton, int index) {
+    var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     switch (sendButton) {
       case "Publish":
@@ -662,7 +664,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           padding: const EdgeInsets.symmetric(horizontal: 110),
           child: MaterialButton(
             onPressed: () async {
-              await _unSubscribe(index, session, unregister);
+              await _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription);
             },
             color: Colors.blueAccent,
             minWidth: 200,
@@ -731,7 +733,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           padding: const EdgeInsets.symmetric(horizontal: 110),
           child: MaterialButton(
             onPressed: () async {
-              await _unRegister(index, session, unregister);
+              await _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister);
             },
             color: Colors.blueAccent,
             minWidth: 200,
@@ -754,7 +756,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // UNREGISTER
   Future<void> _unRegister(int index, Session? session, var reg) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
@@ -781,7 +782,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // UNSUBSCRIBE
   Future<void> _unSubscribe(int index, Session? session, var sub) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
@@ -807,9 +807,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // REGISTER AND STORE RESULT FUNCTION
   Future<void> _registerAndStoreResult(int index) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     try {
       var session = await connect(
         _tabData[index].linkController.text,
@@ -832,9 +832,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
       );
 
+    sessionProvider..setSession(session)
+    ..setUnregister(registration);
+
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
-        sendButton(unregister, index, session, registration);
+        sendButton(unregister, index);
         _tabData[index].linkController.clear();
         _tabData[index].realmController.clear();
         _tabData[index].selectedSerializer = "";
@@ -849,9 +852,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  // SUBSCRIBE
   Future<void> _subscribe(int index) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     try {
       Map<String, dynamic> kWarValues = {};
       for (final map in _kwargsProviders[index].tableData) {
@@ -875,9 +878,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
       );
 
+      sessionProvider..setSession(session)
+      ..setUnSubscribe(subscription);
+
       setState(() {
         var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";
-        sendButton(unsubscribe, index, session, subscription);
+        sendButton(unsubscribe, index);
         _tabData[index].linkController.clear();
         _tabData[index].realmController.clear();
         _tabData[index].selectedSerializer = "";

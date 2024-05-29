@@ -5,6 +5,7 @@ import "package:xconn_ui/providers/event_provider.dart";
 import "package:xconn_ui/providers/invocation_provider.dart";
 import "package:xconn_ui/providers/kwargs_provider.dart";
 import "package:xconn_ui/providers/result_provider.dart";
+import "package:xconn_ui/providers/session_states_provider.dart";
 import "package:xconn_ui/responsive/responsive_layout.dart";
 import "package:xconn_ui/screens/mobile/splash_screen.dart";
 
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => InvocationProvider()),
         ChangeNotifierProvider(create: (context) => EventProvider()),
         ChangeNotifierProvider(create: (context) => ResultProvider()),
+        ChangeNotifierProvider(create: (context) => SessionStateProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

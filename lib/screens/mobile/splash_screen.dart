@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _animationController.forward();
 
     Timer(
-      const Duration(seconds: 3),
+      const Duration(seconds: 2),
       () async => Navigator.pushReplacement(
         context,
         MaterialPageRoute(
