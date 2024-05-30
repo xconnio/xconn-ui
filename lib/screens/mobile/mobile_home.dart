@@ -7,7 +7,10 @@ import "package:xconn_ui/providers/event_provider.dart";
 import "package:xconn_ui/providers/invocation_provider.dart";
 import "package:xconn_ui/providers/kwargs_provider.dart";
 import "package:xconn_ui/providers/result_provider.dart";
+import "package:xconn_ui/providers/router_state_provider.dart";
+import "package:xconn_ui/providers/router_toggleswitch_provider.dart";
 import "package:xconn_ui/providers/session_states_provider.dart";
+import "package:xconn_ui/screens/mobile/router_dialogbox.dart";
 import "package:xconn_ui/utils/args_screen.dart";
 import "package:xconn_ui/utils/kwargs_screen.dart";
 import "package:xconn_ui/utils/tab_data_class.dart";
@@ -36,12 +39,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     _initializeProviders();
   }
 
-  // HANDLE TABS SELECTION
   void _handleTabSelection() {
     setState(() {});
   }
 
-  // INITIALIZE PROVIDERS
   void _initializeProviders() {
     for (final _ in _tabNames) {
       _argsProviders.add(ArgsProvider());
@@ -65,7 +66,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     });
   }
 
-  // REMOVE TABS
   void _removeTab(int index) {
     setState(() {
       _tabNames.removeAt(index);
@@ -98,6 +98,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   @override
   Widget build(BuildContext context) {
+    var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -110,6 +111,93 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
         automaticallyImplyLeading: false,
         actions: [
+          Consumer<RouterToggleSwitchProvider>(
+            builder: (context, routerResult, _) {
+              var scaffoldMessenger = ScaffoldMessenger.of(context);
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+                child: Row(
+                  children: [
+                    Text(
+                      "Router",
+                      style: TextStyle(color: homeAppBarTextColor, fontSize: iconSize),
+                    ),
+                    const SizedBox(width: 5),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: Switch(
+                        activeColor: blueAccentColor,
+                        value: routerResult.isSelected,
+                        onChanged: (value) async {
+                          if (value) {
+                            await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const RouterDialogBox();
+                              },
+                            );
+
+                            if (routerResult.isServerStarted) {
+                              routerResult.toggleSwitch(value: true);
+                            } else {
+                              scaffoldMessenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text("Failed to start the server."),
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          } else {
+                            await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    "Router Connection",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: homeAppBarTextColor,
+                                      fontSize: iconSize,
+                                    ),
+                                  ),
+                                  content: InkWell(
+                                    onTap: () {
+                                      routerProvider.serverRouter.close();
+                                      routerResult.setServerStarted(started: false);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Container(
+                                      height: 35,
+                                      width: MediaQuery.of(context).size.width,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            blueAccentColor,
+                                            Colors.lightBlue,
+                                          ],
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Close",
+                                        style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                            routerResult.toggleSwitch(value: false);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 15),
             child: IconButton(
@@ -151,7 +239,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  // Delete Tab
   Widget _buildTabWithDeleteButton(int index, String tabName) {
     final isSelected = _tabController.index == index;
     return GestureDetector(
@@ -463,7 +550,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  // RESULT TEXT
   Widget resultText(String buttonText) {
     switch (buttonText) {
       case "Register":
@@ -774,6 +860,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].sendButtonText = "send";
         _tabData[index].selectedSerializer = "";
         _tabData[index].selectedValue = "";
+        _tabData[index].topicProcedureController.clear();
         Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
       });
     } on Exception catch (e) {

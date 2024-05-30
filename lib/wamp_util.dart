@@ -41,12 +41,8 @@ Future<Session> connect(
   return client.connect(url, realm);
 }
 
-Future<void> startRouter(String host, int port, List<String> realms) {
+Server startRouter(String host, int port, List<String> realms) {
   var r = Router();
-
   realms.forEach(r.addRealm);
-
-  Server s = Server(r);
-
-  return s.start(host, port);
+  return Server(r);
 }
