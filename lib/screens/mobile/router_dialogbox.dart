@@ -20,9 +20,9 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
 
   @override
   Widget build(BuildContext context) {
-    var realmProvider = Provider.of<RouterRealmProvider>(context, listen: false);
-    var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
-    var switchProvider = Provider.of<RouterToggleSwitchProvider>(context, listen: false);
+    final realmProvider = context.read<RouterRealmProvider>();
+    final routerProvider = context.read<RouterStateProvider>();
+    final switchProvider = context.read<RouterToggleSwitchProvider>();
     return AlertDialog(
       scrollable: true,
       title: Text(
@@ -31,42 +31,123 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
       ),
       content: Form(
         key: _formKey,
-        // autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextFormField(
-              cursorColor: blueAccentColor,
-              controller: realmProvider.hostController,
-              decoration: InputDecoration(
-                labelText: "Enter host url here",
-                labelStyle: TextStyle(color: blackColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: blackColor),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Please enter host url";
-                }
-                return null;
-              },
-            ),
+            _buildHostField(realmProvider),
             const SizedBox(height: 10),
-            TextFormField(
-              keyboardType: TextInputType.number,
+            _buildPortField(realmProvider),
+            const SizedBox(height: 10),
+            _buildRealmsSection(realmProvider),
+            _buildRealmsList(realmProvider),
+            _buildActionButtons(context, realmProvider, routerProvider, switchProvider),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHostField(RouterRealmProvider realmProvider) {
+    return TextFormField(
+      cursorColor: blueAccentColor,
+      controller: realmProvider.hostController,
+      decoration: InputDecoration(
+        labelText: "Enter host url here",
+        labelStyle: TextStyle(color: blackColor),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: blackColor),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Please enter host url";
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPortField(RouterRealmProvider realmProvider) {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      cursorColor: blueAccentColor,
+      controller: realmProvider.portController,
+      decoration: InputDecoration(
+        labelText: "Enter port here",
+        labelStyle: TextStyle(color: blackColor),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: blackColor),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Please enter port";
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildRealmsSection(RouterRealmProvider realmProvider) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Realms",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              setState(realmProvider.addController);
+            },
+            icon: const Icon(Icons.add_box_sharp, size: 24),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRealmsList(RouterRealmProvider realmProvider) {
+    return SizedBox(
+      height: 180,
+      width: MediaQuery.of(context).size.width,
+      child: ListView.builder(
+        itemCount: realmProvider.realmControllers.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: TextFormField(
               cursorColor: blueAccentColor,
-              controller: realmProvider.portController,
+              controller: realmProvider.realmControllers[index],
               decoration: InputDecoration(
-                labelText: "Enter port here",
+                labelText: "Enter realm here",
                 labelStyle: TextStyle(color: blackColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -82,249 +163,130 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return "Please enter port";
+                  return "Please enter realm here";
                 }
                 return null;
               },
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        "Realms",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        realmProvider.addController();
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.add_box_sharp,
-                      size: 24,
-                    ),
-                  ),
-                ],
+            trailing: InkWell(
+              hoverColor: Colors.blue.shade200,
+              onTap: () {
+                setState(() {
+                  realmProvider.removeController(index);
+                });
+              },
+              child: Icon(
+                Icons.delete,
+                color: closeIconColor,
               ),
             ),
-            SizedBox(
-              height: 180,
-              width: MediaQuery.of(context).size.width,
-              child: ListView.builder(
-                itemCount: realmProvider.realmControllers.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: TextFormField(
-                      cursorColor: blueAccentColor,
-                      controller: realmProvider.realmControllers[index],
-                      decoration: InputDecoration(
-                        labelText: "Enter realm here",
-                        labelStyle: TextStyle(color: blackColor),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: blackColor),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter realm here";
-                        }
-                        return null;
-                      },
-                    ),
-                    trailing: InkWell(
-                      hoverColor: Colors.blue.shade200,
-                      onTap: () {
-                        setState(() {
-                          realmProvider.removeController(index);
-                        });
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: closeIconColor,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+          );
+        },
+      ),
+    );
+  }
 
-            // InkWell(
-            //   onTap: () async {
-            //     final scaffoldMessenger = ScaffoldMessenger.of(context);
-            //     if (_formKey.currentState!.validate()) {
-            //       List<String> realms = realmProvider.realmControllers.map((controller) => controller.text).toList();
-            //       String host = realmProvider.portController.text.trim();
-            //       int? port;
-            //       Navigator.of(context).pop();
-            //       try {
-            //         port = int.parse(host.trim());
-            //         print("realm $realms");
-            //         print("host ${realmProvider.hostController.text}");
-            //         print("port $port");
-            //         await startRouter(
-            //           realmProvider.hostController.text, port, realms,);
-            //
-            //           Navigator.of(context).pop();
-            //           await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MobileHomeScaffold()));
-            //         Future.delayed(const Duration(seconds: 2), (){
-            //           Fluttertoast.showToast(
-            //             msg: "Server is running on this host: ${realmProvider.hostController.text} and on this port $port",
-            //             toastLength: Toast.LENGTH_SHORT,
-            //             gravity: ToastGravity.BOTTOM,
-            //             timeInSecForIosWeb: 1,
-            //             backgroundColor: Colors.green,
-            //             textColor: Colors.white,
-            //             fontSize: 16,
-            //           );
-            //
-            //         });
-            //
-            //
-            //       } on Exception catch (e) {
-            //         scaffoldMessenger.showSnackBar(
-            //           SnackBar(
-            //             content: Text("Error is: $e"),
-            //             duration: const Duration(seconds: 3),
-            //           ),
-            //         );
-            //         print(e);
-            //       }
-            //
-            //     }
-            //   },
-            //   child: Container(
-            //     height: 35,
-            //     width: MediaQuery.of(context).size.width,
-            //     alignment: Alignment.center,
-            //     decoration: BoxDecoration(
-            //       borderRadius: BorderRadius.circular(5),
-            //       gradient: LinearGradient(
-            //         colors: [
-            //           blueAccentColor,
-            //           Colors.lightBlue,
-            //         ],
-            //       ),
-            //     ),
-            //     child: Text(
-            //       "Start",
-            //       style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
-            //     ),
-            //   ),
-            // ),
+  Widget _buildActionButtons(
+    BuildContext context,
+    RouterRealmProvider realmProvider,
+    RouterStateProvider routerProvider,
+    RouterToggleSwitchProvider switchProvider,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildCloseButton(context),
+        _buildStartButton(context, realmProvider, routerProvider, switchProvider),
+      ],
+    );
+  }
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InkWell(
-                  onTap: () async {
-                    await Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
-                    );
-                  },
-                  child: Container(
-                    height: 35,
-                    width: 100,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: closeIconColor.withOpacity(0.3)),
-                    ),
-                    child: Text(
-                      "Close",
-                      style: TextStyle(color: blackColor, fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
+  Widget _buildCloseButton(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        await Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
+        );
+      },
+      child: Container(
+        height: 35,
+        width: 100,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: closeIconColor.withOpacity(0.3)),
+        ),
+        child: Text(
+          "Close",
+          style: TextStyle(color: blackColor, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStartButton(
+    BuildContext context,
+    RouterRealmProvider realmProvider,
+    RouterStateProvider routerProvider,
+    RouterToggleSwitchProvider switchProvider,
+  ) {
+    return InkWell(
+      onTap: () async {
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+        if (_formKey.currentState!.validate()) {
+          switchProvider.setServerStarted(started: true);
+          final realms = realmProvider.realmControllers.map((controller) => controller.text).toList();
+          final host = realmProvider.portController.text.trim();
+          int port;
+          try {
+            port = int.parse(host);
+            final router = startRouter(
+              realmProvider.hostController.text,
+              port,
+              realms,
+            );
+            routerProvider.setServerRouter(router);
+            unawaited(router.start(realmProvider.hostController.text, port));
+            realmProvider.resetControllers();
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text(
+                  "Server is running on this host localhost: ${realmProvider.hostController.text} and on this port $port",
                 ),
-                InkWell(
-                  onTap: () async {
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    if (_formKey.currentState!.validate()) {
-                      switchProvider.setServerStarted(started: true);
-                      List<String> realms =
-                          realmProvider.realmControllers.map((controller) => controller.text).toList();
-                      String host = realmProvider.portController.text.trim();
-                      int port;
-                      try {
-                        port = int.parse(host.trim());
-                        var router = startRouter(
-                          realmProvider.hostController.text,
-                          port,
-                          realms,
-                        );
-                        scaffoldMessenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "Server is running on this host localhost: ${realmProvider.hostController.text}   and on this port $port",
-                            ),
-                            duration: const Duration(seconds: 3),
-                          ),
-                        );
-                        routerProvider.setServerRouter(router);
-                        unawaited(router.start(realmProvider.hostController.text, port));
-                        realmProvider.resetControllers();
-                        await Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
-                        );
-                      } on Exception catch (e) {
-                        scaffoldMessenger.showSnackBar(
-                          SnackBar(
-                            content: Text("Error is: $e"),
-                            duration: const Duration(seconds: 3),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  child: Container(
-                    height: 35,
-                    width: 100,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      gradient: LinearGradient(
-                        colors: [
-                          blueAccentColor,
-                          Colors.lightBlue,
-                        ],
-                      ),
-                    ),
-                    child: Text(
-                      "Start",
-                      style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+                duration: const Duration(seconds: 3),
+              ),
+            );
+            await Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
+            );
+          } on Exception catch (e) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error is: $e"),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        }
+      },
+      child: Container(
+        height: 35,
+        width: 100,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          gradient: const LinearGradient(
+            colors: [
+              Colors.blueAccent,
+              Colors.lightBlue,
+            ],
+          ),
+        ),
+        child: Text(
+          "Start",
+          style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );
