@@ -34,9 +34,29 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildHostField(realmProvider),
+            _buildTextFormField(
+              controller: realmProvider.hostController,
+              labelText: "Enter host here",
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter host here";
+                }
+                return "";
+              },
+              keyboardType: TextInputType.text,
+            ),
             const SizedBox(height: 10),
-            _buildPortField(realmProvider),
+            _buildTextFormField(
+              controller: realmProvider.portController,
+              labelText: "Enter port here",
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please enter port here";
+                }
+                return "";
+              },
+              keyboardType: TextInputType.number,
+            ),
             const SizedBox(height: 10),
             _buildRealmsSection(realmProvider),
             _buildRealmsList(realmProvider),
@@ -47,12 +67,18 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
     );
   }
 
-  Widget _buildHostField(RouterRealmProvider realmProvider) {
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String labelText,
+    required String? Function(String?) validator,
+    required TextInputType keyboardType,
+  }) {
     return TextFormField(
       cursorColor: blueAccentColor,
-      controller: realmProvider.hostController,
+      controller: controller,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
-        labelText: "Enter host url here",
+        labelText: labelText,
         labelStyle: TextStyle(color: blackColor),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -66,41 +92,7 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "Please enter host url";
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildPortField(RouterRealmProvider realmProvider) {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      cursorColor: blueAccentColor,
-      controller: realmProvider.portController,
-      decoration: InputDecoration(
-        labelText: "Enter port here",
-        labelStyle: TextStyle(color: blackColor),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: blackColor),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "Please enter port";
-        }
-        return null;
-      },
+      validator: validator,
     );
   }
 
