@@ -41,7 +41,7 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
                 if (value == null || value.isEmpty) {
                   return "Please enter host here";
                 }
-                return "";
+                return null;
               },
               keyboardType: TextInputType.text,
             ),
@@ -53,7 +53,7 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
                 if (value == null || value.isEmpty) {
                   return "Please enter port here";
                 }
-                return "";
+                return null;
               },
               keyboardType: TextInputType.number,
             ),
@@ -135,30 +135,16 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
         itemCount: realmProvider.realmControllers.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: TextFormField(
-              cursorColor: blueAccentColor,
+            title: _buildTextFormField(
               controller: realmProvider.realmControllers[index],
-              decoration: InputDecoration(
-                labelText: "Enter realm here",
-                labelStyle: TextStyle(color: blackColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: blackColor),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+              labelText: "Enter realm here",
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return "Please enter realm here";
                 }
                 return null;
               },
+              keyboardType: TextInputType.text,
             ),
             trailing: InkWell(
               hoverColor: Colors.blue.shade200,
@@ -229,22 +215,22 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
         if (_formKey.currentState!.validate()) {
           switchProvider.setServerStarted(started: true);
           final realms = realmProvider.realmControllers.map((controller) => controller.text).toList();
-          final host = realmProvider.portController.text.trim();
+          final host = realmProvider.hostController.text.trim();
           int port;
           try {
-            port = int.parse(host);
+            port = int.parse(realmProvider.portController.text);
             final router = startRouter(
-              realmProvider.hostController.text,
+              host,
               port,
               realms,
             );
             routerProvider.setServerRouter(router);
-            unawaited(router.start(realmProvider.hostController.text, port));
+            unawaited(router.start(host, port));
             realmProvider.resetControllers();
             scaffoldMessenger.showSnackBar(
               SnackBar(
                 content: Text(
-                  "Server is running on this host localhost: ${realmProvider.hostController.text} and on this port $port",
+                  "Server is running on this host localhost: $host and on this port $port",
                 ),
                 duration: const Duration(seconds: 3),
               ),
