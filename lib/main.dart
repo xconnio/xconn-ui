@@ -5,6 +5,9 @@ import "package:xconn_ui/providers/event_provider.dart";
 import "package:xconn_ui/providers/invocation_provider.dart";
 import "package:xconn_ui/providers/kwargs_provider.dart";
 import "package:xconn_ui/providers/result_provider.dart";
+import "package:xconn_ui/providers/router_realm_provider.dart";
+import "package:xconn_ui/providers/router_state_provider.dart";
+import "package:xconn_ui/providers/router_toggleswitch_provider.dart";
 import "package:xconn_ui/providers/session_states_provider.dart";
 import "package:xconn_ui/responsive/responsive_layout.dart";
 import "package:xconn_ui/screens/mobile/splash_screen.dart";
@@ -26,6 +29,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => EventProvider()),
         ChangeNotifierProvider(create: (context) => ResultProvider()),
         ChangeNotifierProvider(create: (context) => SessionStateProvider()),
+        ChangeNotifierProvider(create: (context) => RouterToggleSwitchProvider()),
+        ChangeNotifierProvider(create: (context) => RouterRealmProvider()),
+        ChangeNotifierProvider(create: (context) => RouterStateProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
