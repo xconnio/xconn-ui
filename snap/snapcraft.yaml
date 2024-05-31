@@ -1,0 +1,25 @@
+name: wick-ui
+base: core22
+version: '0.1.0'
+summary: WAMP API tester with a UI
+description: |
+  WAMP API tester with a UI
+
+grade: stable
+confinement: strict
+compression: lzo
+
+apps:
+  wick-ui:
+    command: xconn_ui
+    extensions:
+      - gnome
+    plugs:
+      - network
+      - network-bind
+
+parts:
+  wick-ui:
+    plugin: flutter
+    source: .
+    flutter-target: lib/main.dart
