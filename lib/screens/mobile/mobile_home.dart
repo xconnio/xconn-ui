@@ -189,7 +189,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Future<void> _showRouterDialog(
-      BuildContext context, RouterToggleSwitchProvider routerResult, ScaffoldMessengerState scaffoldMessenger) async {
+    BuildContext context,
+    RouterToggleSwitchProvider routerResult,
+    ScaffoldMessengerState scaffoldMessenger,
+  ) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -210,7 +213,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Future<void> _showCloseRouterDialog(
-      BuildContext context, RouterStateProvider routerProvider, RouterToggleSwitchProvider routerResult) async {
+    BuildContext context,
+    RouterStateProvider routerProvider,
+    RouterToggleSwitchProvider routerResult,
+  ) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -421,9 +427,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: invocationRslt.map((invocation) {
-            return _buildResultContainer(invocation);
-          }).toList(),
+          children: invocationRslt.map(_buildResultContainer).toList(),
         );
       },
     );
@@ -436,9 +440,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         List<String> eventRslt = results.where((result) => result.startsWith("$index:")).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: eventRslt.map((event) {
-            return _buildResultContainer(event);
-          }).toList(),
+          children: eventRslt.map(_buildResultContainer).toList(),
         );
       },
     );
@@ -451,9 +453,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _tabData[index].callRslt!.map((result) {
-            return _buildResultContainer(result);
-          }).toList(),
+          children: _tabData[index].callRslt!.map(_buildResultContainer).toList(),
         );
       },
     );
@@ -491,14 +491,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Register":
       case "UnRegister":
         resultLabel = "Invocation";
-        break;
       case "Call":
         resultLabel = "Result";
-        break;
       case "Subscribe":
       case "UnSubscribe":
         resultLabel = "Event";
-        break;
       default:
         return Container();
     }
@@ -600,15 +597,19 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Subscribe":
         return buildButton(sendButton, () async => _subscribe(index));
       case "UnSubscribe":
-        return buildButton(sendButton,
-            () async => _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription));
+        return buildButton(
+          sendButton,
+          () async => _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription),
+        );
       case "Call":
         return buildButton(sendButton, () async => _call(index));
       case "Register":
         return buildButton(sendButton, () async => _registerAndStoreResult(index));
       case "UnRegister":
         return buildButton(
-            sendButton, () async => _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister));
+          sendButton,
+          () async => _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister),
+        );
       default:
         return Container();
     }

@@ -2,7 +2,7 @@ install:
 	flutter pub get
 
 lint:
-	dart analyze
+	dart analyze --fatal-infos
 
 lint-fix:
 	dart fix --apply
