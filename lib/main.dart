@@ -43,8 +43,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const ResponsiveLayout(
-          mobileScaffold: SplashScreen(),
-          tabletScaffold: SplashScreen(),
+          mobileScaffold: MobileHomeScaffold(),
+          tabletScaffold: MobileHomeScaffold(),
           desktopScaffold: MobileHomeScaffold(),
         ),
       ),
