@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => RouterStateProvider()),
       ],
       child: MaterialApp(
+        title: "Wick",
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
