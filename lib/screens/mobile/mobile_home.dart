@@ -34,9 +34,13 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   @override
   void initState() {
     super.initState();
+    _initializeTabController();
+    _initializeProviders();
+  }
+
+  void _initializeTabController() {
     _tabController = TabController(length: _tabNames.length, vsync: this);
     _tabController.addListener(_handleTabSelection);
-    _initializeProviders();
   }
 
   void _handleTabSelection() {
@@ -44,7 +48,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   void _initializeProviders() {
-    for (final _ in _tabNames) {
+    for (int i = 0; i < _tabNames.length; i++) {
       _argsProviders.add(ArgsProvider());
       _kwargsProviders.add(KwargsProvider());
     }
@@ -53,15 +57,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   void _addTab() {
     setState(() {
       int newIndex = _tabNames.length;
-      _tabNames.add("Tab ");
+      _tabNames.add("Tab ${newIndex + 1}");
       _tabContents.add("Content for Tab ${newIndex + 1}");
       _tabData.add(TabData());
       _argsProviders.add(ArgsProvider());
       _kwargsProviders.add(KwargsProvider());
-      if (_tabController.length != _tabNames.length) {
-        _tabController = TabController(length: _tabNames.length, vsync: this);
-        _tabController.addListener(_handleTabSelection);
-      }
+      _updateTabController();
       _tabController.index = newIndex;
     });
   }
@@ -74,12 +75,14 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       _tabData.removeAt(index);
       _argsProviders.removeAt(index);
       _kwargsProviders.removeAt(index);
-
-      if (_tabController.length != _tabNames.length) {
-        _tabController = TabController(length: _tabNames.length, vsync: this);
-        _tabController.addListener(_handleTabSelection);
-      }
+      _updateTabController();
     });
+  }
+
+  void _updateTabController() {
+    if (_tabController.length != _tabNames.length) {
+      _initializeTabController();
+    }
   }
 
   @override
@@ -87,13 +90,17 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     _tabController
       ..removeListener(_handleTabSelection)
       ..dispose();
+    _disposeProviders();
+    super.dispose();
+  }
+
+  void _disposeProviders() {
     for (final provider in _argsProviders) {
       provider.dispose();
     }
     for (final kProvider in _kwargsProviders) {
       kProvider.dispose();
     }
-    super.dispose();
   }
 
   @override
@@ -130,65 +137,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                         value: routerResult.isSelected,
                         onChanged: (value) async {
                           if (value) {
-                            await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const RouterDialogBox();
-                              },
-                            );
-
-                            if (routerResult.isServerStarted) {
-                              routerResult.toggleSwitch(value: true);
-                            } else {
-                              scaffoldMessenger.showSnackBar(
-                                const SnackBar(
-                                  content: Text("Failed to start the server."),
-                                  duration: Duration(seconds: 3),
-                                ),
-                              );
-                            }
+                            await _showRouterDialog(context, routerResult, scaffoldMessenger);
                           } else {
-                            await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text(
-                                    "Router Connection",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: homeAppBarTextColor,
-                                      fontSize: iconSize,
-                                    ),
-                                  ),
-                                  content: InkWell(
-                                    onTap: () {
-                                      routerProvider.serverRouter.close();
-                                      routerResult.setServerStarted(started: false);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Container(
-                                      height: 35,
-                                      width: MediaQuery.of(context).size.width,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            blueAccentColor,
-                                            Colors.lightBlue,
-                                          ],
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "Close",
-                                        style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                            routerResult.toggleSwitch(value: false);
+                            await _showCloseRouterDialog(context, routerProvider, routerResult);
                           }
                         },
                       ),
@@ -217,9 +168,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   tabs: _tabNames
                       .asMap()
                       .entries
-                      .map(
-                        (entry) => _buildTabWithDeleteButton(entry.key, entry.value),
-                      )
+                      .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
                       .toList(),
                 ),
               )
@@ -239,8 +188,75 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
+  Future<void> _showRouterDialog(
+      BuildContext context, RouterToggleSwitchProvider routerResult, ScaffoldMessengerState scaffoldMessenger) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const RouterDialogBox();
+      },
+    );
+
+    if (routerResult.isServerStarted) {
+      routerResult.toggleSwitch(value: true);
+    } else {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("Failed to start the server."),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showCloseRouterDialog(
+      BuildContext context, RouterStateProvider routerProvider, RouterToggleSwitchProvider routerResult) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Router Connection",
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: homeAppBarTextColor,
+              fontSize: iconSize,
+            ),
+          ),
+          content: InkWell(
+            onTap: () {
+              routerProvider.serverRouter.close();
+              routerResult.setServerStarted(started: false);
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              height: 35,
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                gradient: LinearGradient(
+                  colors: [
+                    blueAccentColor,
+                    Colors.lightBlue,
+                  ],
+                ),
+              ),
+              child: Text(
+                "Close",
+                style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    routerResult.toggleSwitch(value: false);
+  }
+
   Widget _buildTabWithDeleteButton(int index, String tabName) {
     final isSelected = _tabController.index == index;
+
     return GestureDetector(
       onTap: () {
         _tabController.animateTo(index);
@@ -271,576 +287,328 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  // MAIN BUILD TAB
   Widget _buildTab(int index) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: DropdownButton<String>(
-                      value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
-                      hint: Text(
-                        "Actions",
-                        style: TextStyle(color: dropDownTextColor),
-                      ),
-                      items: <String>[
-                        "Register",
-                        "Subscribe",
-                        "Call",
-                        "Publish",
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: TextStyle(color: dropDownTextColor),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _tabData[index].selectedValue = newValue!;
-                          switch (newValue) {
-                            case "Subscribe":
-                              {
-                                _tabData[index].sendButtonText = "Subscribe";
-                                break;
-                              }
-                            case "Register":
-                              {
-                                _tabData[index].sendButtonText = "Register";
-                                break;
-                              }
-                            case "Call":
-                              {
-                                _tabData[index].sendButtonText = "Call";
-                                break;
-                              }
-                            case "Publish":
-                              {
-                                _tabData[index].sendButtonText = "Publish";
-                                break;
-                              }
-                            default:
-                              {
-                                _tabData[index].sendButtonText = "Send";
-                              }
-                          }
-                        });
-                      },
-                    ),
-                  ),
-                  Container(
-                    height: 30,
-                    width: 1,
-                    color: Colors.grey,
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _tabData[index].linkController,
-                      decoration: const InputDecoration(
-                        hintText: "Enter URL or paste text",
-                        labelText: "Enter URL or paste text",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
-                    hint: const Text("Serializers"),
-                    items: <String>[
-                      jsonSerializer,
-                      cborSerializer,
-                      msgPackSerializer,
-                    ].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _tabData[index].selectedSerializer = newValue!;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: TextFormField(
-                    controller: _tabData[index].realmController,
-                    decoration: InputDecoration(
-                      hintText: "Enter realm here",
-                      labelText: "Enter realm here",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.all(10),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-
-          // Topic Procedure TextFormFields
+          _buildTabActionDropdown(index),
+          const SizedBox(height: 20),
+          _buildTabSerializerDropdown(index),
+          const SizedBox(height: 20),
           buildTopicProcedure(_tabData[index].topicProcedureController, _tabData[index].sendButtonText),
-
           const SizedBox(height: 20),
-
-          // Args
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
-
           const SizedBox(height: 20),
-
-          // K-Wargs
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
-
           const SizedBox(height: 20),
-
-          // Send Button
           sendButton(_tabData[index].sendButtonText, index),
-
           const SizedBox(height: 50),
-
           resultText(_tabData[index].sendButtonText),
+          _buildInvocationResults(index),
+          _buildEventResults(index),
+          _buildCallResults(index),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
 
-          Consumer<InvocationProvider>(
-            builder: (context, invocationResult, _) {
-              List<String> results = invocationResult.invocations;
-              List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: invocationRslt.map((invocation) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 20, right: 20),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          invocation,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: blackColor,
-                          ),
-                        ),
-                      ),
+  Widget _buildTabActionDropdown(int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 100,
+              child: DropdownButton<String>(
+                value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
+                hint: Text(
+                  "Actions",
+                  style: TextStyle(color: dropDownTextColor),
+                ),
+                items: ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: dropDownTextColor),
                     ),
                   );
                 }).toList(),
-              );
-            },
-          ),
-          Consumer<EventProvider>(
-            builder: (context, eventResult, _) {
-              List<String> results = eventResult.events;
-              List<String> eventRslt = results.where((result) => result.startsWith("$index:")).toList();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: eventRslt.map((event) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 20, right: 20),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          event,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: blackColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              );
-            },
-          ),
-          Consumer<ResultProvider>(
-            builder: (context, callResult, _) {
-              List<String> results = callResult.results;
-              _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _tabData[index].callRslt!.map((result) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 20, right: 20),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          result,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: blackColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              );
-            },
-          ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _tabData[index].selectedValue = newValue!;
+                    _tabData[index].sendButtonText = newValue;
+                  });
+                },
+              ),
+            ),
+            Container(height: 30, width: 1, color: Colors.grey),
+            Expanded(
+              child: TextFormField(
+                controller: _tabData[index].linkController,
+                decoration: const InputDecoration(
+                  hintText: "Enter URL or paste text",
+                  labelText: "Enter URL or paste text",
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          const SizedBox(
-            height: 20,
+  Widget _buildTabSerializerDropdown(int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: DropdownButton<String>(
+              value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
+              hint: const Text("Serializers"),
+              items: [jsonSerializer, cborSerializer, msgPackSerializer].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _tabData[index].selectedSerializer = newValue!;
+                });
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextFormField(
+              controller: _tabData[index].realmController,
+              decoration: InputDecoration(
+                hintText: "Enter realm here",
+                labelText: "Enter realm here",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.all(10),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildInvocationResults(int index) {
+    return Consumer<InvocationProvider>(
+      builder: (context, invocationResult, _) {
+        List<String> results = invocationResult.invocations;
+        List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: invocationRslt.map((invocation) {
+            return _buildResultContainer(invocation);
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildEventResults(int index) {
+    return Consumer<EventProvider>(
+      builder: (context, eventResult, _) {
+        List<String> results = eventResult.events;
+        List<String> eventRslt = results.where((result) => result.startsWith("$index:")).toList();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: eventRslt.map((event) {
+            return _buildResultContainer(event);
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildCallResults(int index) {
+    return Consumer<ResultProvider>(
+      builder: (context, callResult, _) {
+        List<String> results = callResult.results;
+        _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _tabData[index].callRslt!.map((result) {
+            return _buildResultContainer(result);
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildResultContainer(String result) {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            result,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: blackColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget resultText(String buttonText) {
+    String resultLabel;
+
     switch (buttonText) {
       case "Register":
-        return Padding(
-          padding: const EdgeInsets.only(left: 25),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              height: 30,
-              width: MediaQuery.of(context).size.width,
-              child: Text(
-                "Invocation",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: blackColor,
-                ),
-              ),
-            ),
-          ),
-        );
-
       case "UnRegister":
-        return Padding(
-          padding: const EdgeInsets.only(left: 25),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              height: 30,
-              width: MediaQuery.of(context).size.width,
-              child: Text(
-                "Invocation",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: blackColor,
-                ),
-              ),
-            ),
-          ),
-        );
-
+        resultLabel = "Invocation";
+        break;
       case "Call":
-        return Padding(
-          padding: const EdgeInsets.only(left: 25),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              height: 30,
-              width: MediaQuery.of(context).size.width,
-              child: Text(
-                "Result",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: blackColor,
-                ),
-              ),
-            ),
-          ),
-        );
-
+        resultLabel = "Result";
+        break;
       case "Subscribe":
-        return Padding(
-          padding: const EdgeInsets.only(left: 25),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              height: 30,
-              width: MediaQuery.of(context).size.width,
-              child: Text(
-                "Event",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: blackColor,
-                ),
-              ),
-            ),
-          ),
-        );
-
       case "UnSubscribe":
-        return Padding(
-          padding: const EdgeInsets.only(left: 25),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              height: 30,
-              width: MediaQuery.of(context).size.width,
-              child: Text(
-                "Event",
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: blackColor,
-                ),
-              ),
-            ),
-          ),
-        );
-
+        resultLabel = "Event";
+        break;
       default:
         return Container();
     }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 25),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          height: 30,
+          width: MediaQuery.of(context).size.width,
+          child: Text(
+            resultLabel,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: blackColor,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget sendButton(String sendButton, int index) {
     var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    Future<void> publish() async {
+      List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+      Map<String, dynamic> kWarValues = {};
+      for (final map in _kwargsProviders[index].tableData) {
+        String key = map["key"];
+        dynamic value = map["value"];
+        kWarValues[key] = value;
+      }
+      var session = await connect(
+        _tabData[index].linkController.text,
+        _tabData[index].realmController.text,
+        _tabData[index].selectedSerializer,
+      );
+      await session.publish(
+        _tabData[index].topicProcedureController.text,
+        args: argsData,
+        kwargs: kWarValues,
+      );
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("Publish Successful"),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      setState(() {
+        _tabData[index].linkController.clear();
+        _tabData[index].realmController.clear();
+        _tabData[index].topicProcedureController.clear();
+        _argsProviders[index].controllers.clear();
+        _kwargsProviders[index].tableData.clear();
+        _tabData[index].selectedSerializer = "";
+      });
+    }
+
+    Widget buildButton(String label, Future<void> Function() action) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 110),
+        child: MaterialButton(
+          onPressed: () async {
+            try {
+              await action();
+            } on Exception catch (error) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text("$sendButton Error: $error"),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
+          },
+          color: Colors.blueAccent,
+          minWidth: 200,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    }
+
     switch (sendButton) {
       case "Publish":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 110),
-          child: MaterialButton(
-            onPressed: () async {
-              try {
-                final scaffoldMessenger = ScaffoldMessenger.of(context);
-                // Args
-                List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-                Map<String, dynamic> kWarValues = {};
-                for (final map in _kwargsProviders[index].tableData) {
-                  String key = map["key"];
-                  dynamic value = map["value"];
-                  kWarValues[key] = value;
-                }
-                Map<String, dynamic> formattedResult = kWarValues;
-                var session = await connect(
-                  _tabData[index].linkController.text,
-                  _tabData[index].realmController.text,
-                  _tabData[index].selectedSerializer,
-                );
-                await session.publish(
-                  _tabData[index].topicProcedureController.text,
-                  args: argsData,
-                  kwargs: formattedResult,
-                );
-                scaffoldMessenger.showSnackBar(
-                  const SnackBar(
-                    content: Text("Publish Successful"),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-                setState(() {
-                  _tabData[index].linkController.clear();
-                  _tabData[index].realmController.clear();
-                  _tabData[index].topicProcedureController.clear();
-                  _argsProviders[index].controllers.clear();
-                  _kwargsProviders[index].tableData.clear();
-                  _tabData[index].selectedSerializer = "";
-                });
-              } on Exception catch (error) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text("Publish Error: $error"),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-              }
-            },
-            color: Colors.blueAccent,
-            minWidth: 200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              sendButton,
-              style: TextStyle(
-                color: whiteColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-
+        return buildButton(sendButton, publish);
       case "Subscribe":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 110),
-          child: MaterialButton(
-            onPressed: () async {
-              await _subscribe(index);
-            },
-            color: Colors.blueAccent,
-            minWidth: 200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              sendButton,
-              style: TextStyle(
-                color: whiteColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-
+        return buildButton(sendButton, () async => _subscribe(index));
       case "UnSubscribe":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 110),
-          child: MaterialButton(
-            onPressed: () async {
-              await _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription);
-            },
-            color: Colors.blueAccent,
-            minWidth: 200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              sendButton,
-              style: TextStyle(
-                color: whiteColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-
+        return buildButton(sendButton,
+            () async => _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription));
       case "Call":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 110),
-          child: MaterialButton(
-            onPressed: () async {
-              await _call(index);
-            },
-            color: Colors.blueAccent,
-            minWidth: 200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              sendButton,
-              style: TextStyle(
-                color: whiteColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-
+        return buildButton(sendButton, () async => _call(index));
       case "Register":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 110),
-          child: MaterialButton(
-            onPressed: () async {
-              await _registerAndStoreResult(index);
-            },
-            color: Colors.blueAccent,
-            minWidth: 200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              sendButton,
-              style: TextStyle(
-                color: whiteColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-
+        return buildButton(sendButton, () async => _registerAndStoreResult(index));
       case "UnRegister":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 110),
-          child: MaterialButton(
-            onPressed: () async {
-              await _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister);
-            },
-            color: Colors.blueAccent,
-            minWidth: 200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              sendButton,
-              style: TextStyle(
-                color: whiteColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-
+        return buildButton(
+            sendButton, () async => _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister));
       default:
         return Container();
     }
@@ -907,7 +675,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].realmController.text,
         _tabData[index].selectedSerializer,
       );
-
       var registration = await session.register(
         _tabData[index].topicProcedureController.text,
         (invocation) {
@@ -922,11 +689,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           duration: Duration(seconds: 2),
         ),
       );
-
       sessionProvider
         ..setSession(session)
         ..setUnregister(registration);
-
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
         sendButton(unregister, index);
@@ -948,32 +713,27 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     try {
-      Map<String, dynamic> kWarValues = {};
-      for (final map in _kwargsProviders[index].tableData) {
-        String key = map["key"];
-        dynamic value = map["value"];
-        kWarValues[key] = value;
-      }
       var session = await connect(
         _tabData[index].linkController.text,
         _tabData[index].realmController.text,
         _tabData[index].selectedSerializer,
       );
-      var subscription = await session.subscribe(_tabData[index].topicProcedureController.text, (event) {
-        String events = "$index: args=${event.args}, kwargs=${event.kwargs}";
-        Provider.of<EventProvider>(context, listen: false).addEvents(events);
-      });
+      var subscription = await session.subscribe(
+        _tabData[index].topicProcedureController.text,
+        (event) {
+          String events = "$index: args=${event.args}, kwargs=${event.kwargs}";
+          Provider.of<EventProvider>(context, listen: false).addEvents(events);
+        },
+      );
       scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text("Subscribe Successful"),
           duration: Duration(seconds: 2),
         ),
       );
-
       sessionProvider
         ..setSession(session)
         ..setUnSubscribe(subscription);
-
       setState(() {
         var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";
         sendButton(unsubscribe, index);
@@ -1002,7 +762,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         dynamic value = map["value"];
         kWarValues[key] = value;
       }
-      Map<String, dynamic> formattedResult = kWarValues;
       var session = await connect(
         _tabData[index].linkController.text,
         _tabData[index].realmController.text,
@@ -1013,8 +772,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         resultProvider.results.clear();
       });
 
-      var calls =
-          await session.call(_tabData[index].topicProcedureController.text, args: argsData, kwargs: formattedResult);
+      var calls = await session.call(
+        _tabData[index].topicProcedureController.text,
+        args: argsData,
+        kwargs: kWarValues,
+      );
       String result = "$index: args=${calls.args}, kwargs=${calls.kwargs}";
       resultProvider.addResult(result);
       _tabData[index].linkController.clear();
@@ -1040,107 +802,35 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget buildTopicProcedure(TextEditingController controller, String sendButtonText) {
-    switch (sendButtonText) {
-      case "Publish":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: "Enter topic here",
-              labelText: "Enter topic here",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.all(10),
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
+              ? "Enter topic here"
+              : "Enter procedure here",
+          labelText: sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
+              ? "Enter topic here"
+              : "Enter procedure here",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
-        );
-
-      case "Call":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: "Enter procedure here",
-              labelText: "Enter procedure here",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.all(10),
-            ),
-          ),
-        );
-
-      case "Register":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: "Enter procedure here",
-              labelText: "Enter procedure here",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.all(10),
-            ),
-          ),
-        );
-
-      case "Subscribe":
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: "Enter topic here",
-              labelText: "Enter topic here",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.all(10),
-            ),
-          ),
-        );
-
-      default:
-        return Container();
-    }
+          contentPadding: const EdgeInsets.all(10),
+        ),
+      ),
+    );
   }
 
   Widget buildArgs(String argsSendButton, ArgsProvider argsProvider) {
-    switch (argsSendButton) {
-      case "Publish":
-        return ArgsTextFormFields(
-          provider: argsProvider,
-        );
-
-      case "Call":
-        return ArgsTextFormFields(
-          provider: argsProvider,
-        );
-
-      default:
-        return Container();
-    }
+    return argsSendButton.contains("Publish") || argsSendButton.contains("Call")
+        ? ArgsTextFormFields(provider: argsProvider)
+        : Container();
   }
 
   Widget buildKwargs(String kWargSendButton, KwargsProvider kwargsProvider) {
-    switch (kWargSendButton) {
-      case "Publish":
-        return DynamicKeyValuePairs(
-          provider: kwargsProvider,
-        );
-
-      case "Call":
-        return DynamicKeyValuePairs(
-          provider: kwargsProvider,
-        );
-
-      default:
-        return Container();
-    }
+    return kWargSendButton.contains("Publish") || kWargSendButton.contains("Call")
+        ? DynamicKeyValuePairs(provider: kwargsProvider)
+        : Container();
   }
 }
