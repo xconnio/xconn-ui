@@ -1,7 +1,7 @@
 import "dart:async";
 import "package:flutter/material.dart";
-import "package:xconn_ui/constants.dart";
-import "package:xconn_ui/screens/mobile/mobile_home.dart";
+import "package:wick_ui/constants.dart";
+import "package:wick_ui/screens/mobile/mobile_home.dart";
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

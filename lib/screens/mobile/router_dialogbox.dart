@@ -1,12 +1,12 @@
 import "dart:async";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
-import "package:xconn_ui/constants.dart";
-import "package:xconn_ui/providers/router_realm_provider.dart";
-import "package:xconn_ui/providers/router_state_provider.dart";
-import "package:xconn_ui/providers/router_toggleswitch_provider.dart";
-import "package:xconn_ui/screens/mobile/mobile_home.dart";
-import "package:xconn_ui/wamp_util.dart";
+import "package:wick_ui/constants.dart";
+import "package:wick_ui/providers/router_realm_provider.dart";
+import "package:wick_ui/providers/router_state_provider.dart";
+import "package:wick_ui/providers/router_toggleswitch_provider.dart";
+import "package:wick_ui/screens/mobile/mobile_home.dart";
+import "package:wick_ui/wamp_util.dart";
 
 class RouterDialogBox extends StatefulWidget {
   const RouterDialogBox({super.key});

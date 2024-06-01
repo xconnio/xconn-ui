@@ -1,17 +1,17 @@
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
-import "package:xconn_ui/providers/args_provider.dart";
-import "package:xconn_ui/providers/event_provider.dart";
-import "package:xconn_ui/providers/invocation_provider.dart";
-import "package:xconn_ui/providers/kwargs_provider.dart";
-import "package:xconn_ui/providers/result_provider.dart";
-import "package:xconn_ui/providers/router_realm_provider.dart";
-import "package:xconn_ui/providers/router_state_provider.dart";
-import "package:xconn_ui/providers/router_toggleswitch_provider.dart";
-import "package:xconn_ui/providers/session_states_provider.dart";
-import "package:xconn_ui/responsive/responsive_layout.dart";
-import "package:xconn_ui/screens/mobile/mobile_home.dart";
-import "package:xconn_ui/screens/mobile/splash_screen.dart";
+import "package:wick_ui/providers/args_provider.dart";
+import "package:wick_ui/providers/event_provider.dart";
+import "package:wick_ui/providers/invocation_provider.dart";
+import "package:wick_ui/providers/kwargs_provider.dart";
+import "package:wick_ui/providers/result_provider.dart";
+import "package:wick_ui/providers/router_realm_provider.dart";
+import "package:wick_ui/providers/router_state_provider.dart";
+import "package:wick_ui/providers/router_toggleswitch_provider.dart";
+import "package:wick_ui/providers/session_states_provider.dart";
+import "package:wick_ui/responsive/responsive_layout.dart";
+import "package:wick_ui/screens/mobile/mobile_home.dart";
+import "package:wick_ui/screens/mobile/splash_screen.dart";
 
 void main() {
   runApp(const MyApp());
