@@ -11,7 +11,7 @@ compression: lzo
 
 apps:
   wick-ui:
-    command: xconn_ui
+    command: wick-desktop
     extensions:
       - gnome
     plugs:
