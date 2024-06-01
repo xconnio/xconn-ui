@@ -10,6 +10,7 @@ import "package:xconn_ui/providers/router_state_provider.dart";
 import "package:xconn_ui/providers/router_toggleswitch_provider.dart";
 import "package:xconn_ui/providers/session_states_provider.dart";
 import "package:xconn_ui/responsive/responsive_layout.dart";
+import "package:xconn_ui/screens/mobile/mobile_home.dart";
 import "package:xconn_ui/screens/mobile/splash_screen.dart";
 
 void main() {
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
         home: const ResponsiveLayout(
           mobileScaffold: SplashScreen(),
           tabletScaffold: SplashScreen(),
-          desktopScaffold: SplashScreen(),
+          desktopScaffold: MobileHomeScaffold(),
         ),
       ),
     );
