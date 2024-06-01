@@ -1,7 +1,7 @@
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
-import "package:xconn_ui/constants.dart";
-import "package:xconn_ui/providers/args_provider.dart";
+import "package:wick_ui/constants.dart";
+import "package:wick_ui/providers/args_provider.dart";
 
 class ArgsTextFormFields extends StatefulWidget {
   const ArgsTextFormFields({required this.provider, super.key});
