@@ -205,20 +205,20 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           return const RouterDialogBox();
         },
       );
-
-      if (routerResult.isServerStarted) {
-        routerResult.toggleSwitch(value: true);
-      } else {
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text("Failed to start the server."),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
     } on Exception catch (e) {
       scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
     }
+
+    if (!routerResult.isServerStarted) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text("Failed to start the server."),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+    routerResult.toggleSwitch(value: true);
   }
 
   Future<void> _showCloseRouterDialog(
@@ -534,52 +534,42 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  Widget sendButton(String sendButton, int index) {
-    var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
+  Future<void> _publish(int index) async {
+    List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+    Map<String, dynamic> kWarValues = {};
+    for (final map in _kwargsProviders[index].tableData) {
+      String key = map["key"];
+      dynamic value = map["value"];
+      kWarValues[key] = value;
+    }
 
-    Future<void> publish() async {
-      List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-      Map<String, dynamic> kWarValues = {};
-      for (final map in _kwargsProviders[index].tableData) {
-        String key = map["key"];
-        dynamic value = map["value"];
-        kWarValues[key] = value;
-      }
+    try {
       var session = await connect(
         _tabData[index].linkController.text,
         _tabData[index].realmController.text,
         _tabData[index].selectedSerializer,
       );
-      try {
-        await session.publish(
-          _tabData[index].topicProcedureController.text,
-          args: argsData,
-          kwargs: kWarValues,
-        );
-        scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text("Publish Successful"),
-            duration: Duration(seconds: 3),
-          ),
-        );
-        setState(() {
-          _tabData[index].linkController.clear();
-          _tabData[index].realmController.clear();
-          _tabData[index].topicProcedureController.clear();
-          _argsProviders[index].controllers.clear();
-          _kwargsProviders[index].tableData.clear();
-          _tabData[index].selectedSerializer = "";
-        });
-      } on Exception catch (e) {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text("Error in publishing $e"),
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
+      await session.publish(
+        _tabData[index].topicProcedureController.text,
+        args: argsData,
+        kwargs: kWarValues,
+      );
+      setState(() {
+        _tabData[index].linkController.clear();
+        _tabData[index].realmController.clear();
+        _tabData[index].topicProcedureController.clear();
+        _argsProviders[index].controllers.clear();
+        _kwargsProviders[index].tableData.clear();
+        _tabData[index].selectedSerializer = "";
+      });
+    } on Exception catch (e) {
+      return Future.error(e);
     }
+  }
+
+  Widget sendButton(String sendButton, int index) {
+    var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     Widget buildButton(String label, Future<void> Function() action) {
       return Padding(
@@ -616,7 +606,24 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
     switch (sendButton) {
       case "Publish":
-        return buildButton(sendButton, publish);
+        return buildButton(sendButton, () async {
+          try {
+            await _publish(index);
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("Publish Successful"),
+                duration: Duration(seconds: 3),
+              ),
+            );
+          } on Exception catch(e){
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error in publishing $e"),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        });
       case "Subscribe":
         return buildButton(sendButton, () async => _subscribe(index));
       case "UnSubscribe":
