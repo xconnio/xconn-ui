@@ -136,10 +136,15 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                         activeColor: blueAccentColor,
                         value: routerResult.isSelected,
                         onChanged: (value) async {
-                          if (value) {
-                            await _showRouterDialog(context, routerResult, scaffoldMessenger);
-                          } else {
-                            await _showCloseRouterDialog(context, routerProvider, routerResult);
+                          try {
+                            if (value) {
+                              await _showRouterDialog(context, routerResult, scaffoldMessenger);
+                            } else {
+                              await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
+                            }
+                          } on Exception catch (e) {
+                            scaffoldMessenger
+                                .showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
                           }
                         },
                       ),
@@ -193,71 +198,80 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     RouterToggleSwitchProvider routerResult,
     ScaffoldMessengerState scaffoldMessenger,
   ) async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const RouterDialogBox();
-      },
-    );
+    try {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const RouterDialogBox();
+        },
+      );
+    } on Exception catch (e) {
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
+    }
 
-    if (routerResult.isServerStarted) {
-      routerResult.toggleSwitch(value: true);
-    } else {
+    if (!routerResult.isServerStarted) {
       scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text("Failed to start the server."),
           duration: Duration(seconds: 3),
         ),
       );
+      return;
     }
+    routerResult.toggleSwitch(value: true);
   }
 
   Future<void> _showCloseRouterDialog(
     BuildContext context,
     RouterStateProvider routerProvider,
     RouterToggleSwitchProvider routerResult,
+    ScaffoldMessengerState scaffoldMessenger,
   ) async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "Router Connection",
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              color: homeAppBarTextColor,
-              fontSize: iconSize,
+    try {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              "Router Connection",
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: homeAppBarTextColor,
+                fontSize: iconSize,
+              ),
             ),
-          ),
-          content: InkWell(
-            onTap: () {
-              routerProvider.serverRouter.close();
-              routerResult.setServerStarted(started: false);
-              Navigator.of(context).pop();
-            },
-            child: Container(
-              height: 35,
-              width: MediaQuery.of(context).size.width,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                gradient: LinearGradient(
-                  colors: [
-                    blueAccentColor,
-                    Colors.lightBlue,
-                  ],
+            content: InkWell(
+              onTap: () {
+                routerProvider.serverRouter.close();
+                routerResult.setServerStarted(started: false);
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                height: 35,
+                width: MediaQuery.of(context).size.width,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: LinearGradient(
+                    colors: [
+                      blueAccentColor,
+                      Colors.lightBlue,
+                    ],
+                  ),
+                ),
+                child: Text(
+                  "Close",
+                  style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-              child: Text(
-                "Close",
-                style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
             ),
-          ),
-        );
-      },
-    );
-    routerResult.toggleSwitch(value: false);
+          );
+        },
+      );
+      routerResult.toggleSwitch(value: false);
+    } on Exception catch (e) {
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
+    }
   }
 
   Widget _buildTabWithDeleteButton(int index, String tabName) {
@@ -520,33 +534,26 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  Widget sendButton(String sendButton, int index) {
-    var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
+  Future<void> _publish(int index) async {
+    List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+    Map<String, dynamic> kWarValues = {};
+    for (final map in _kwargsProviders[index].tableData) {
+      String key = map["key"];
+      dynamic value = map["value"];
+      kWarValues[key] = value;
+    }
 
-    Future<void> publish() async {
-      List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-      Map<String, dynamic> kWarValues = {};
-      for (final map in _kwargsProviders[index].tableData) {
-        String key = map["key"];
-        dynamic value = map["value"];
-        kWarValues[key] = value;
-      }
+    try {
       var session = await connect(
         _tabData[index].linkController.text,
         _tabData[index].realmController.text,
         _tabData[index].selectedSerializer,
       );
+
       await session.publish(
         _tabData[index].topicProcedureController.text,
         args: argsData,
         kwargs: kWarValues,
-      );
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("Publish Successful"),
-          duration: Duration(seconds: 3),
-        ),
       );
       setState(() {
         _tabData[index].linkController.clear();
@@ -556,7 +563,14 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _kwargsProviders[index].tableData.clear();
         _tabData[index].selectedSerializer = "";
       });
+    } on Exception catch (e) {
+      return Future.error(e);
     }
+  }
+
+  Widget sendButton(String sendButton, int index) {
+    var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     Widget buildButton(String label, Future<void> Function() action) {
       return Padding(
@@ -593,89 +607,154 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
     switch (sendButton) {
       case "Publish":
-        return buildButton(sendButton, publish);
+        return buildButton(sendButton, () async {
+          try {
+            await _publish(index);
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("Publish Successful"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } on Exception catch (e) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error in publishing $e"),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       case "Subscribe":
-        return buildButton(sendButton, () async => _subscribe(index));
+        return buildButton(sendButton, () async {
+          try {
+            await _subscribe(index);
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("Subscribe Successful"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } on Exception catch (e) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error in Subscribing $e"),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       case "UnSubscribe":
-        return buildButton(
-          sendButton,
-          () async => _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription),
-        );
+        return buildButton(sendButton, () async {
+          try {
+            await _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription);
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("UnSubscribe Successfully"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } on Exception catch (e) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error in Subscribing: $e"),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       case "Call":
-        return buildButton(sendButton, () async => _call(index));
+        return buildButton(sendButton, () async {
+          try {
+            await _call(index);
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("Call Successful"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } on Exception catch (e) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error in Calling: $e"),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       case "Register":
-        return buildButton(sendButton, () async => _registerAndStoreResult(index));
+        return buildButton(sendButton, () async {
+          try {
+            await _registerAndStoreResult(index);
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("Registration Successful"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } on Exception catch (e) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error in Registration $e"),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       case "UnRegister":
-        return buildButton(
-          sendButton,
-          () async => _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister),
-        );
+        return buildButton(sendButton, () async {
+          try {
+            await _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister);
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("UnRegister Successfully"),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } on Exception catch (e) {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text("Error in UnRegistering: $e"),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       default:
         return Container();
     }
   }
 
   Future<void> _unRegister(int index, Session? session, var reg) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    try {
-      await session?.unregister(reg);
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("UnRegister Successfully"),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      setState(() {
-        _tabData[index].sendButtonText = "send";
-        _tabData[index].selectedSerializer = "";
-        _tabData[index].selectedValue = "";
-        _tabData[index].topicProcedureController.clear();
-        Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
-      });
-    } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text("Error: $e"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
+    await session?.unregister(reg);
+    setState(() {
+      _tabData[index].sendButtonText = "send";
+      _tabData[index].selectedSerializer = "";
+      _tabData[index].selectedValue = "";
+      _tabData[index].topicProcedureController.clear();
+      Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
+    });
   }
 
   Future<void> _unSubscribe(int index, Session? session, var sub) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    try {
-      await session?.unsubscribe(sub);
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("UnSubscribe Successfully"),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      setState(() {
-        _tabData[index].sendButtonText = "send";
-        _tabData[index].selectedSerializer = "";
-        _tabData[index].selectedValue = "";
-      });
-    } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text("Error: $e"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
+    await session?.unsubscribe(sub);
+    setState(() {
+      _tabData[index].sendButtonText = "send";
+      _tabData[index].selectedSerializer = "";
+      _tabData[index].selectedValue = "";
+    });
   }
 
   Future<void> _registerAndStoreResult(int index) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
+
     try {
       var session = await connect(
         _tabData[index].linkController.text,
         _tabData[index].realmController.text,
         _tabData[index].selectedSerializer,
       );
+
       var registration = await session.register(
         _tabData[index].topicProcedureController.text,
         (invocation) {
@@ -684,12 +763,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           return Result();
         },
       );
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("Registration Successful"),
-          duration: Duration(seconds: 2),
-        ),
-      );
+
       sessionProvider
         ..setSession(session)
         ..setUnregister(registration);
@@ -701,17 +775,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].selectedSerializer = "";
       });
     } on Exception catch (error) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      throw Future.error(error);
     }
   }
 
   Future<void> _subscribe(int index) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     try {
       var session = await connect(
@@ -726,12 +794,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           Provider.of<EventProvider>(context, listen: false).addEvents(events);
         },
       );
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("Subscribe Successful"),
-          duration: Duration(seconds: 2),
-        ),
-      );
       sessionProvider
         ..setSession(session)
         ..setUnSubscribe(subscription);
@@ -743,17 +805,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].selectedSerializer = "";
       });
     } on Exception catch (error) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text("Subscribe Error: $error"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      throw Future.error(error);
     }
   }
 
   Future<void> _call(int index) async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
     var resultProvider = Provider.of<ResultProvider>(context, listen: false);
     try {
       List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
@@ -769,36 +825,23 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].selectedSerializer,
       );
 
-      setState(() {
-        resultProvider.results.clear();
-      });
-
       var calls = await session.call(
         _tabData[index].topicProcedureController.text,
         args: argsData,
         kwargs: kWarValues,
       );
+
+      resultProvider.results.clear();
       String result = "$index: args=${calls.args}, kwargs=${calls.kwargs}";
       resultProvider.addResult(result);
+
       _tabData[index].linkController.clear();
       _tabData[index].realmController.clear();
       _tabData[index].selectedSerializer = "";
       _argsProviders[index].controllers.clear();
       _kwargsProviders[index].tableData.clear();
-
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("Call Successful"),
-          duration: Duration(seconds: 2),
-        ),
-      );
     } on Exception catch (error) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text("Call Error: $error"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      throw Future.error(error);
     }
   }
 
