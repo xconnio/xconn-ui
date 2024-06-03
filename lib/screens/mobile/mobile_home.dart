@@ -618,27 +618,27 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Publish":
         return buildButton(sendButton, publish);
       case "Subscribe":
-        return buildButton(sendButton, () async => _subscribe(index, context));
+        return buildButton(sendButton, () async => _subscribe(index));
       case "UnSubscribe":
         return buildButton(
           sendButton,
-          () async => _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription, context),
+          () async => _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription),
         );
       case "Call":
-        return buildButton(sendButton, () async => _call(index, context));
+        return buildButton(sendButton, () async => _call(index));
       case "Register":
-        return buildButton(sendButton, () async => _registerAndStoreResult(index, context));
+        return buildButton(sendButton, () async => _registerAndStoreResult(index));
       case "UnRegister":
         return buildButton(
           sendButton,
-          () async => _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister, context),
+          () async => _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister),
         );
       default:
         return Container();
     }
   }
 
-  Future<void> _unRegister(int index, Session? session, var reg, BuildContext context) async {
+  Future<void> _unRegister(int index, Session? session, var reg) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
       await session?.unregister(reg);
@@ -665,7 +665,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Future<void> _unSubscribe(int index, Session? session, var sub, BuildContext context) async {
+  Future<void> _unSubscribe(int index, Session? session, var sub) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
       await session?.unsubscribe(sub);
@@ -690,7 +690,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Future<void> _registerAndStoreResult(int index, BuildContext context) async {
+  Future<void> _registerAndStoreResult(int index) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     Registration? registration;
@@ -744,7 +744,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Future<void> _subscribe(int index, BuildContext context) async {
+  Future<void> _subscribe(int index) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     try {
@@ -796,7 +796,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Future<void> _call(int index, BuildContext context) async {
+  Future<void> _call(int index) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     var resultProvider = Provider.of<ResultProvider>(context, listen: false);
     try {
