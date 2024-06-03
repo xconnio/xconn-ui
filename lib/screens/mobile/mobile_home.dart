@@ -145,8 +145,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                                 await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
                               }
                             } on Exception catch (e) {
-                              scaffoldMessenger
-                                  .showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
+                              scaffoldMessenger.showSnackBar(
+                                SnackBar(content: Text("An error occurred: ${e.runtimeType} - $e. Please try again.")),
+                              );
                             }
                           },
                         ),
