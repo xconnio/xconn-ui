@@ -10,6 +10,7 @@ import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
 import "package:wick_ui/providers/session_states_provider.dart";
 import "package:wick_ui/responsive/responsive_layout.dart";
+import "package:wick_ui/screens/desktop/desktop_home.dart";
 import "package:wick_ui/screens/mobile/mobile_home.dart";
 
 void main() {
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
         home: const ResponsiveLayout(
           mobileScaffold: MobileHomeScaffold(),
           tabletScaffold: MobileHomeScaffold(),
-          desktopScaffold: MobileHomeScaffold(),
+          desktopScaffold: DesktopHomeScaffold(),
         ),
       ),
     );

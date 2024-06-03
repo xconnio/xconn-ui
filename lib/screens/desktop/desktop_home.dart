@@ -6,24 +6,21 @@ import "package:wick_ui/providers/event_provider.dart";
 import "package:wick_ui/providers/invocation_provider.dart";
 import "package:wick_ui/providers/kwargs_provider.dart";
 import "package:wick_ui/providers/result_provider.dart";
-import "package:wick_ui/providers/router_state_provider.dart";
-import "package:wick_ui/providers/router_toggleswitch_provider.dart";
 import "package:wick_ui/providers/session_states_provider.dart";
-import "package:wick_ui/screens/mobile/router_dialogbox.dart";
 import "package:wick_ui/utils/args_screen.dart";
 import "package:wick_ui/utils/kwargs_screen.dart";
 import "package:wick_ui/utils/tab_data_class.dart";
 import "package:wick_ui/wamp_util.dart";
 import "package:xconn/exports.dart";
 
-class MobileHomeScaffold extends StatefulWidget {
-  const MobileHomeScaffold({super.key});
+class DesktopHomeScaffold extends StatefulWidget {
+  const DesktopHomeScaffold({super.key});
 
   @override
-  State<MobileHomeScaffold> createState() => _MobileHomeScaffoldState();
+  State<DesktopHomeScaffold> createState() => _DesktopHomeScaffoldState();
 }
 
-class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProviderStateMixin {
+class _DesktopHomeScaffoldState extends State<DesktopHomeScaffold> with TickerProviderStateMixin {
   late TabController _tabController;
   final List<String> _tabNames = ["Tab"];
   final List<String> _tabContents = ["Content for Tab 1"];
@@ -105,7 +102,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   @override
   Widget build(BuildContext context) {
-    var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -118,42 +114,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
         automaticallyImplyLeading: false,
         actions: [
-          Consumer<RouterToggleSwitchProvider>(
-            builder: (context, routerResult, _) {
-              var scaffoldMessenger = ScaffoldMessenger.of(context);
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
-                child: Row(
-                  children: [
-                    Text(
-                      "Router",
-                      style: TextStyle(color: homeAppBarTextColor, fontSize: iconSize),
-                    ),
-                    const SizedBox(width: 5),
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Switch(
-                        activeColor: blueAccentColor,
-                        value: routerResult.isSelected,
-                        onChanged: (value) async {
-                          try {
-                            if (value) {
-                              await _showRouterDialog(context, routerResult, scaffoldMessenger);
-                            } else {
-                              await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
-                            }
-                          } on Exception catch (e) {
-                            scaffoldMessenger
-                                .showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
           Padding(
             padding: const EdgeInsets.only(right: 15),
             child: IconButton(
@@ -164,119 +124,39 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ],
         bottom: _tabNames.isNotEmpty
             ? PreferredSize(
-                preferredSize: const Size.fromHeight(kToolbarHeight),
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  indicatorColor: blueAccentColor,
-                  indicatorWeight: 1,
-                  tabs: _tabNames
-                      .asMap()
-                      .entries
-                      .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
-                      .toList(),
-                ),
-              )
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            indicatorColor: blueAccentColor,
+            indicatorWeight: 1,
+            tabs: _tabNames
+                .asMap()
+                .entries
+                .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
+                .toList(),
+          ),
+        )
             : null,
       ),
       drawer: const Drawer(),
       body: _tabNames.isNotEmpty
           ? Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: TabBarView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _tabController,
-                children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
-              ),
-            )
+        padding: const EdgeInsets.only(top: 10),
+        child: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _tabController,
+          children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
+        ),
+      )
           : const Center(child: Text("No Tabs")),
     );
   }
 
-  Future<void> _showRouterDialog(
-    BuildContext context,
-    RouterToggleSwitchProvider routerResult,
-    ScaffoldMessengerState scaffoldMessenger,
-  ) async {
-    try {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const RouterDialogBox();
-        },
-      );
-    } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
-    }
 
-    if (!routerResult.isServerStarted) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("Failed to start the server."),
-          duration: Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
-    routerResult.toggleSwitch(value: true);
-  }
-
-  Future<void> _showCloseRouterDialog(
-    BuildContext context,
-    RouterStateProvider routerProvider,
-    RouterToggleSwitchProvider routerResult,
-    ScaffoldMessengerState scaffoldMessenger,
-  ) async {
-    try {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              "Router Connection",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: homeAppBarTextColor,
-                fontSize: iconSize,
-              ),
-            ),
-            content: InkWell(
-              onTap: () {
-                routerProvider.serverRouter.close();
-                routerResult.setServerStarted(started: false);
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                height: 35,
-                width: MediaQuery.of(context).size.width,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: LinearGradient(
-                    colors: [
-                      blueAccentColor,
-                      Colors.lightBlue,
-                    ],
-                  ),
-                ),
-                child: Text(
-                  "Close",
-                  style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-      routerResult.toggleSwitch(value: false);
-    } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
-    }
-  }
 
   Widget _buildTabWithDeleteButton(int index, String tabName) {
     final isSelected = _tabController.index == index;
-
     return GestureDetector(
       onTap: () {
         _tabController.animateTo(index);
@@ -757,7 +637,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
       var registration = await session.register(
         _tabData[index].topicProcedureController.text,
-        (invocation) {
+            (invocation) {
           String invocations = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
           Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations);
           return Result();
@@ -789,7 +669,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       );
       var subscription = await session.subscribe(
         _tabData[index].topicProcedureController.text,
-        (event) {
+            (event) {
           String events = "$index: args=${event.args}, kwargs=${event.kwargs}";
           Provider.of<EventProvider>(context, listen: false).addEvents(events);
         },
