@@ -1,4 +1,4 @@
-package io.xconn.xconn_ui
+package io.xconn.wick_ui
 
 import io.flutter.embedding.android.FlutterActivity
 
