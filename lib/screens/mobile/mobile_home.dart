@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart" show kIsWeb;
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:wick_ui/constants.dart";
@@ -118,42 +119,44 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
         automaticallyImplyLeading: false,
         actions: [
-          Consumer<RouterToggleSwitchProvider>(
-            builder: (context, routerResult, _) {
-              var scaffoldMessenger = ScaffoldMessenger.of(context);
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
-                child: Row(
-                  children: [
-                    Text(
-                      "Router",
-                      style: TextStyle(color: homeAppBarTextColor, fontSize: iconSize),
-                    ),
-                    const SizedBox(width: 5),
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Switch(
-                        activeColor: blueAccentColor,
-                        value: routerResult.isSelected,
-                        onChanged: (value) async {
-                          try {
-                            if (value) {
-                              await _showRouterDialog(context, routerResult, scaffoldMessenger);
-                            } else {
-                              await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
-                            }
-                          } on Exception catch (e) {
-                            scaffoldMessenger
-                                .showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
-                          }
-                        },
+          if (!kIsWeb)
+            Consumer<RouterToggleSwitchProvider>(
+              builder: (context, routerResult, _) {
+                var scaffoldMessenger = ScaffoldMessenger.of(context);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Router",
+                        style: TextStyle(color: homeAppBarTextColor, fontSize: iconSize),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+                      const SizedBox(width: 5),
+                      Transform.scale(
+                        scale: 0.7,
+                        child: Switch(
+                          activeColor: blueAccentColor,
+                          value: routerResult.isSelected,
+                          onChanged: (value) async {
+                            try {
+                              if (value) {
+                                await _showRouterDialog(context, routerResult, scaffoldMessenger);
+                              } else {
+                                await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
+                              }
+                            } on Exception catch (e) {
+                              scaffoldMessenger.showSnackBar(
+                                SnackBar(content: Text("An error occurred: ${e.runtimeType} - $e. Please try again.")),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           Padding(
             padding: const EdgeInsets.only(right: 15),
             child: IconButton(

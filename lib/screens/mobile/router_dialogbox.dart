@@ -5,6 +5,7 @@ import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/router_realm_provider.dart";
 import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
+import "package:wick_ui/screens/mobile/mobile_home.dart";
 import "package:wick_ui/wamp_util.dart";
 
 class RouterDialogBox extends StatefulWidget {
@@ -221,21 +222,55 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
               realms,
             );
             routerProvider.setServerRouter(router);
-            unawaited(router.start(host, port));
-            realmProvider.resetControllers();
-            scaffoldMessenger.showSnackBar(
-              SnackBar(
-                content: Text(
-                  "Server is running on this host localhost: $host and on this port $port",
+
+            try {
+              await router.start(host, port).timeout(
+                const Duration(milliseconds: 500),
+                onTimeout: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
+                  );
+                  throw TimeoutException("Server is running on this host localhost: $host and on this port $port");
+                },
+              );
+
+              realmProvider.resetControllers();
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Server is running on this host localhost: $host and on this port $port",
+                  ),
+                  duration: const Duration(seconds: 3),
                 ),
-                duration: const Duration(seconds: 3),
+              );
+            } on TimeoutException catch (_) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text("Server is running on this host localhost: $host and on this port $port"),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            } on Exception catch (e) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text("Error: $e"),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
+          } on FormatException {
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("Invalid port number"),
+                duration: Duration(seconds: 3),
               ),
             );
-            Navigator.pop(context);
           } on Exception catch (e) {
             scaffoldMessenger.showSnackBar(
               SnackBar(
-                content: Text("Error is: $e"),
+                content: Text("Unexpected error: $e"),
                 duration: const Duration(seconds: 3),
               ),
             );
