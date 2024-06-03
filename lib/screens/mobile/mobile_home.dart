@@ -615,7 +615,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 duration: Duration(seconds: 3),
               ),
             );
-          } on Exception catch(e){
+          } on Exception catch (e) {
             scaffoldMessenger.showSnackBar(
               SnackBar(
                 content: Text("Error in publishing $e"),
