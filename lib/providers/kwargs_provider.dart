@@ -8,7 +8,9 @@ class KwargsProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get tableData => _tableData;
 
   void addRow(Map<String, String> rowData) {
+    print("len ${_tableData.length}");
     _tableData.add(rowData);
+    print("len1 ${_tableData.length}");
     notifyListeners();
   }
 

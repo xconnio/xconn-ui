@@ -7,6 +7,8 @@ import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
 import "package:wick_ui/wamp_util.dart";
 
+import "mobile_home.dart";
+
 class RouterDialogBox extends StatefulWidget {
   const RouterDialogBox({super.key});
 
@@ -205,6 +207,7 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
     RouterStateProvider routerProvider,
     RouterToggleSwitchProvider switchProvider,
   ) {
+
     return InkWell(
       onTap: () async {
         final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -221,21 +224,56 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
               realms,
             );
             routerProvider.setServerRouter(router);
-            unawaited(router.start(host, port));
-            realmProvider.resetControllers();
-            scaffoldMessenger.showSnackBar(
-              SnackBar(
-                content: Text(
-                  "Server is running on this host localhost: $host and on this port $port",
+
+            try {
+              await router.start(host, port).timeout(
+                const Duration(milliseconds: 500),
+                onTimeout: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
+                  );
+                  throw TimeoutException("Server is running on this host localhost: $host and on this port $port");
+
+                },
+              );
+
+              realmProvider.resetControllers();
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Server is running on this host localhost: $host and on this port $port",
+                  ),
+                  duration: const Duration(seconds: 3),
                 ),
-                duration: const Duration(seconds: 3),
+              );
+            } on TimeoutException catch (_) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text("Server is running on this host localhost: $host and on this port $port"),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            } on Exception catch (e) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text("Error: $e"),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
+          } on FormatException {
+            scaffoldMessenger.showSnackBar(
+              const SnackBar(
+                content: Text("Invalid port number"),
+                duration: Duration(seconds: 3),
               ),
             );
-            Navigator.pop(context);
-          } on Exception catch (e) {
+          }on Exception catch (e) {
             scaffoldMessenger.showSnackBar(
               SnackBar(
-                content: Text("Error is: $e"),
+                content: Text("Unexpected error: $e"),
                 duration: const Duration(seconds: 3),
               ),
             );
@@ -261,5 +299,69 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
         ),
       ),
     );
+
+
+    // return InkWell(
+    //   onTap: () async {
+    //     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    //     if (_formKey.currentState!.validate()) {
+    //       switchProvider.setServerStarted(started: true);
+    //       final realms = realmProvider.realmControllers.map((controller) => controller.text).toList();
+    //       final host = realmProvider.hostController.text.trim();
+    //       int port;
+    //       try {
+    //         port = int.parse(realmProvider.portController.text);
+    //         final router = startRouter(
+    //           host,
+    //           port,
+    //           realms,
+    //         );
+    //         routerProvider.setServerRouter(router);
+    //         // unawaited(router.start(host, port));
+    //         await router.start(host, port).timeout(const Duration(seconds: 2)).onError((error, stackTrace) {
+    //
+    //         });
+    //         realmProvider.resetControllers();
+    //         scaffoldMessenger.showSnackBar(
+    //           SnackBar(
+    //             content: Text(
+    //               "Server is running on this host localhost: $host and on this port $port",
+    //             ),
+    //             duration: const Duration(seconds: 3),
+    //           ),
+    //         );
+    //         await Navigator.pushReplacement(
+    //           context,
+    //           MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
+    //         );
+    //       } on Exception catch (e) {
+    //         scaffoldMessenger.showSnackBar(
+    //           SnackBar(
+    //             content: Text("Error is: $e"),
+    //             duration: const Duration(seconds: 3),
+    //           ),
+    //         );
+    //       }
+    //     }
+    //   },
+    //   child: Container(
+    //     height: 35,
+    //     width: 100,
+    //     alignment: Alignment.center,
+    //     decoration: BoxDecoration(
+    //       borderRadius: BorderRadius.circular(5),
+    //       gradient: const LinearGradient(
+    //         colors: [
+    //           Colors.blueAccent,
+    //           Colors.lightBlue,
+    //         ],
+    //       ),
+    //     ),
+    //     child: Text(
+    //       "Start",
+    //       style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
+    //     ),
+    //   ),
+    // );
   }
 }

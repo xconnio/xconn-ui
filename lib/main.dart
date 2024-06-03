@@ -12,6 +12,7 @@ import "package:wick_ui/providers/session_states_provider.dart";
 import "package:wick_ui/responsive/responsive_layout.dart";
 import "package:wick_ui/screens/mobile/mobile_home.dart";
 
+
 void main() {
   runApp(const MyApp());
 }
