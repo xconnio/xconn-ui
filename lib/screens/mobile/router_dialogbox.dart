@@ -1,5 +1,4 @@
 import "dart:async";
-
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:wick_ui/constants.dart";
@@ -297,68 +296,5 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
         ),
       ),
     );
-
-    // return InkWell(
-    //   onTap: () async {
-    //     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    //     if (_formKey.currentState!.validate()) {
-    //       switchProvider.setServerStarted(started: true);
-    //       final realms = realmProvider.realmControllers.map((controller) => controller.text).toList();
-    //       final host = realmProvider.hostController.text.trim();
-    //       int port;
-    //       try {
-    //         port = int.parse(realmProvider.portController.text);
-    //         final router = startRouter(
-    //           host,
-    //           port,
-    //           realms,
-    //         );
-    //         routerProvider.setServerRouter(router);
-    //         // unawaited(router.start(host, port));
-    //         await router.start(host, port).timeout(const Duration(seconds: 2)).onError((error, stackTrace) {
-    //
-    //         });
-    //         realmProvider.resetControllers();
-    //         scaffoldMessenger.showSnackBar(
-    //           SnackBar(
-    //             content: Text(
-    //               "Server is running on this host localhost: $host and on this port $port",
-    //             ),
-    //             duration: const Duration(seconds: 3),
-    //           ),
-    //         );
-    //         await Navigator.pushReplacement(
-    //           context,
-    //           MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
-    //         );
-    //       } on Exception catch (e) {
-    //         scaffoldMessenger.showSnackBar(
-    //           SnackBar(
-    //             content: Text("Error is: $e"),
-    //             duration: const Duration(seconds: 3),
-    //           ),
-    //         );
-    //       }
-    //     }
-    //   },
-    //   child: Container(
-    //     height: 35,
-    //     width: 100,
-    //     alignment: Alignment.center,
-    //     decoration: BoxDecoration(
-    //       borderRadius: BorderRadius.circular(5),
-    //       gradient: const LinearGradient(
-    //         colors: [
-    //           Colors.blueAccent,
-    //           Colors.lightBlue,
-    //         ],
-    //       ),
-    //     ),
-    //     child: Text(
-    //       "Start",
-    //       style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
-    //     ),
-    //   ),
-    // );
   }
 }

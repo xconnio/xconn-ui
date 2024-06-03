@@ -1,4 +1,3 @@
-import "dart:io" show Platform;
 import "package:flutter/foundation.dart" show kIsWeb;
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -120,8 +119,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
         automaticallyImplyLeading: false,
         actions: [
-          if (!kIsWeb &&
-              (Platform.isAndroid || Platform.isIOS || Platform.isWindows || Platform.isLinux || Platform.isMacOS))
+          if (!kIsWeb)
             Consumer<RouterToggleSwitchProvider>(
               builder: (context, routerResult, _) {
                 var scaffoldMessenger = ScaffoldMessenger.of(context);
