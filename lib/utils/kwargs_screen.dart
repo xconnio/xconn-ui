@@ -92,7 +92,7 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
 }
 
 class TableWidget extends StatefulWidget {
-   TableWidget(this.tableData, this.provider, {super.key});
+  const TableWidget(this.tableData, this.provider, {super.key});
 
   final List<Map<String, dynamic>> tableData;
   final KwargsProvider provider;
@@ -114,10 +114,6 @@ class _TableWidgetState extends State<TableWidget> {
     Map<String, dynamic> rowData,
     int index,
   ) {
-
-    print("valueAs $rowData");
-    print("valueAD $index");
-
     return TableRow(
       children: [
         _buildTableCell(
@@ -151,7 +147,6 @@ class _TableWidgetState extends State<TableWidget> {
               color: Colors.red,
             ),
             onPressed: () {
-              print("index is $index");
               setState(() {
                 widget.provider.removeRow(index);
               });

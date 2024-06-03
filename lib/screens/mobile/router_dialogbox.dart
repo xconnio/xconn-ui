@@ -1,13 +1,13 @@
 import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/router_realm_provider.dart";
 import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
+import "package:wick_ui/screens/mobile/mobile_home.dart";
 import "package:wick_ui/wamp_util.dart";
-
-import "mobile_home.dart";
 
 class RouterDialogBox extends StatefulWidget {
   const RouterDialogBox({super.key});
@@ -207,7 +207,6 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
     RouterStateProvider routerProvider,
     RouterToggleSwitchProvider switchProvider,
   ) {
-
     return InkWell(
       onTap: () async {
         final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -235,7 +234,6 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
                     MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
                   );
                   throw TimeoutException("Server is running on this host localhost: $host and on this port $port");
-
                 },
               );
 
@@ -270,7 +268,7 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
                 duration: Duration(seconds: 3),
               ),
             );
-          }on Exception catch (e) {
+          } on Exception catch (e) {
             scaffoldMessenger.showSnackBar(
               SnackBar(
                 content: Text("Unexpected error: $e"),
@@ -299,7 +297,6 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
         ),
       ),
     );
-
 
     // return InkWell(
     //   onTap: () async {

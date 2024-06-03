@@ -124,31 +124,31 @@ class _WebHomeScaffoldState extends State<WebHomeScaffold> with TickerProviderSt
         ],
         bottom: _tabNames.isNotEmpty
             ? PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            indicatorColor: blueAccentColor,
-            indicatorWeight: 1,
-            tabs: _tabNames
-                .asMap()
-                .entries
-                .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
-                .toList(),
-          ),
-        )
+                preferredSize: const Size.fromHeight(kToolbarHeight),
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  indicatorColor: blueAccentColor,
+                  indicatorWeight: 1,
+                  tabs: _tabNames
+                      .asMap()
+                      .entries
+                      .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
+                      .toList(),
+                ),
+              )
             : null,
       ),
       drawer: const Drawer(),
       body: _tabNames.isNotEmpty
           ? Padding(
-        padding: const EdgeInsets.only(top: 10),
-        child: TabBarView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: _tabController,
-          children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
-        ),
-      )
+              padding: const EdgeInsets.only(top: 10),
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _tabController,
+                children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
+              ),
+            )
           : const Center(child: Text("No Tabs")),
     );
   }
@@ -636,7 +636,7 @@ class _WebHomeScaffoldState extends State<WebHomeScaffold> with TickerProviderSt
 
       var registration = await session.register(
         _tabData[index].topicProcedureController.text,
-            (invocation) {
+        (invocation) {
           String invocations = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
           Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations);
           return Result();
@@ -668,7 +668,7 @@ class _WebHomeScaffoldState extends State<WebHomeScaffold> with TickerProviderSt
       );
       var subscription = await session.subscribe(
         _tabData[index].topicProcedureController.text,
-            (event) {
+        (event) {
           String events = "$index: args=${event.args}, kwargs=${event.kwargs}";
           Provider.of<EventProvider>(context, listen: false).addEvents(events);
         },
