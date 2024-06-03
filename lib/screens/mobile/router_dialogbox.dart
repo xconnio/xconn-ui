@@ -5,7 +5,6 @@ import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/router_realm_provider.dart";
 import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
-import "package:wick_ui/screens/mobile/mobile_home.dart";
 import "package:wick_ui/wamp_util.dart";
 
 class RouterDialogBox extends StatefulWidget {
@@ -181,11 +180,8 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
 
   Widget _buildCloseButton(BuildContext context) {
     return InkWell(
-      onTap: () async {
-        await Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
-        );
+      onTap: () {
+        Navigator.pop(context);
       },
       child: Container(
         height: 35,
@@ -235,10 +231,7 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
                 duration: const Duration(seconds: 3),
               ),
             );
-            await Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
-            );
+            Navigator.pop(context);
           } on Exception catch (e) {
             scaffoldMessenger.showSnackBar(
               SnackBar(
