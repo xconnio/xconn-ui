@@ -535,84 +535,84 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget sendButton(String sendButton, int index) {
-      var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
+    var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-      Future<void> publish() async {
-        List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-        Map<String, dynamic> kWarValues = {};
-        for (final map in _kwargsProviders[index].tableData) {
-          String key = map["key"];
-          dynamic value = map["value"];
-          kWarValues[key] = value;
-        }
-        var session = await connect(
-          _tabData[index].linkController.text,
-          _tabData[index].realmController.text,
-          _tabData[index].selectedSerializer,
-        );
-        try {
-          await session.publish(
-            _tabData[index].topicProcedureController.text,
-            args: argsData,
-            kwargs: kWarValues,
-          );
-          scaffoldMessenger.showSnackBar(
-            const SnackBar(
-              content: Text("Publish Successful"),
-              duration: Duration(seconds: 3),
-            ),
-          );
-          setState(() {
-            _tabData[index].linkController.clear();
-            _tabData[index].realmController.clear();
-            _tabData[index].topicProcedureController.clear();
-            _argsProviders[index].controllers.clear();
-            _kwargsProviders[index].tableData.clear();
-            _tabData[index].selectedSerializer = "";
-          });
-        } on Exception catch (e) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text("Error in publishing $e"),
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
+    Future<void> publish() async {
+      List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+      Map<String, dynamic> kWarValues = {};
+      for (final map in _kwargsProviders[index].tableData) {
+        String key = map["key"];
+        dynamic value = map["value"];
+        kWarValues[key] = value;
       }
-
-      Widget buildButton(String label, Future<void> Function() action) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 110),
-          child: MaterialButton(
-            onPressed: () async {
-              try {
-                await action();
-              } on Exception catch (error) {
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text("$sendButton Error: $error"),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-              }
-            },
-            color: Colors.blueAccent,
-            minWidth: 200,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+      var session = await connect(
+        _tabData[index].linkController.text,
+        _tabData[index].realmController.text,
+        _tabData[index].selectedSerializer,
+      );
+      try {
+        await session.publish(
+          _tabData[index].topicProcedureController.text,
+          args: argsData,
+          kwargs: kWarValues,
+        );
+        scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text("Publish Successful"),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        setState(() {
+          _tabData[index].linkController.clear();
+          _tabData[index].realmController.clear();
+          _tabData[index].topicProcedureController.clear();
+          _argsProviders[index].controllers.clear();
+          _kwargsProviders[index].tableData.clear();
+          _tabData[index].selectedSerializer = "";
+        });
+      } on Exception catch (e) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text("Error in publishing $e"),
+            duration: const Duration(seconds: 3),
           ),
         );
       }
+    }
+
+    Widget buildButton(String label, Future<void> Function() action) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 110),
+        child: MaterialButton(
+          onPressed: () async {
+            try {
+              await action();
+            } on Exception catch (error) {
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text("$sendButton Error: $error"),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
+          },
+          color: Colors.blueAccent,
+          minWidth: 200,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    }
 
     switch (sendButton) {
       case "Publish":
@@ -625,7 +625,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           () async => _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription, context),
         );
       case "Call":
-        return buildButton(sendButton, () async => _call(index,context));
+        return buildButton(sendButton, () async => _call(index, context));
       case "Register":
         return buildButton(sendButton, () async => _registerAndStoreResult(index, context));
       case "UnRegister":
