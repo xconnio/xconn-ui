@@ -39,7 +39,6 @@ class _ArgsTextFormFieldsState extends State<ArgsTextFormFields> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -71,12 +70,10 @@ class _ArgsTextFormFieldsState extends State<ArgsTextFormFields> {
                     controller: widget.provider.controllers[index],
                     decoration: InputDecoration(
                       labelText: "Enter args here",
-                      labelStyle: TextStyle(color: blackColor),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: blackColor),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       enabledBorder: OutlineInputBorder(

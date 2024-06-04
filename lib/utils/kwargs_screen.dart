@@ -51,7 +51,6 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -181,9 +180,6 @@ class _TableWidgetState extends State<TableWidget> {
       },
       children: [
         TableRow(
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-          ),
           children: [
             _buildTableCell(
               const Text(
