@@ -25,8 +25,6 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
       builder: (context, tableProvider, _) {
         Map<String, dynamic> kWarValues = {};
         for (final mapEntry in tableProvider.tableData) {
-          // String key = map["key"];
-          // dynamic value = map["value"];
           if (mapEntry.key.isNotEmpty) {
             kWarValues[mapEntry.key] = mapEntry.value;
           }
@@ -62,12 +60,6 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
                         onPressed: () {
                           setState(() {
                             widget.provider.addRow(const MapEntry("", ""));
-                            // widget.provider.addRow(
-                            //     {
-                            //   "key": "",
-                            //   "value": "",
-                            // }
-                            // );
                           });
                         },
                         icon: const Icon(
