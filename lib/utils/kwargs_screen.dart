@@ -23,7 +23,7 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
   Widget build(BuildContext context) {
     return Consumer<KwargsProvider>(
       builder: (context, tableProvider, _) {
-        Map<String, dynamic> kWarValues = {};
+        Map<String, String> kWarValues = {};
         for (final mapEntry in tableProvider.tableData) {
           if (mapEntry.key.isNotEmpty) {
             kWarValues[mapEntry.key] = mapEntry.value;
@@ -89,7 +89,7 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
 class TableWidget extends StatefulWidget {
   const TableWidget(this.tableData, this.provider, {super.key});
 
-  final List<MapEntry<String, dynamic>> tableData;
+  final List<MapEntry<String, String>> tableData;
   final KwargsProvider provider;
 
   @override
@@ -99,14 +99,14 @@ class TableWidget extends StatefulWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(IterableProperty<MapEntry<String, dynamic>>("tableData", tableData))
+      ..add(IterableProperty<MapEntry<String, String>>("tableData", tableData))
       ..add(DiagnosticsProperty<KwargsProvider>("provider", provider));
   }
 }
 
 class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
-    MapEntry<String, dynamic> rowData,
+    MapEntry<String, String> rowData,
     int index,
   ) {
     return TableRow(
@@ -117,7 +117,7 @@ class _TableWidgetState extends State<TableWidget> {
             onChanged: (newValue) {
               setState(() {
                 final index = widget.tableData.indexOf(rowData);
-                final updatedEntry = MapEntry<String, dynamic>(newValue, rowData.value);
+                final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
                 widget.tableData[index] = updatedEntry;
               });
             },
@@ -129,11 +129,11 @@ class _TableWidgetState extends State<TableWidget> {
         ),
         _buildTableCell(
           TextFormField(
-            initialValue: rowData.value.toString(),
+            initialValue: rowData.value,
             onChanged: (newValue) {
               setState(() {
                 final index = widget.tableData.indexOf(rowData);
-                final updatedEntry = MapEntry<String, dynamic>(rowData.key, newValue);
+                final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
                 widget.tableData[index] = updatedEntry;
               });
             },

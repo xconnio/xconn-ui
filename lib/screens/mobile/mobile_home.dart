@@ -542,7 +542,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   Future<void> _publish(int index) async {
     List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-    Map<String, dynamic> kWarValues = {};
+    Map<String, String> kWarValues = {};
     for (final mapEntry in _kwargsProviders[index].tableData) {
       kWarValues[mapEntry.key] = mapEntry.value;
     }
@@ -752,7 +752,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _registerAndStoreResult(int index) async {
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-    Map<String, dynamic> kWarValues = {};
+    Map<String, String> kWarValues = {};
     for (final mapEntry in _kwargsProviders[index].tableData) {
       kWarValues[mapEntry.key] = mapEntry.value;
     }
@@ -824,7 +824,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     var resultProvider = Provider.of<ResultProvider>(context, listen: false);
     try {
       List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-      Map<String, dynamic> kWarValues = {};
+      Map<String, String> kWarValues = {};
       for (final mapEntry in _kwargsProviders[index].tableData) {
         kWarValues[mapEntry.key] = mapEntry.value;
       }
