@@ -22,12 +22,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           ListTile(
             onTap: () async {
-              await showDialog(context: context, builder: (_) => ThemeDialog()).timeout(
-                const Duration(seconds: 2),
-                onTimeout: () {
-                  Navigator.pop(context);
-                },
-              );
+              await showDialog(context: context, builder: (_) => ThemeDialog());
             },
             leading: const Icon(
               Icons.sunny_snowing,

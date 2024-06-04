@@ -204,7 +204,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 child: TabBar(
                   controller: _tabController,
                   isScrollable: true,
-                  // indicatorColor: blueAccentColor,
                   indicatorWeight: 1,
                   tabs: _tabNames
                       .asMap()
@@ -325,7 +324,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             Text(
               tabName,
               style: TextStyle(
-                // color: isSelected ? blueAccentColor : blackColor,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
