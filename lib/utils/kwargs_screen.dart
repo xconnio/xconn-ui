@@ -23,12 +23,10 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
   Widget build(BuildContext context) {
     return Consumer<KwargsProvider>(
       builder: (context, tableProvider, _) {
-        Map<String, dynamic> kWarValues = {};
-        for (final map in tableProvider.tableData) {
-          String key = map["key"];
-          dynamic value = map["value"];
-          if (key.isNotEmpty) {
-            kWarValues[key] = value;
+        Map<String, String> kWarValues = {};
+        for (final mapEntry in tableProvider.tableData) {
+          if (mapEntry.key.isNotEmpty) {
+            kWarValues[mapEntry.key] = mapEntry.value;
           }
         }
 
@@ -61,10 +59,7 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
                       IconButton(
                         onPressed: () {
                           setState(() {
-                            widget.provider.addRow({
-                              "key": "",
-                              "value": "",
-                            });
+                            widget.provider.addRow(const MapEntry("", ""));
                           });
                         },
                         icon: const Icon(
@@ -94,7 +89,7 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
 class TableWidget extends StatefulWidget {
   const TableWidget(this.tableData, this.provider, {super.key});
 
-  final List<Map<String, dynamic>> tableData;
+  final List<MapEntry<String, String>> tableData;
   final KwargsProvider provider;
 
   @override
@@ -104,23 +99,27 @@ class TableWidget extends StatefulWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(IterableProperty<Map<String, dynamic>>("tableData", tableData))
+      ..add(IterableProperty<MapEntry<String, String>>("tableData", tableData))
       ..add(DiagnosticsProperty<KwargsProvider>("provider", provider));
   }
 }
 
 class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
-    Map<String, dynamic> rowData,
+    MapEntry<String, String> rowData,
     int index,
   ) {
     return TableRow(
       children: [
         _buildTableCell(
           TextFormField(
-            initialValue: rowData["key"],
+            initialValue: rowData.key,
             onChanged: (newValue) {
-              rowData["key"] = newValue;
+              setState(() {
+                final index = widget.tableData.indexOf(rowData);
+                final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
+                widget.tableData[index] = updatedEntry;
+              });
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -130,9 +129,13 @@ class _TableWidgetState extends State<TableWidget> {
         ),
         _buildTableCell(
           TextFormField(
-            initialValue: rowData["value"],
+            initialValue: rowData.value,
             onChanged: (newValue) {
-              rowData["value"] = newValue;
+              setState(() {
+                final index = widget.tableData.indexOf(rowData);
+                final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
+                widget.tableData[index] = updatedEntry;
+              });
             },
             decoration: const InputDecoration(
               border: InputBorder.none,

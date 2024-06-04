@@ -1,13 +1,13 @@
 import "package:flutter/cupertino.dart";
 
 class KwargsProvider extends ChangeNotifier {
-  final List<Map<String, dynamic>> _tableData = [
-    {"key": "", "value": ""},
+  final List<MapEntry<String, String>> _tableData = [
+    const MapEntry("", ""),
   ];
 
-  List<Map<String, dynamic>> get tableData => _tableData;
+  List<MapEntry<String, String>> get tableData => _tableData;
 
-  void addRow(Map<String, String> rowData) {
+  void addRow(MapEntry<String, String> rowData) {
     _tableData.add(rowData);
     notifyListeners();
   }

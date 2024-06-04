@@ -161,7 +161,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             padding: const EdgeInsets.only(right: 15),
             child: IconButton(
               onPressed: _addTab,
-              icon: const Icon(Icons.add_box_sharp),
+              icon: Icon(
+                Icons.add_box_sharp,
+                color: blackColor,
+              ),
             ),
           ),
         ],
@@ -539,11 +542,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   Future<void> _publish(int index) async {
     List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-    Map<String, dynamic> kWarValues = {};
-    for (final map in _kwargsProviders[index].tableData) {
-      String key = map["key"];
-      dynamic value = map["value"];
-      kWarValues[key] = value;
+    Map<String, String> kWarValues = {};
+    for (final mapEntry in _kwargsProviders[index].tableData) {
+      kWarValues[mapEntry.key] = mapEntry.value;
     }
 
     try {
@@ -750,6 +751,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   Future<void> _registerAndStoreResult(int index) async {
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
+    List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+    Map<String, String> kWarValues = {};
+    for (final mapEntry in _kwargsProviders[index].tableData) {
+      kWarValues[mapEntry.key] = mapEntry.value;
+    }
 
     try {
       var session = await connect(
@@ -763,7 +769,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         (invocation) {
           String invocations = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
           Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations);
-          return Result();
+          return Result(args: argsData, kwargs: kWarValues);
         },
       );
 
@@ -776,6 +782,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].linkController.clear();
         _tabData[index].realmController.clear();
         _tabData[index].selectedSerializer = "";
+        _argsProviders[index].controllers.clear();
+        _kwargsProviders[index].tableData.clear();
       });
     } on Exception catch (error) {
       throw Future.error(error);
@@ -816,11 +824,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     var resultProvider = Provider.of<ResultProvider>(context, listen: false);
     try {
       List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
-      Map<String, dynamic> kWarValues = {};
-      for (final map in _kwargsProviders[index].tableData) {
-        String key = map["key"];
-        dynamic value = map["value"];
-        kWarValues[key] = value;
+      Map<String, String> kWarValues = {};
+      for (final mapEntry in _kwargsProviders[index].tableData) {
+        kWarValues[mapEntry.key] = mapEntry.value;
       }
       var session = await connect(
         _tabData[index].linkController.text,
@@ -870,13 +876,15 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget buildArgs(String argsSendButton, ArgsProvider argsProvider) {
-    return argsSendButton.contains("Publish") || argsSendButton.contains("Call")
+    return argsSendButton.contains("Publish") || argsSendButton.contains("Call") || argsSendButton.contains("Register")
         ? ArgsTextFormFields(provider: argsProvider)
         : Container();
   }
 
   Widget buildKwargs(String kWargSendButton, KwargsProvider kwargsProvider) {
-    return kWargSendButton.contains("Publish") || kWargSendButton.contains("Call")
+    return kWargSendButton.contains("Publish") ||
+            kWargSendButton.contains("Call") ||
+            kWargSendButton.contains("Register")
         ? DynamicKeyValuePairs(provider: kwargsProvider)
         : Container();
   }
