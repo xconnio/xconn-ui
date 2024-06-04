@@ -1,6 +1,6 @@
 {
-    "name": "xconn_ui",
-    "short_name": "xconn_ui",
+    "name": "WAMP API tester with a UI",
+    "short_name": "Wick",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
