@@ -25,9 +25,9 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
     final switchProvider = context.read<RouterToggleSwitchProvider>();
     return AlertDialog(
       scrollable: true,
-      title: Text(
+      title: const Text(
         "Router Connection",
-        style: TextStyle(fontWeight: FontWeight.w700, color: homeAppBarTextColor, fontSize: iconSize),
+        style: TextStyle(fontWeight: FontWeight.w700, fontSize: iconSize),
       ),
       content: Form(
         key: _formKey,
@@ -74,21 +74,17 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
     required TextInputType keyboardType,
   }) {
     return TextFormField(
-      cursorColor: blueAccentColor,
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: TextStyle(color: blackColor),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: blackColor),
           borderRadius: BorderRadius.circular(8),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
         ),
       ),
@@ -111,7 +107,6 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
                 ),
               ),
             ),
@@ -147,7 +142,6 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
               keyboardType: TextInputType.text,
             ),
             trailing: InkWell(
-              hoverColor: Colors.blue.shade200,
               onTap: () {
                 setState(() {
                   realmProvider.removeController(index);
@@ -192,9 +186,9 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
           borderRadius: BorderRadius.circular(5),
           border: Border.all(color: closeIconColor.withOpacity(0.3)),
         ),
-        child: Text(
+        child: const Text(
           "Close",
-          style: TextStyle(color: blackColor, fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );

@@ -1,12 +1,12 @@
 import "package:flutter/material.dart";
 
 /// Colors ///
-Color homeAppBarBackgroundColor = Colors.white;
+Color homeAppBarBackgroundColor = const Color(0xffF9F9FB);
 Color homeAppBarTextColor = Colors.black;
 Color blackColor = Colors.black;
 Color dropDownTextColor = Colors.green;
 Color blueAccentColor = Colors.blueAccent;
-Color whiteColor = Colors.white;
+Color whiteColor = const Color(0xffF9F9FB);
 Color closeIconColor = Colors.redAccent;
 
 /// Icon Size ///

@@ -11,6 +11,7 @@ import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
 import "package:wick_ui/providers/session_states_provider.dart";
 import "package:wick_ui/screens/mobile/router_dialogbox.dart";
+import "package:wick_ui/screens/mobile/settings_screen.dart";
 import "package:wick_ui/utils/args_screen.dart";
 import "package:wick_ui/utils/kwargs_screen.dart";
 import "package:wick_ui/utils/tab_data_class.dart";
@@ -104,15 +105,37 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
+  Future<void> _showPopupMenu(BuildContext context) async {
+    await showMenu(
+      context: context,
+      position: const RelativeRect.fromLTRB(90, 90, 20, 0),
+      items: [
+        PopupMenuItem(
+          value: "Settings",
+          child: ListTile(
+            onTap: () {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+            },
+            leading: const Icon(
+              Icons.settings,
+            ),
+            title: const Text(
+              "Settings",
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Wick",
           style: TextStyle(
-            color: homeAppBarTextColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -127,9 +150,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
                   child: Row(
                     children: [
-                      Text(
+                      const Text(
                         "Router",
-                        style: TextStyle(color: homeAppBarTextColor, fontSize: iconSize),
+                        style: TextStyle(fontSize: iconSize),
                       ),
                       const SizedBox(width: 5),
                       Transform.scale(
@@ -157,13 +180,20 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 );
               },
             ),
+          IconButton(
+            onPressed: _addTab,
+            icon: const Icon(
+              Icons.add_box_sharp,
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.only(right: 15),
+            padding: const EdgeInsets.only(right: 10),
             child: IconButton(
-              onPressed: _addTab,
-              icon: Icon(
-                Icons.add_box_sharp,
-                color: blackColor,
+              onPressed: () async {
+                await _showPopupMenu(context);
+              },
+              icon: const Icon(
+                Icons.more_vert,
               ),
             ),
           ),
@@ -174,7 +204,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 child: TabBar(
                   controller: _tabController,
                   isScrollable: true,
-                  indicatorColor: blueAccentColor,
+                  // indicatorColor: blueAccentColor,
                   indicatorWeight: 1,
                   tabs: _tabNames
                       .asMap()
@@ -265,9 +295,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     ],
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   "Close",
-                  style: TextStyle(color: whiteColor, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -295,7 +325,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             Text(
               tabName,
               style: TextStyle(
-                color: isSelected ? blueAccentColor : blackColor,
+                // color: isSelected ? blueAccentColor : blackColor,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -493,10 +523,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           ),
           child: Text(
             result,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: blackColor,
             ),
           ),
         ),
@@ -529,10 +558,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           width: MediaQuery.of(context).size.width,
           child: Text(
             resultLabel,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: blackColor,
             ),
           ),
         ),
@@ -600,7 +628,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           child: Text(
             label,
             style: const TextStyle(
-              color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
