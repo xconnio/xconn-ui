@@ -381,8 +381,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               child: TextFormField(
                 controller: _tabData[index].linkController,
                 decoration: const InputDecoration(
-                  hintText: "Enter URL or paste text",
-                  labelText: "Enter URL or paste text",
+                  hintText: "ws://localhost:8080/ws",
+                  labelText: "Enter URL here",
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(10),
                 ),
