@@ -38,7 +38,6 @@ dependencies:
   fluttertoast: ^8.2.5
   provider: ^6.1.2
   shared_preferences: ^2.2.3
-  theme_provider: ^0.6.0
   xconn:
     git: https://github.com/xconnio/xconn-dart
 

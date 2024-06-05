@@ -106,8 +106,9 @@ class TableWidget extends StatefulWidget {
 class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
     MapEntry<String, String> rowData,
-    int index,
+    // int index,
   ) {
+    int index = widget.tableData.indexOf(rowData);
     return TableRow(
       children: [
         _buildTableCell(
@@ -115,7 +116,6 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.key,
             onChanged: (newValue) {
               setState(() {
-                final index = widget.tableData.indexOf(rowData);
                 final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
                 widget.tableData[index] = updatedEntry;
               });
@@ -131,7 +131,6 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.value,
             onChanged: (newValue) {
               setState(() {
-                final index = widget.tableData.indexOf(rowData);
                 final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
                 widget.tableData[index] = updatedEntry;
               });
@@ -204,10 +203,119 @@ class _TableWidgetState extends State<TableWidget> {
         ...widget.tableData.asMap().entries.map(
               (entry) => _buildTableRow(
                 entry.value,
-                entry.key,
+                // entry.key,
               ),
             ),
       ],
     );
   }
 }
+
+// class _TableWidgetState extends State<TableWidget> {
+//   TableRow _buildTableRow(
+//     MapEntry<String, String> rowData,
+//     int index,
+//   ) {
+//     return TableRow(
+//       children: [
+//         _buildTableCell(
+//           TextFormField(
+//             initialValue: rowData.key,
+//             onChanged: (newValue) {
+//               setState(() {
+//                 final index = widget.tableData.indexOf(rowData);
+//                 final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
+//                 widget.tableData[index] = updatedEntry;
+//               });
+//             },
+//             decoration: const InputDecoration(
+//               border: InputBorder.none,
+//               contentPadding: EdgeInsets.all(8),
+//             ),
+//           ),
+//         ),
+//         _buildTableCell(
+//           TextFormField(
+//             initialValue: rowData.value,
+//             onChanged: (newValue) {
+//               setState(() {
+//                 final index = widget.tableData.indexOf(rowData);
+//                 final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
+//                 widget.tableData[index] = updatedEntry;
+//               });
+//             },
+//             decoration: const InputDecoration(
+//               border: InputBorder.none,
+//               contentPadding: EdgeInsets.all(8),
+//             ),
+//           ),
+//         ),
+//         _buildTableCell(
+//           IconButton(
+//             icon: const Icon(
+//               Icons.delete,
+//               color: Colors.red,
+//             ),
+//             onPressed: () {
+//               setState(() {
+//                 widget.provider.removeRow(index);
+//               });
+//             },
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+//
+//   TableCell _buildTableCell(Widget child) {
+//     return TableCell(
+//       child: Container(
+//         alignment: Alignment.center,
+//         height: 50,
+//         child: child,
+//       ),
+//     );
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Table(
+//       border: TableBorder.all(color: Colors.grey),
+//       columnWidths: const {
+//         0: FixedColumnWidth(150),
+//         1: FixedColumnWidth(150),
+//         2: FixedColumnWidth(50),
+//       },
+//       children: [
+//         TableRow(
+//           children: [
+//             _buildTableCell(
+//               const Text(
+//                 "Key",
+//                 style: TextStyle(fontWeight: FontWeight.bold),
+//               ),
+//             ),
+//             _buildTableCell(
+//               const Text(
+//                 "Value",
+//                 style: TextStyle(fontWeight: FontWeight.bold),
+//               ),
+//             ),
+//             _buildTableCell(
+//               const Text(
+//                 "",
+//                 style: TextStyle(fontWeight: FontWeight.bold),
+//               ),
+//             ),
+//           ],
+//         ),
+//         ...widget.tableData.asMap().entries.map(
+//               (entry) => _buildTableRow(
+//                 entry.value,
+//                 entry.key,
+//               ),
+//             ),
+//       ],
+//     );
+//   }
+// }
