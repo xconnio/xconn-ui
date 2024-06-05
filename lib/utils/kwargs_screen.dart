@@ -105,9 +105,9 @@ class TableWidget extends StatefulWidget {
 
 class _TableWidgetState extends State<TableWidget> {
   TableRow _buildTableRow(
-      MapEntry<String, String> rowData,
-      int index,
-      ) {
+    MapEntry<String, String> rowData,
+    int index,
+  ) {
     return TableRow(
       children: [
         _buildTableCell(
@@ -201,10 +201,10 @@ class _TableWidgetState extends State<TableWidget> {
         ),
         ...widget.tableData.asMap().entries.map(
               (entry) => _buildTableRow(
-            entry.value,
-            entry.key,
-          ),
-        ),
+                entry.value,
+                entry.key,
+              ),
+            ),
       ],
     );
   }
