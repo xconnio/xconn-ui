@@ -9,19 +9,13 @@ import "package:wick_ui/providers/router_realm_provider.dart";
 import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
 import "package:wick_ui/providers/session_states_provider.dart";
+import "package:wick_ui/providers/theme_provider.dart";
 import "package:wick_ui/responsive/responsive_layout.dart";
 import "package:wick_ui/screens/mobile/mobile_home.dart";
 
 void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
+  runApp(
+    MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ArgsProvider()),
         ChangeNotifierProvider(create: (context) => KwargsProvider()),
@@ -32,20 +26,27 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => RouterToggleSwitchProvider()),
         ChangeNotifierProvider(create: (context) => RouterRealmProvider()),
         ChangeNotifierProvider(create: (context) => RouterStateProvider()),
+        ChangeNotifierProvider(create: (context) => MyThemeProvider()),
       ],
-      child: MaterialApp(
-        title: "Wick",
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: "Arial",
-          useMaterial3: true,
-        ),
-        home: const ResponsiveLayout(
-          mobileScaffold: MobileHomeScaffold(),
-          tabletScaffold: MobileHomeScaffold(),
-          desktopScaffold: MobileHomeScaffold(),
-        ),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<MyThemeProvider>(context);
+    return MaterialApp(
+      title: "Wick",
+      debugShowCheckedModeBanner: false,
+      theme: themeProvider.themeData,
+      home: const ResponsiveLayout(
+        mobileScaffold: MobileHomeScaffold(),
+        tabletScaffold: MobileHomeScaffold(),
+        desktopScaffold: MobileHomeScaffold(),
       ),
     );
   }

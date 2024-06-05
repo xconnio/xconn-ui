@@ -5,6 +5,7 @@ class RouterToggleSwitchProvider with ChangeNotifier {
   bool _isServerStarted = false;
 
   bool get isSelected => _isSelected;
+
   bool get isServerStarted => _isServerStarted;
 
   void toggleSwitch({required bool value}) {

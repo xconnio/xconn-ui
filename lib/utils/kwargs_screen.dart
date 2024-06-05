@@ -51,7 +51,6 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -116,7 +115,6 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.key,
             onChanged: (newValue) {
               setState(() {
-                final index = widget.tableData.indexOf(rowData);
                 final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
                 widget.tableData[index] = updatedEntry;
               });
@@ -132,7 +130,6 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.value,
             onChanged: (newValue) {
               setState(() {
-                final index = widget.tableData.indexOf(rowData);
                 final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
                 widget.tableData[index] = updatedEntry;
               });
@@ -181,9 +178,6 @@ class _TableWidgetState extends State<TableWidget> {
       },
       children: [
         TableRow(
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-          ),
           children: [
             _buildTableCell(
               const Text(
