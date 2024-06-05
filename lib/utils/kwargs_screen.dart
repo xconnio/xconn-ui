@@ -115,7 +115,6 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.key,
             onChanged: (newValue) {
               setState(() {
-                final index = widget.tableData.indexOf(rowData);
                 final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
                 widget.tableData[index] = updatedEntry;
               });
@@ -131,7 +130,6 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.value,
             onChanged: (newValue) {
               setState(() {
-                final index = widget.tableData.indexOf(rowData);
                 final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
                 widget.tableData[index] = updatedEntry;
               });
