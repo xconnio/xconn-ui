@@ -60,6 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   onTap: () {
                     themeProvider.setThemeData(ThemeData.light());
+                    Navigator.pop(context);
                   },
                   leading: const Icon(
                     Icons.light_mode,
@@ -73,6 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   onTap: () {
                     themeProvider.setThemeData(ThemeData.dark());
+                    Navigator.pop(context);
                   },
                   leading: const Icon(
                     Icons.dark_mode,

@@ -7,7 +7,9 @@ class SessionStateProvider with ChangeNotifier {
   Object? _unSubscribe;
 
   Session? get session => _session;
+
   Object? get unregister => _unregister;
+
   Object? get subscription => _unSubscribe;
 
   void setSession(Session? session) {
