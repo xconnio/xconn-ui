@@ -25,7 +25,8 @@ class MobileHomeScaffold extends StatefulWidget {
   State<MobileHomeScaffold> createState() => _MobileHomeScaffoldState();
 }
 
-class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProviderStateMixin {
+class _MobileHomeScaffoldState extends State<MobileHomeScaffold>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   final List<String> _tabNames = ["Tab"];
   final List<String> _tabContents = ["Content for Tab 1"];
@@ -114,7 +115,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           value: "Settings",
           child: ListTile(
             onTap: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),),);
             },
             leading: const Icon(
               Icons.settings,
@@ -130,7 +134,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   @override
   Widget build(BuildContext context) {
-    var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
+    var routerProvider =
+        Provider.of<RouterStateProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -140,14 +145,16 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             fontWeight: FontWeight.bold,
           ),
         ),
-        automaticallyImplyLeading: false,
         actions: [
           if (!kIsWeb)
             Consumer<RouterToggleSwitchProvider>(
               builder: (context, routerResult, _) {
                 var scaffoldMessenger = ScaffoldMessenger.of(context);
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: horizontalPadding,
+                  ),
                   child: Row(
                     children: [
                       const Text(
@@ -163,13 +170,26 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                           onChanged: (value) async {
                             try {
                               if (value) {
-                                await _showRouterDialog(context, routerResult, scaffoldMessenger);
+                                await _showRouterDialog(
+                                  context,
+                                  routerResult,
+                                  scaffoldMessenger,
+                                );
                               } else {
-                                await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
+                                await _showCloseRouterDialog(
+                                  context,
+                                  routerProvider,
+                                  routerResult,
+                                  scaffoldMessenger,
+                                );
                               }
                             } on Exception catch (e) {
                               scaffoldMessenger.showSnackBar(
-                                SnackBar(content: Text("An error occurred: ${e.runtimeType} - $e. Please try again.")),
+                                SnackBar(
+                                  content: Text(
+                                    "An error occurred: ${e.runtimeType} - $e. Please try again.",
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -208,20 +228,26 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   tabs: _tabNames
                       .asMap()
                       .entries
-                      .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
+                      .map(
+                        (entry) =>
+                            _buildTabWithDeleteButton(entry.key, entry.value),
+                      )
                       .toList(),
                 ),
               )
             : null,
       ),
-      drawer: const Drawer(),
       body: _tabNames.isNotEmpty
           ? Padding(
               padding: const EdgeInsets.only(top: 10),
               child: TabBarView(
                 physics: const NeverScrollableScrollPhysics(),
                 controller: _tabController,
-                children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
+                children: _tabContents
+                    .asMap()
+                    .entries
+                    .map((entry) => _buildTab(entry.key))
+                    .toList(),
               ),
             )
           : const Center(child: Text("No Tabs")),
@@ -241,7 +267,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         },
       );
     } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text("An error occurred. Please try again. $e"),
+        ),
+      );
     }
 
     if (!routerResult.isServerStarted) {
@@ -305,7 +335,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       );
       routerResult.toggleSwitch(value: false);
     } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text("An error occurred. Please try again. $e"),
+        ),
+      );
     }
   }
 
@@ -350,13 +384,14 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           const SizedBox(height: 20),
           _buildTabSerializerDropdown(index),
           const SizedBox(height: 20),
-          buildTopicProcedure(_tabData[index].topicProcedureController, _tabData[index].sendButtonText),
+          buildTopicProcedure(
+            _tabData[index].topicProcedureController,
+            _tabData[index].sendButtonText,
+          ),
           const SizedBox(height: 20),
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
           const SizedBox(height: 20),
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
-          const SizedBox(height: 20),
-          sendButton(_tabData[index].sendButtonText, index),
           const SizedBox(height: 50),
           resultText(_tabData[index].sendButtonText),
           _buildInvocationResults(index),
@@ -370,52 +405,59 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   Widget _buildTabActionDropdown(int index) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey),
-        ),
-        child: Row(
-          children: [
-            DropdownButton<String>(
-              focusColor: Colors.transparent,
-              value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
-              hint: Text(
-                "Actions",
-                style: TextStyle(color: dropDownTextColor),
-              ),
-              items: ["Register", "Subscribe", "Call", "Publish"].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: TextStyle(color: dropDownTextColor),
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _tabData[index].selectedValue = newValue!;
-                  _tabData[index].sendButtonText = newValue;
-                });
-              },
-            ),
-            Container(height: 30, width: 1, color: Colors.grey),
-            Expanded(
+      padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
               child: TextFormField(
                 controller: _tabData[index].linkController,
                 decoration: const InputDecoration(
                   hintText: "ws://localhost:8080/ws",
                   labelText: "Enter URL here",
-                  border: InputBorder.none,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
                   contentPadding: EdgeInsets.all(10),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          sendButton(_tabData[index].sendButtonText, index),
+          Container(width: 1, height: 45, color: Colors.black),
+          Container(
+            height: 45,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+              color: Colors.blue,
+            ),
+            child: PopupMenuButton<String>(
+              onSelected: (String newValue) {
+                setState(() {
+                  _tabData[index].selectedValue = newValue;
+                  _tabData[index].sendButtonText = newValue;
+                });
+              },
+              itemBuilder: (BuildContext context) {
+                return ["Register", "Subscribe", "Call", "Publish"]
+                    .map((String value) {
+                  return PopupMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList();
+              },
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.white,
+              ), // Transparent icon to avoid extra arrow
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -432,10 +474,13 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButton<String>(
-              value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
+              value: _tabData[index].selectedSerializer.isEmpty
+                  ? null
+                  : _tabData[index].selectedSerializer,
               focusColor: Colors.transparent,
               hint: const Text("Serializers"),
-              items: [jsonSerializer, cborSerializer, msgPackSerializer].map((String value) {
+              items: [jsonSerializer, cborSerializer, msgPackSerializer]
+                  .map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -471,7 +516,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     return Consumer<InvocationProvider>(
       builder: (context, invocationResult, _) {
         List<String> results = invocationResult.invocations;
-        List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
+        List<String> invocationRslt =
+            results.where((result) => result.startsWith("$index:")).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: invocationRslt.map(_buildResultContainer).toList(),
@@ -484,7 +530,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     return Consumer<EventProvider>(
       builder: (context, eventResult, _) {
         List<String> results = eventResult.events;
-        List<String> eventRslt = results.where((result) => result.startsWith("$index:")).toList();
+        List<String> eventRslt =
+            results.where((result) => result.startsWith("$index:")).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: eventRslt.map(_buildResultContainer).toList(),
@@ -497,10 +544,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     return Consumer<ResultProvider>(
       builder: (context, callResult, _) {
         List<String> results = callResult.results;
-        _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
+        _tabData[index].callRslt =
+            results.where((result) => result.startsWith("$index:")).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _tabData[index].callRslt!.map(_buildResultContainer).toList(),
+          children:
+              _tabData[index].callRslt!.map(_buildResultContainer).toList(),
         );
       },
     );
@@ -566,7 +615,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Future<void> _publish(int index) async {
-    List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+    List<String> argsData = _argsProviders[index]
+        .controllers
+        .map((controller) => controller.text)
+        .toList();
     Map<String, String> kWarValues = {};
     for (final mapEntry in _kwargsProviders[index].tableData) {
       kWarValues[mapEntry.key] = mapEntry.value;
@@ -598,13 +650,15 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget sendButton(String sendButton, int index) {
-    var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
+    var sessionStateProvider =
+        Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     Widget buildButton(String label, Future<void> Function() action) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 110),
-        child: MaterialButton(
+      return SizedBox(
+        height: 45,
+        width: 140,
+        child: ElevatedButton(
           onPressed: () async {
             try {
               await action();
@@ -617,10 +671,16 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               );
             }
           },
-          color: Colors.blueAccent,
-          minWidth: 200,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+          style: const ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(Colors.blue),
+            shape: MaterialStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
+              ),
+            ),
           ),
           child: Text(
             label,
@@ -675,7 +735,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnSubscribe":
         return buildButton(sendButton, () async {
           try {
-            await _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription);
+            await _unSubscribe(
+              index,
+              sessionStateProvider.session,
+              sessionStateProvider.subscription,
+            );
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnSubscribe Successfully"),
@@ -732,7 +796,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnRegister":
         return buildButton(sendButton, () async {
           try {
-            await _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister);
+            await _unRegister(
+              index,
+              sessionStateProvider.session,
+              sessionStateProvider.unregister,
+            );
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnRegister Successfully"),
@@ -760,7 +828,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
       _tabData[index].topicProcedureController.clear();
-      Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
+      Provider.of<InvocationProvider>(context, listen: false)
+          .invocations
+          .clear();
     });
   }
 
@@ -774,8 +844,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Future<void> _registerAndStoreResult(int index) async {
-    var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
-    List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+    var sessionProvider =
+        Provider.of<SessionStateProvider>(context, listen: false);
+    List<String> argsData = _argsProviders[index]
+        .controllers
+        .map((controller) => controller.text)
+        .toList();
     Map<String, String> kWarValues = {};
     for (final mapEntry in _kwargsProviders[index].tableData) {
       kWarValues[mapEntry.key] = mapEntry.value;
@@ -791,8 +865,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       var registration = await session.register(
         _tabData[index].topicProcedureController.text,
         (invocation) {
-          String invocations = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
-          Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations);
+          String invocations =
+              "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
+          Provider.of<InvocationProvider>(context, listen: false)
+              .addInvocation(invocations);
           return Result(args: argsData, kwargs: kWarValues);
         },
       );
@@ -815,7 +891,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Future<void> _subscribe(int index) async {
-    var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
+    var sessionProvider =
+        Provider.of<SessionStateProvider>(context, listen: false);
     try {
       var session = await connect(
         _tabData[index].linkController.text,
@@ -847,7 +924,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _call(int index) async {
     var resultProvider = Provider.of<ResultProvider>(context, listen: false);
     try {
-      List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+      List<String> argsData = _argsProviders[index]
+          .controllers
+          .map((controller) => controller.text)
+          .toList();
       Map<String, String> kWarValues = {};
       for (final mapEntry in _kwargsProviders[index].tableData) {
         kWarValues[mapEntry.key] = mapEntry.value;
@@ -878,16 +958,21 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Widget buildTopicProcedure(TextEditingController controller, String sendButtonText) {
+  Widget buildTopicProcedure(
+    TextEditingController controller,
+    String sendButtonText,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          hintText: sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
+          hintText: sendButtonText.contains("Publish") ||
+                  sendButtonText.contains("Subscribe")
               ? "Enter topic here"
               : "Enter procedure here",
-          labelText: sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
+          labelText: sendButtonText.contains("Publish") ||
+                  sendButtonText.contains("Subscribe")
               ? "Enter topic here"
               : "Enter procedure here",
           border: OutlineInputBorder(
@@ -900,7 +985,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget buildArgs(String argsSendButton, ArgsProvider argsProvider) {
-    return argsSendButton.contains("Publish") || argsSendButton.contains("Call") || argsSendButton.contains("Register")
+    return argsSendButton.contains("Publish") ||
+            argsSendButton.contains("Call") ||
+            argsSendButton.contains("Register")
         ? ArgsTextFormFields(provider: argsProvider)
         : Container();
   }
