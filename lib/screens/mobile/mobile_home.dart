@@ -447,7 +447,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             child: TextFormField(
               controller: _tabData[index].realmController,
               decoration: InputDecoration(
-                hintText: "ex: realm1",
+                hintText: "Enter realm here",
                 hintStyle: const TextStyle(fontWeight: FontWeight.w200),
                 labelText: "Enter realm here",
                 border: OutlineInputBorder(
