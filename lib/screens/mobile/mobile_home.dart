@@ -245,12 +245,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
 
     if (!routerResult.isServerStarted) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text("Failed to start the server."),
-          duration: Duration(seconds: 3),
-        ),
-      );
       return;
     }
     routerResult.toggleSwitch(value: true);
@@ -267,11 +261,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(
+            title: const Text(
               "Router Connection",
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: homeAppBarTextColor,
                 fontSize: iconSize,
               ),
             ),
@@ -408,6 +401,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 controller: _tabData[index].linkController,
                 decoration: const InputDecoration(
                   hintText: "ws://localhost:8080/ws",
+                  hintStyle: TextStyle(fontWeight: FontWeight.w200),
                   labelText: "Enter URL here",
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(10),
@@ -453,7 +447,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             child: TextFormField(
               controller: _tabData[index].realmController,
               decoration: InputDecoration(
-                hintText: "Enter realm here",
+                hintText: "ex: realm1",
+                hintStyle: const TextStyle(fontWeight: FontWeight.w200),
                 labelText: "Enter realm here",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -887,6 +882,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           hintText: sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
               ? "Enter topic here"
               : "Enter procedure here",
+          hintStyle: const TextStyle(fontWeight: FontWeight.w200),
           labelText: sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
               ? "Enter topic here"
               : "Enter procedure here",
