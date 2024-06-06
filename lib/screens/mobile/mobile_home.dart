@@ -379,31 +379,28 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ),
         child: Row(
           children: [
-            SizedBox(
-              width: 100,
-              child: DropdownButton<String>(
-                focusColor: Colors.transparent,
-                value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
-                hint: Text(
-                  "Actions",
-                  style: TextStyle(color: dropDownTextColor),
-                ),
-                items: ["Register", "Subscribe", "Call", "Publish"].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(color: dropDownTextColor),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _tabData[index].selectedValue = newValue!;
-                    _tabData[index].sendButtonText = newValue;
-                  });
-                },
+            DropdownButton<String>(
+              focusColor: Colors.transparent,
+              value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
+              hint: Text(
+                "Actions",
+                style: TextStyle(color: dropDownTextColor),
               ),
+              items: ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: TextStyle(color: dropDownTextColor),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _tabData[index].selectedValue = newValue!;
+                  _tabData[index].sendButtonText = newValue;
+                });
+              },
             ),
             Container(height: 30, width: 1, color: Colors.grey),
             Expanded(
