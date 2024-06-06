@@ -226,14 +226,6 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
               );
 
               realmProvider.resetControllers();
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "Server is running on this host localhost: $host and on this port $port",
-                  ),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
             } on TimeoutException catch (_) {
               scaffoldMessenger.showSnackBar(
                 SnackBar(
