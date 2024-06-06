@@ -244,10 +244,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
     }
 
-    if (!routerResult.isServerStarted) {
-      return;
+    if (routerResult.isServerStarted) {
+      routerResult.toggleSwitch(value: true);
     }
-    routerResult.toggleSwitch(value: true);
   }
 
   Future<void> _showCloseRouterDialog(
