@@ -382,6 +382,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             SizedBox(
               width: 100,
               child: DropdownButton<String>(
+                focusColor: Colors.transparent,
                 value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
                 hint: Text(
                   "Actions",
@@ -435,6 +436,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             ),
             child: DropdownButton<String>(
               value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
+              focusColor: Colors.transparent,
               hint: const Text("Serializers"),
               items: [jsonSerializer, cborSerializer, msgPackSerializer].map((String value) {
                 return DropdownMenuItem<String>(
