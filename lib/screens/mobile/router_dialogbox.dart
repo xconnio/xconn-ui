@@ -5,7 +5,6 @@ import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/router_realm_provider.dart";
 import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
-import "package:wick_ui/screens/mobile/mobile_home.dart";
 import "package:wick_ui/wamp_util.dart";
 
 class RouterDialogBox extends StatefulWidget {
@@ -222,23 +221,11 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
                 const Duration(milliseconds: 500),
                 onTimeout: () {
                   Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MobileHomeScaffold()),
-                  );
                   throw TimeoutException("Server is running on this host localhost: $host and on this port $port");
                 },
               );
 
               realmProvider.resetControllers();
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "Server is running on this host localhost: $host and on this port $port",
-                  ),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
             } on TimeoutException catch (_) {
               scaffoldMessenger.showSnackBar(
                 SnackBar(
