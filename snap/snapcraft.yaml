@@ -1,4 +1,4 @@
-name: wick-ui
+name: wick-desktop
 base: core22
 version: '0.1.0'
 summary: WAMP API tester with a UI
@@ -10,7 +10,7 @@ confinement: strict
 compression: lzo
 
 apps:
-  wick-ui:
+  wick-desktop:
     command: wick-desktop
     extensions:
       - gnome
@@ -19,7 +19,7 @@ apps:
       - network-bind
 
 parts:
-  wick-ui:
+  wick-desktop:
     plugin: flutter
     source: .
     flutter-target: lib/main.dart
