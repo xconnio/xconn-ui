@@ -607,36 +607,38 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       return SizedBox(
         height: 45,
         width: 145,
-        child: ElevatedButton(
-          onPressed: () async {
-            try {
-              await action();
-            } on Exception catch (error) {
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text("$sendButton Error: $error"),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
-          },
-          style: const ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(Colors.blue),
-            shape: WidgetStatePropertyAll(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
+        child: Expanded(
+          child: ElevatedButton(
+            onPressed: () async {
+              try {
+                await action();
+              } on Exception catch (error) {
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text("$sendButton Error: $error"),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+            style: const ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.blue),
+              shape: WidgetStatePropertyAll(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                  ),
                 ),
               ),
             ),
-          ),
-          child: Text(
-            _tabData[index].sendButtonText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+            child: Text(
+              _tabData[index].sendButtonText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -723,7 +725,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Register":
         return buildButton(sendButton, () async {
           try {
-             await _registerAndStoreResult(index);
+            await _registerAndStoreResult(index);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("Registration Successful"),
