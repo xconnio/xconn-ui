@@ -366,12 +366,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   Widget _buildTabActionDropdown(int index) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
+      padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
       child: Row(
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
+              padding: const EdgeInsets.only(right: 10),
               child: TextFormField(
                 controller: _tabData[index].linkController,
                 decoration: const InputDecoration(
@@ -606,7 +606,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     Widget buildButton(String label, Future<void> Function() action) {
       return SizedBox(
         height: 45,
-        width: 140,
+        width: 145,
         child: ElevatedButton(
           onPressed: () async {
             try {
@@ -621,8 +621,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             }
           },
           style: const ButtonStyle(
-            backgroundColor: MaterialStatePropertyAll(Colors.blue),
-            shape: MaterialStatePropertyAll(
+            backgroundColor: WidgetStatePropertyAll(Colors.blue),
+            shape: WidgetStatePropertyAll(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(10),
@@ -632,8 +632,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             ),
           ),
           child: Text(
-            label,
+            _tabData[index].sendButtonText,
             style: const TextStyle(
+              color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -722,7 +723,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Register":
         return buildButton(sendButton, () async {
           try {
-            await _registerAndStoreResult(index);
+             await _registerAndStoreResult(index);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("Registration Successful"),
@@ -765,7 +766,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _unRegister(int index, Session? session, var reg) async {
     await session?.unregister(reg);
     setState(() {
-      _tabData[index].sendButtonText = "send";
+      _tabData[index].sendButtonText = "Register";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
       _tabData[index].topicProcedureController.clear();
@@ -776,7 +777,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _unSubscribe(int index, Session? session, var sub) async {
     await session?.unsubscribe(sub);
     setState(() {
-      _tabData[index].sendButtonText = "send";
+      _tabData[index].sendButtonText = "Subscribe";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
     });
