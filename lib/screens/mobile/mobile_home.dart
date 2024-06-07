@@ -114,12 +114,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           value: "Settings",
           child: ListTile(
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ),
-              );
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
             },
             leading: const Icon(
               Icons.settings,
@@ -151,10 +146,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               builder: (context, routerResult, _) {
                 var scaffoldMessenger = ScaffoldMessenger.of(context);
                 return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: horizontalPadding,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
                   child: Row(
                     children: [
                       const Text(
@@ -170,26 +162,13 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                           onChanged: (value) async {
                             try {
                               if (value) {
-                                await _showRouterDialog(
-                                  context,
-                                  routerResult,
-                                  scaffoldMessenger,
-                                );
+                                await _showRouterDialog(context, routerResult, scaffoldMessenger);
                               } else {
-                                await _showCloseRouterDialog(
-                                  context,
-                                  routerProvider,
-                                  routerResult,
-                                  scaffoldMessenger,
-                                );
+                                await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
                               }
                             } on Exception catch (e) {
                               scaffoldMessenger.showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "An error occurred: ${e.runtimeType} - $e. Please try again.",
-                                  ),
-                                ),
+                                SnackBar(content: Text("An error occurred: ${e.runtimeType} - $e. Please try again.")),
                               );
                             }
                           },
@@ -228,9 +207,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   tabs: _tabNames
                       .asMap()
                       .entries
-                      .map(
-                        (entry) => _buildTabWithDeleteButton(entry.key, entry.value),
-                      )
+                      .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
                       .toList(),
                 ),
               )
@@ -262,11 +239,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         },
       );
     } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text("An error occurred. Please try again. $e"),
-        ),
-      );
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
     }
 
     if (!routerResult.isServerStarted) {
@@ -330,11 +303,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       );
       routerResult.toggleSwitch(value: false);
     } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text("An error occurred. Please try again. $e"),
-        ),
-      );
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
     }
   }
 
@@ -379,10 +348,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           const SizedBox(height: 20),
           _buildTabSerializerDropdown(index),
           const SizedBox(height: 20),
-          buildTopicProcedure(
-            _tabData[index].topicProcedureController,
-            _tabData[index].sendButtonText,
-          ),
+          buildTopicProcedure(_tabData[index].topicProcedureController, _tabData[index].sendButtonText),
           const SizedBox(height: 20),
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
           const SizedBox(height: 20),
@@ -718,11 +684,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnSubscribe":
         return buildButton(sendButton, () async {
           try {
-            await _unSubscribe(
-              index,
-              sessionStateProvider.session,
-              sessionStateProvider.subscription,
-            );
+            await _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnSubscribe Successfully"),
@@ -779,11 +741,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnRegister":
         return buildButton(sendButton, () async {
           try {
-            await _unRegister(
-              index,
-              sessionStateProvider.session,
-              sessionStateProvider.unregister,
-            );
+            await _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnRegister Successfully"),
@@ -929,10 +887,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Widget buildTopicProcedure(
-    TextEditingController controller,
-    String sendButtonText,
-  ) {
+  Widget buildTopicProcedure(TextEditingController controller, String sendButtonText) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: TextFormField(
