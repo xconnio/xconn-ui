@@ -755,7 +755,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _unRegister(int index, Session? session, var reg) async {
     await session?.unregister(reg);
     setState(() {
-      _tabData[index].sendButtonText = "Register";
+      _tabData[index].sendButtonText = "Call";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
       _tabData[index].topicProcedureController.clear();
@@ -766,7 +766,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _unSubscribe(int index, Session? session, var sub) async {
     await session?.unsubscribe(sub);
     setState(() {
-      _tabData[index].sendButtonText = "Subscribe";
+      _tabData[index].sendButtonText = "Call";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
       Provider.of<EventProvider>(context, listen: false).events.clear();
