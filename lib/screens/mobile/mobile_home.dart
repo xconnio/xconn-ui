@@ -503,19 +503,19 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget _buildResultContainer(String result) {
+    String finalResult = result.replaceFirst(RegExp(r"^\d+: "), "");
     return Align(
       alignment: Alignment.topLeft,
       child: Padding(
-        padding: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 3),
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.symmetric(horizontal: 15),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            result,
+            finalResult,
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -614,15 +614,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               );
             }
           },
-          style: const ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(Colors.blue),
-            shape: WidgetStatePropertyAll(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
-                ),
-              ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
             ),
           ),
           child: Text(
@@ -679,7 +674,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnSubscribe":
         return buildButton(sendButton, () async {
           try {
-            await _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription);
+            await _unSubscribe(index, sessionStateProvider.sessionUnSubscribe, sessionStateProvider.subscription);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnSubscribe Successfully"),
@@ -736,7 +731,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnRegister":
         return buildButton(sendButton, () async {
           try {
-            await _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister);
+            await _unRegister(index, sessionStateProvider.sessionUnRegister, sessionStateProvider.unregister);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnRegister Successfully"),
@@ -774,6 +769,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       _tabData[index].sendButtonText = "Subscribe";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
+      Provider.of<EventProvider>(context, listen: false).events.clear();
     });
   }
 
@@ -802,7 +798,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       );
 
       sessionProvider
-        ..setSession(session)
+        ..setSessionUnRegister(session)
         ..setUnregister(registration);
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
@@ -834,7 +830,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         },
       );
       sessionProvider
-        ..setSession(session)
+        ..setSessionUnSubscribe(session)
         ..setUnSubscribe(subscription);
       setState(() {
         var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";

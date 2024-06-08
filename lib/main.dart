@@ -12,8 +12,11 @@ import "package:wick_ui/providers/session_states_provider.dart";
 import "package:wick_ui/providers/theme_provider.dart";
 import "package:wick_ui/responsive/responsive_layout.dart";
 import "package:wick_ui/screens/mobile/mobile_home.dart";
+import "package:wick_ui/utils/shared_pref.dart";
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPref.instance.init();
   runApp(
     MultiProvider(
       providers: [
