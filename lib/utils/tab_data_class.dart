@@ -5,7 +5,7 @@ class TabData {
 
   String selectedValue = "";
   String selectedSerializer = "";
-  String sendButtonText = "Send";
+  String sendButtonText = "Call";
   List<String>? callRslt = [];
   TextEditingController linkController = TextEditingController();
   TextEditingController realmController = TextEditingController();

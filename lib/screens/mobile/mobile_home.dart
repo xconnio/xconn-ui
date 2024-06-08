@@ -140,7 +140,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             fontWeight: FontWeight.bold,
           ),
         ),
-        automaticallyImplyLeading: false,
         actions: [
           if (!kIsWeb)
             Consumer<RouterToggleSwitchProvider>(
@@ -214,7 +213,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               )
             : null,
       ),
-      drawer: const Drawer(),
       body: _tabNames.isNotEmpty
           ? Padding(
               padding: const EdgeInsets.only(top: 10),
@@ -347,8 +345,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
           const SizedBox(height: 20),
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
-          const SizedBox(height: 20),
-          sendButton(_tabData[index].sendButtonText, index),
           const SizedBox(height: 50),
           resultText(_tabData[index].sendButtonText),
           _buildInvocationResults(index),
@@ -362,53 +358,59 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   Widget _buildTabActionDropdown(int index) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey),
-        ),
-        child: Row(
-          children: [
-            DropdownButton<String>(
-              focusColor: Colors.transparent,
-              value: _tabData[index].selectedValue.isEmpty ? null : _tabData[index].selectedValue,
-              hint: Text(
-                "Actions",
-                style: TextStyle(color: dropDownTextColor),
-              ),
-              items: ["Register", "Subscribe", "Call", "Publish"].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: TextStyle(color: dropDownTextColor),
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _tabData[index].selectedValue = newValue!;
-                  _tabData[index].sendButtonText = newValue;
-                });
-              },
-            ),
-            Container(height: 30, width: 1, color: Colors.grey),
-            Expanded(
+      padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10),
               child: TextFormField(
                 controller: _tabData[index].linkController,
                 decoration: const InputDecoration(
                   hintText: "ws://localhost:8080/ws",
                   hintStyle: TextStyle(fontWeight: FontWeight.w200),
                   labelText: "Enter URL here",
-                  border: InputBorder.none,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
                   contentPadding: EdgeInsets.all(10),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          sendButton(_tabData[index].sendButtonText, index),
+          Container(width: 1, height: 45, color: Colors.black),
+          Container(
+            height: 45,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+              color: Colors.blue,
+            ),
+            child: PopupMenuButton<String>(
+              onSelected: (String newValue) {
+                setState(() {
+                  _tabData[index].selectedValue = newValue;
+                  _tabData[index].sendButtonText = newValue;
+                });
+              },
+              itemBuilder: (BuildContext context) {
+                return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                  return PopupMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList();
+              },
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -596,9 +598,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     Widget buildButton(String label, Future<void> Function() action) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 110),
-        child: MaterialButton(
+      return SizedBox(
+        height: 45,
+        width: 145,
+        child: ElevatedButton(
           onPressed: () async {
             try {
               await action();
@@ -611,14 +614,21 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               );
             }
           },
-          color: Colors.blueAccent,
-          minWidth: 200,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+          style: const ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(Colors.blue),
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
+              ),
+            ),
           ),
           child: Text(
-            label,
+            _tabData[index].sendButtonText,
             style: const TextStyle(
+              color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -750,7 +760,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _unRegister(int index, Session? session, var reg) async {
     await session?.unregister(reg);
     setState(() {
-      _tabData[index].sendButtonText = "send";
+      _tabData[index].sendButtonText = "Register";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
       _tabData[index].topicProcedureController.clear();
@@ -761,7 +771,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Future<void> _unSubscribe(int index, Session? session, var sub) async {
     await session?.unsubscribe(sub);
     setState(() {
-      _tabData[index].sendButtonText = "send";
+      _tabData[index].sendButtonText = "Subscribe";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
     });
