@@ -614,15 +614,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               );
             }
           },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-            shape: MaterialStateProperty.all(
-              const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  bottomLeft: Radius.circular(10),
-                ),
-              ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
             ),
           ),
           child: Text(
