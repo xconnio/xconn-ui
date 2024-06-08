@@ -503,19 +503,19 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget _buildResultContainer(String result) {
+    String finalResult = result.replaceFirst(RegExp(r"^\d+: "), "");
     return Align(
       alignment: Alignment.topLeft,
       child: Padding(
-        padding: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 3),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            result,
+            finalResult,
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -614,10 +614,10 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               );
             }
           },
-          style: const ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(Colors.blue),
-            shape: WidgetStatePropertyAll(
-              RoundedRectangleBorder(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            shape: MaterialStateProperty.all(
+              const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(10),
                   bottomLeft: Radius.circular(10),
