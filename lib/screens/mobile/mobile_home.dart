@@ -814,7 +814,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _kwargsProviders[index].tableData.clear();
       });
     } on Exception catch (error) {
-      throw Future.error(error);
+      throw Exception(error);
     }
   }
 
@@ -844,7 +844,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         _tabData[index].selectedSerializer = "";
       });
     } on Exception catch (error) {
-      throw Future.error(error);
+      throw Exception(error);
     }
   }
 
@@ -878,7 +878,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       _argsProviders[index].controllers.clear();
       _kwargsProviders[index].tableData.clear();
     } on Exception catch (error) {
-      throw Future.error(error);
+      throw Exception(error);
     }
   }
 
