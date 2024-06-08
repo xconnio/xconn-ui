@@ -20,7 +20,7 @@ class MyThemeProvider extends ChangeNotifier {
 
   dynamic _loadThemeData() async {
     bool? isLightTheme = SharedPref.instance.preferences.getBool(_themePreferenceKey);
-    _themeData = isLightTheme! ? ThemeData.light() : ThemeData.dark();
+    _themeData = isLightTheme != null && isLightTheme ? ThemeData.light() : ThemeData.dark();
     notifyListeners();
   }
 }

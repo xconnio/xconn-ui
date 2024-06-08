@@ -509,7 +509,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       child: Padding(
         padding: const EdgeInsets.only(top: 3),
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.symmetric(horizontal: 15),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
@@ -674,7 +674,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnSubscribe":
         return buildButton(sendButton, () async {
           try {
-            await _unSubscribe(index, sessionStateProvider.session, sessionStateProvider.subscription);
+            await _unSubscribe(index, sessionStateProvider.sessionUnSubscribe, sessionStateProvider.subscription);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnSubscribe Successfully"),
@@ -731,7 +731,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnRegister":
         return buildButton(sendButton, () async {
           try {
-            await _unRegister(index, sessionStateProvider.session, sessionStateProvider.unregister);
+            await _unRegister(index, sessionStateProvider.sessionUnRegister, sessionStateProvider.unregister);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnRegister Successfully"),
@@ -769,6 +769,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       _tabData[index].sendButtonText = "Subscribe";
       _tabData[index].selectedSerializer = "";
       _tabData[index].selectedValue = "";
+      Provider.of<EventProvider>(context, listen: false).events.clear();
     });
   }
 
@@ -797,7 +798,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       );
 
       sessionProvider
-        ..setSession(session)
+        ..setSessionUnRegister(session)
         ..setUnregister(registration);
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
@@ -829,7 +830,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         },
       );
       sessionProvider
-        ..setSession(session)
+        ..setSessionUnSubscribe(session)
         ..setUnSubscribe(subscription);
       setState(() {
         var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";
