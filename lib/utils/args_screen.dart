@@ -57,47 +57,45 @@ class _ArgsTextFormFieldsState extends State<ArgsTextFormFields> {
             ],
           ),
         ),
-        SizedBox(
-          height: 120,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: widget.provider.controllers.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: SizedBox(
-                  height: 45,
-                  child: TextFormField(
-                    controller: widget.provider.controllers[index],
-                    decoration: InputDecoration(
-                      labelText: "Enter args here",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: widget.provider.controllers.length,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: SizedBox(
+                height: 45,
+                child: TextFormField(
+                  controller: widget.provider.controllers[index],
+                  decoration: InputDecoration(
+                    labelText: "Enter args here",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
-                trailing: InkWell(
-                  hoverColor: Colors.blue.shade200,
-                  onTap: () {
-                    setState(() {
-                      widget.provider.removeController(index);
-                    });
-                  },
-                  child: Icon(
-                    Icons.delete,
-                    color: closeIconColor,
-                  ),
+              ),
+              trailing: InkWell(
+                hoverColor: Colors.blue.shade200,
+                onTap: () {
+                  setState(() {
+                    widget.provider.removeController(index);
+                  });
+                },
+                child: Icon(
+                  Icons.delete,
+                  color: closeIconColor,
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ],
     );
