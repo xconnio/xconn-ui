@@ -140,17 +140,19 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
               },
               keyboardType: TextInputType.text,
             ),
-            trailing: realmProvider.realmControllers.length == 1 ? const SizedBox() : InkWell(
-              onTap: () {
-                setState(() {
-                  realmProvider.removeController(index);
-                });
-              },
-              child: Icon(
-                Icons.delete,
-                color: closeIconColor,
-              ),
-            ),
+            trailing: realmProvider.realmControllers.length == 1
+                ? const SizedBox()
+                : InkWell(
+                    onTap: () {
+                      setState(() {
+                        realmProvider.removeController(index);
+                      });
+                    },
+                    child: Icon(
+                      Icons.delete,
+                      color: closeIconColor,
+                    ),
+                  ),
           );
         },
       ),
