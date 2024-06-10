@@ -140,7 +140,7 @@ class _RouterDialogBoxState extends State<RouterDialogBox> {
               },
               keyboardType: TextInputType.text,
             ),
-            trailing: InkWell(
+            trailing: realmProvider.realmControllers.length == 1 ? const SizedBox() : InkWell(
               onTap: () {
                 setState(() {
                   realmProvider.removeController(index);

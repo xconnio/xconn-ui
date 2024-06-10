@@ -83,7 +83,7 @@ class _ArgsTextFormFieldsState extends State<ArgsTextFormFields> {
                     ),
                   ),
                 ),
-                trailing: InkWell(
+                trailing: widget.provider.controllers.length == 1 ? const SizedBox() : InkWell(
                   hoverColor: Colors.blue.shade200,
                   onTap: () {
                     setState(() {
