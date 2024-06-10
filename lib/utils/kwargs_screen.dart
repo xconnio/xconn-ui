@@ -30,48 +30,45 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
           }
         }
 
-        return SizedBox(
-          height: 200,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Kwargs",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Kwargs",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            widget.provider.addRow(const MapEntry("", ""));
-                          });
-                        },
-                        icon: const Icon(
-                          Icons.add_box_sharp,
-                          size: 24,
-                        ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.provider.addRow(const MapEntry("", ""));
+                        });
+                      },
+                      icon: const Icon(
+                        Icons.add_box_sharp,
+                        size: 24,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                TableWidget(widget.provider.tableData, widget.provider),
-              ],
-            ),
+              ),
+              TableWidget(widget.provider.tableData, widget.provider),
+            ],
           ),
         );
       },
