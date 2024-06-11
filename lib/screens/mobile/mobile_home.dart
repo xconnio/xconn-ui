@@ -603,8 +603,12 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnSubscribe":
         return buildButton(sendButton, () async {
           try {
-            await _unSubscribe(index, sessionStateProvider.sessionUnSubscribe, sessionStateProvider.subscription,
-                tabControllerProvider);
+            await _unSubscribe(
+              index,
+              sessionStateProvider.sessionUnSubscribe,
+              sessionStateProvider.subscription,
+              tabControllerProvider,
+            );
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnSubscribe Successfully"),
@@ -662,7 +666,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         return buildButton(sendButton, () async {
           try {
             await _unRegister(
-                index, sessionStateProvider.sessionUnRegister, sessionStateProvider.unregister, tabControllerProvider);
+              index,
+              sessionStateProvider.sessionUnRegister,
+              sessionStateProvider.unregister,
+              tabControllerProvider,
+            );
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnRegister Successfully"),
