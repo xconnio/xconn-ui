@@ -1,9 +1,7 @@
 import "package:flutter/cupertino.dart";
 
 class KwargsProvider extends ChangeNotifier {
-  final List<MapEntry<String, String>> _tableData = [
-    const MapEntry("", ""),
-  ];
+  final List<MapEntry<String, String>> _tableData = [];
 
   List<MapEntry<String, String>> get tableData => _tableData;
 

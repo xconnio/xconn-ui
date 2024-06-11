@@ -345,8 +345,18 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
           const SizedBox(height: 20),
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
-          const SizedBox(height: 50),
-          resultText(_tabData[index].sendButtonText),
+          Consumer3<InvocationProvider, EventProvider, ResultProvider>(
+            builder: (context, invocationProvider, eventProvider, resultProvider, child) {
+              final hasInvocationResults = _hasInvocationResults(index, invocationProvider);
+              final hasEventsResults = _hasEventsResults(index, eventProvider);
+              final hasCallResults = _hasCallResults(index, resultProvider);
+              if (hasInvocationResults || hasEventsResults || hasCallResults) {
+                return resultText(_tabData[index].sendButtonText);
+              } else {
+                return Container();
+              }
+            },
+          ),
           _buildInvocationResults(index),
           _buildEventResults(index),
           _buildCallResults(index),
@@ -354,6 +364,24 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ],
       ),
     );
+  }
+
+  bool _hasInvocationResults(int index, InvocationProvider invocationProvider) {
+    List<String> results = invocationProvider.invocations;
+    List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
+    return invocationRslt.isNotEmpty;
+  }
+
+  bool _hasEventsResults(int index, EventProvider eventResult) {
+    List<String> results = eventResult.events;
+    List<String> eventRslt = results.where((result) => result.startsWith("$index:")).toList();
+    return eventRslt.isNotEmpty;
+  }
+
+  bool _hasCallResults(int index, ResultProvider callResult) {
+    List<String> results = callResult.results;
+    _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
+    return results.isNotEmpty;
   }
 
   Widget _buildTabActionDropdown(int index) {

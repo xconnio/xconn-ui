@@ -166,7 +166,8 @@ class _TableWidgetState extends State<TableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Table(
+    return
+      widget.tableData.isNotEmpty ? Table(
       border: TableBorder.all(color: Colors.grey),
       columnWidths: const {
         0: FixedColumnWidth(150),
@@ -203,6 +204,6 @@ class _TableWidgetState extends State<TableWidget> {
               ),
             ),
       ],
-    );
+    ) : Container();
   }
 }
