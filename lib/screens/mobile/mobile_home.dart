@@ -1,4 +1,4 @@
-import "package:flutter/foundation.dart" show DiagnosticPropertiesBuilder, DiagnosticsProperty, kIsWeb;
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:wick_ui/constants.dart";
@@ -7,12 +7,11 @@ import "package:wick_ui/providers/event_provider.dart";
 import "package:wick_ui/providers/invocation_provider.dart";
 import "package:wick_ui/providers/kwargs_provider.dart";
 import "package:wick_ui/providers/result_provider.dart";
-import "package:wick_ui/providers/router_state_provider.dart";
-import "package:wick_ui/providers/router_toggleswitch_provider.dart";
 import "package:wick_ui/providers/session_states_provider.dart";
-import "package:wick_ui/screens/mobile/router_dialogbox.dart";
+import "package:wick_ui/providers/tab_provider.dart";
 import "package:wick_ui/screens/mobile/settings_screen.dart";
 import "package:wick_ui/utils/args_screen.dart";
+import "package:wick_ui/utils/custom_appbar.dart";
 import "package:wick_ui/utils/kwargs_screen.dart";
 import "package:wick_ui/utils/tab_data_class.dart";
 import "package:wick_ui/wamp_util.dart";
@@ -132,225 +131,50 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
 
   @override
   Widget build(BuildContext context) {
-    var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Wick",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+    return Consumer<TabControllerProvider>(
+      builder: (context, tabControllerProvider, child) {
+        return Scaffold(
+          appBar: CustomAppBar(
+            tabController: tabControllerProvider.tabController,
+            tabNames: tabControllerProvider.tabNames,
+            removeTab: tabControllerProvider.removeTab,
+            addTab: tabControllerProvider.addTab,
           ),
-        ),
-        actions: [
-          if (!kIsWeb)
-            Consumer<RouterToggleSwitchProvider>(
-              builder: (context, routerResult, _) {
-                var scaffoldMessenger = ScaffoldMessenger.of(context);
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
-                  child: Row(
-                    children: [
-                      const Text(
-                        "Router",
-                        style: TextStyle(fontSize: iconSize),
-                      ),
-                      const SizedBox(width: 5),
-                      Transform.scale(
-                        scale: 0.7,
-                        child: Switch(
-                          activeColor: blueAccentColor,
-                          value: routerResult.isSelected,
-                          onChanged: (value) async {
-                            try {
-                              if (value) {
-                                await _showRouterDialog(context, routerResult, scaffoldMessenger);
-                              } else {
-                                await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
-                              }
-                            } on Exception catch (e) {
-                              scaffoldMessenger.showSnackBar(
-                                SnackBar(content: Text("An error occurred: ${e.runtimeType} - $e. Please try again.")),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+          body: tabControllerProvider.tabNames.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: TabBarView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: tabControllerProvider.tabController,
+                    children: tabControllerProvider.tabContents
+                        .asMap()
+                        .entries
+                        .map((entry) => _buildTab(entry.key, tabControllerProvider))
+                        .toList(),
                   ),
-                );
-              },
-            ),
-          IconButton(
-            onPressed: _addTab,
-            icon: const Icon(
-              Icons.add_box_sharp,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: IconButton(
-              onPressed: () async {
-                await _showPopupMenu(context);
-              },
-              icon: const Icon(
-                Icons.more_vert,
-              ),
-            ),
-          ),
-        ],
-        bottom: _tabNames.isNotEmpty
-            ? PreferredSize(
-                preferredSize: const Size.fromHeight(kToolbarHeight),
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  indicatorWeight: 1,
-                  tabs: _tabNames
-                      .asMap()
-                      .entries
-                      .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
-                      .toList(),
-                ),
-              )
-            : null,
-      ),
-      body: _tabNames.isNotEmpty
-          ? Form(
-              key: formkey,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: TabBarView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  controller: _tabController,
-                  children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
-                ),
-              ),
-            )
-          : const Center(child: Text("No Tabs")),
-    );
-  }
-
-  Future<void> _showRouterDialog(
-    BuildContext context,
-    RouterToggleSwitchProvider routerResult,
-    ScaffoldMessengerState scaffoldMessenger,
-  ) async {
-    try {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const RouterDialogBox();
-        },
-      );
-    } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
-    }
-
-    if (routerResult.isServerStarted) {
-      routerResult.toggleSwitch(value: true);
-    }
-  }
-
-  Future<void> _showCloseRouterDialog(
-    BuildContext context,
-    RouterStateProvider routerProvider,
-    RouterToggleSwitchProvider routerResult,
-    ScaffoldMessengerState scaffoldMessenger,
-  ) async {
-    try {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              "Router Connection",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: iconSize,
-              ),
-            ),
-            content: InkWell(
-              onTap: () {
-                routerProvider.serverRouter.close();
-                routerResult.setServerStarted(started: false);
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                height: 35,
-                width: MediaQuery.of(context).size.width,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: LinearGradient(
-                    colors: [
-                      blueAccentColor,
-                      Colors.lightBlue,
-                    ],
-                  ),
-                ),
-                child: const Text(
-                  "Close",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-      routerResult.toggleSwitch(value: false);
-    } on Exception catch (e) {
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text("An error occurred. Please try again. $e")));
-    }
-  }
-
-  Widget _buildTabWithDeleteButton(int index, String tabName) {
-    final isSelected = _tabController.index == index;
-
-    return GestureDetector(
-      onTap: () {
-        _tabController.animateTo(index);
+                )
+              : Container(),
+        );
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              tabName,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.close,
-                color: closeIconColor,
-                size: iconSize,
-              ),
-              onPressed: () => _removeTab(index),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _buildTab(int index) {
+  Widget _buildTab(int index, TabControllerProvider tabControllerProvider) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          _buildTabActionDropdown(index),
+          _buildTabActionDropdown(index, tabControllerProvider),
           const SizedBox(height: 20),
-          _buildTabSerializerDropdown(index),
+          _buildTabSerializerDropdown(index, tabControllerProvider),
           const SizedBox(height: 20),
-          buildTopicProcedure(_tabData[index].topicProcedureController, _tabData[index].sendButtonText),
+          buildTopicProcedure(
+            tabControllerProvider.tabData[index].topicProcedureController,
+            tabControllerProvider.tabData[index].sendButtonText,
+          ),
           const SizedBox(height: 20),
-          buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
+          buildArgs(tabControllerProvider.tabData[index].sendButtonText, tabControllerProvider.argsProviders[index]),
           const SizedBox(height: 20),
-          if (_tabData[index].sendButtonText != "Subscribe" && _tabData[index].sendButtonText != "UnSubscribe")
-            const Divider(),
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
           if (_tabData[index].sendButtonText != "Subscribe" && _tabData[index].sendButtonText != "UnSubscribe")
             const Divider(),
@@ -364,11 +188,17 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               } else {
                 return Container();
               }
-            },
+             },
           ),
+          const Divider(),
+          buildKwargs(
+            tabControllerProvider.tabData[index].sendButtonText,
+            tabControllerProvider.kwargsProviders[index],
+          ),
+          const SizedBox(height: 50),
           _buildInvocationResults(index),
           _buildEventResults(index),
-          _buildCallResults(index),
+          _buildCallResults(index, tabControllerProvider),
           const SizedBox(height: 20),
         ],
       ),
@@ -379,7 +209,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     return results.where((result) => result.startsWith("$index:")).isNotEmpty;
   }
 
-  Widget _buildTabActionDropdown(int index) {
+  Widget _buildTabActionDropdown(int index, TabControllerProvider tabControllerProvider) {
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
       child: Row(
@@ -389,7 +219,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             child: Padding(
               padding: const EdgeInsets.only(right: 10),
               child: TextFormField(
-                controller: _tabData[index].linkController,
+                controller: tabControllerProvider.tabData[index].linkController,
                 decoration: const InputDecoration(
                   hintText: "ws://localhost:8080/ws",
                   hintStyle: TextStyle(fontWeight: FontWeight.w200),
@@ -413,7 +243,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               ),
             ),
           ),
-          sendButton(_tabData[index].sendButtonText, index),
+          sendButton(tabControllerProvider.tabData[index].sendButtonText, index, tabControllerProvider),
           Container(width: 1, height: 45, color: Colors.black),
           if (_tabData[index].sendButtonText == "UnRegister" || _tabData[index].sendButtonText == "UnSubscribe")
             InkWell(
@@ -443,41 +273,59 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             )
           else
             Container(
-              height: 45,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
+                height: 45,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  color: Colors.blue,
                 ),
-                color: Colors.blue,
-              ),
-              child: PopupMenuButton<String>(
-                onSelected: (String newValue) {
-                  setState(() {
-                    _tabData[index].selectedValue = newValue;
-                    _tabData[index].sendButtonText = newValue;
-                  });
-                },
-                itemBuilder: (BuildContext context) {
-                  return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
-                    return PopupMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList();
-                },
-                icon: const Icon(
-                  Icons.arrow_drop_down,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+                child: PopupMenuButton<String>(
+                    onSelected: (String newValue) {
+                      setState(() {
+                        _tabData[index].selectedValue = newValue;
+                        _tabData[index].sendButtonText = newValue;
+                      });
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                        return PopupMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList();
+                    },
+                    icon: const Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.white,
+                    ),
+                    child: PopupMenuButton<String>(
+                      onSelected: (String newValue) {
+                        setState(() {
+                          tabControllerProvider.tabData[index].selectedValue = newValue;
+                          tabControllerProvider.tabData[index].sendButtonText = newValue;
+                        });
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                          return PopupMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList();
+                      },
+                      icon: const Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
+                    )))
         ],
       ),
     );
   }
 
-  Widget _buildTabSerializerDropdown(int index) {
+  Widget _buildTabSerializerDropdown(int index, TabControllerProvider tabControllerProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(
@@ -490,7 +338,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButton<String>(
-              value: _tabData[index].selectedSerializer.isEmpty ? null : _tabData[index].selectedSerializer,
+              value: tabControllerProvider.tabData[index].selectedSerializer.isEmpty
+                  ? null
+                  : tabControllerProvider.tabData[index].selectedSerializer,
               focusColor: Colors.transparent,
               hint: const Text("Serializers"),
               items: [jsonSerializer, cborSerializer, msgPackSerializer].map((String value) {
@@ -501,7 +351,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               }).toList(),
               onChanged: (String? newValue) {
                 setState(() {
-                  _tabData[index].selectedSerializer = newValue!;
+                  tabControllerProvider.tabData[index].selectedSerializer = newValue!;
                 });
               },
             ),
@@ -509,7 +359,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           const SizedBox(width: 10),
           Expanded(
             child: TextFormField(
-              controller: _tabData[index].realmController,
+              controller: tabControllerProvider.tabData[index].realmController,
               decoration: InputDecoration(
                 hintText: "Enter realm here",
                 hintStyle: const TextStyle(fontWeight: FontWeight.w200),
@@ -562,14 +412,15 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  Widget _buildCallResults(int index) {
+  Widget _buildCallResults(int index, TabControllerProvider tabControllerProvider) {
     return Consumer<ResultProvider>(
       builder: (context, callResult, _) {
         List<String> results = callResult.results;
-        _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
+        tabControllerProvider.tabData[index].callRslt =
+            results.where((result) => result.startsWith("$index:")).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _tabData[index].callRslt!.map(_buildResultContainer).toList(),
+          children: tabControllerProvider.tabData[index].callRslt!.map(_buildResultContainer).toList(),
         );
       },
     );
@@ -634,22 +485,23 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  Future<void> _publish(int index) async {
-    List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+  Future<void> _publish(int index, TabControllerProvider tabControllerProvider) async {
+    List<String> argsData =
+        tabControllerProvider.argsProviders[index].controllers.map((controller) => controller.text).toList();
     Map<String, String> kWarValues = {};
-    for (final mapEntry in _kwargsProviders[index].tableData) {
+    for (final mapEntry in tabControllerProvider.kwargsProviders[index].tableData) {
       kWarValues[mapEntry.key] = mapEntry.value;
     }
 
     try {
       var session = await connect(
-        _tabData[index].linkController.text,
-        _tabData[index].realmController.text,
-        _tabData[index].selectedSerializer,
+        tabControllerProvider.tabData[index].linkController.text,
+        tabControllerProvider.tabData[index].realmController.text,
+        tabControllerProvider.tabData[index].selectedSerializer,
       );
 
       await session.publish(
-        _tabData[index].topicProcedureController.text,
+        tabControllerProvider.tabData[index].topicProcedureController.text,
         args: argsData,
         kwargs: kWarValues,
       );
@@ -659,7 +511,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Widget sendButton(String sendButton, int index) {
+  Widget sendButton(String sendButton, int index, TabControllerProvider tabControllerProvider) {
     var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     double baseHeight = 45;
@@ -669,54 +521,51 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     double buttonWidth = baseWidth / pixelDensity;
     Widget buildButton(String label, Future<void> Function() action) {
       return SizedBox(
-        width: buttonWidth,
-        height: buttonHeight,
-        child: ElevatedButton(
-          onPressed: () async {
-            if (label == "UnRegister" || label == "UnSubscribe" || (formkey.currentState?.validate() ?? false)) {
-              try {
-                await action();
-              } on Exception catch (error) {
-                if (context.mounted) {
-                  scaffoldMessenger.showSnackBar(
-                    SnackBar(
-                      content: Text("Send Button Error: $error"),
-                      duration: const Duration(seconds: 3),
-                    ),
-                  );
+          width: buttonWidth,
+          height: buttonHeight,
+          child: ElevatedButton(
+              onPressed: () async {
+                if (label == "UnRegister" || label == "UnSubscribe" || (formkey.currentState?.validate() ?? false)) {
+                  try {
+                    await action();
+                  } on Exception catch (error) {
+                    if (context.mounted) {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: Text("Send Button Error: $error"),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  }
                 }
-              }
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                  ),
+                ),
               ),
-            ),
-          ),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              _tabData[index].sendButtonText,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      );
+              child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    _tabData[index].sendButtonText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ))));
     }
 
     switch (sendButton) {
       case "Publish":
         return buildButton(sendButton, () async {
           try {
-            await _publish(index);
+            await _publish(index, tabControllerProvider);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("Publish Successful"),
@@ -735,7 +584,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Subscribe":
         return buildButton(sendButton, () async {
           try {
-            await _subscribe(index);
+            await _subscribe(index, tabControllerProvider);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("Subscribe Successful"),
@@ -754,7 +603,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnSubscribe":
         return buildButton(sendButton, () async {
           try {
-            await _unSubscribe(index, sessionStateProvider.sessionUnSubscribe, sessionStateProvider.subscription);
+            await _unSubscribe(index, sessionStateProvider.sessionUnSubscribe, sessionStateProvider.subscription,
+                tabControllerProvider);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnSubscribe Successfully"),
@@ -773,7 +623,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Call":
         return buildButton(sendButton, () async {
           try {
-            await _call(index);
+            await _call(index, tabControllerProvider);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("Call Successful"),
@@ -792,7 +642,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "Register":
         return buildButton(sendButton, () async {
           try {
-            await _registerAndStoreResult(index);
+            await _registerAndStoreResult(index, tabControllerProvider);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("Registration Successful"),
@@ -811,7 +661,8 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       case "UnRegister":
         return buildButton(sendButton, () async {
           try {
-            await _unRegister(index, sessionStateProvider.sessionUnRegister, sessionStateProvider.unregister);
+            await _unRegister(
+                index, sessionStateProvider.sessionUnRegister, sessionStateProvider.unregister, tabControllerProvider);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("UnRegister Successfully"),
@@ -832,7 +683,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     }
   }
 
-  Future<void> _unRegister(int index, Session? session, var reg) async {
+  Future<void> _unRegister(int index, Session? session, var reg, TabControllerProvider tabControllerProvider) async {
     await session?.unregister(reg);
     setState(() {
       _tabData[index].sendButtonText = "Register";
@@ -840,7 +691,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     });
   }
 
-  Future<void> _unSubscribe(int index, Session? session, var sub) async {
+  Future<void> _unSubscribe(int index, Session? session, var sub, TabControllerProvider tabControllerProvider) async {
     await session?.unsubscribe(sub);
     setState(() {
       _tabData[index].sendButtonText = "Subscribe";
@@ -848,23 +699,24 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     });
   }
 
-  Future<void> _registerAndStoreResult(int index) async {
+  Future<void> _registerAndStoreResult(int index, TabControllerProvider tabControllerProvider) async {
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
-    List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+    List<String> argsData =
+        tabControllerProvider.argsProviders[index].controllers.map((controller) => controller.text).toList();
     Map<String, String> kWarValues = {};
-    for (final mapEntry in _kwargsProviders[index].tableData) {
+    for (final mapEntry in tabControllerProvider.kwargsProviders[index].tableData) {
       kWarValues[mapEntry.key] = mapEntry.value;
     }
 
     try {
       var session = await connect(
-        _tabData[index].linkController.text,
-        _tabData[index].realmController.text,
-        _tabData[index].selectedSerializer,
+        tabControllerProvider.tabData[index].linkController.text,
+        tabControllerProvider.tabData[index].realmController.text,
+        tabControllerProvider.tabData[index].selectedSerializer,
       );
 
       var registration = await session.register(
-        _tabData[index].topicProcedureController.text,
+        tabControllerProvider.tabData[index].topicProcedureController.text,
         (invocation) {
           String invocations = "$index: args=${invocation.args}, kwargs=${invocation.kwargs}";
           Provider.of<InvocationProvider>(context, listen: false).addInvocation(invocations);
@@ -877,23 +729,23 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ..setUnregister(registration);
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
-        sendButton(unregister, index);
+        sendButton(unregister, index, tabControllerProvider);
       });
     } on Exception catch (error) {
       throw Exception(error);
     }
   }
 
-  Future<void> _subscribe(int index) async {
+  Future<void> _subscribe(int index, TabControllerProvider tabControllerProvider) async {
     var sessionProvider = Provider.of<SessionStateProvider>(context, listen: false);
     try {
       var session = await connect(
-        _tabData[index].linkController.text,
-        _tabData[index].realmController.text,
-        _tabData[index].selectedSerializer,
+        tabControllerProvider.tabData[index].linkController.text,
+        tabControllerProvider.tabData[index].realmController.text,
+        tabControllerProvider.tabData[index].selectedSerializer,
       );
       var subscription = await session.subscribe(
-        _tabData[index].topicProcedureController.text,
+        tabControllerProvider.tabData[index].topicProcedureController.text,
         (event) {
           String events = "$index: args=${event.args}, kwargs=${event.kwargs}";
           Provider.of<EventProvider>(context, listen: false).addEvents(events);
@@ -904,29 +756,30 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         ..setUnSubscribe(subscription);
       setState(() {
         var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";
-        sendButton(unsubscribe, index);
+        sendButton(unsubscribe, index, tabControllerProvider);
       });
     } on Exception catch (error) {
       throw Exception(error);
     }
   }
 
-  Future<void> _call(int index) async {
+  Future<void> _call(int index, TabControllerProvider tabControllerProvider) async {
     var resultProvider = Provider.of<ResultProvider>(context, listen: false);
     try {
-      List<String> argsData = _argsProviders[index].controllers.map((controller) => controller.text).toList();
+      List<String> argsData =
+          tabControllerProvider.argsProviders[index].controllers.map((controller) => controller.text).toList();
       Map<String, String> kWarValues = {};
-      for (final mapEntry in _kwargsProviders[index].tableData) {
+      for (final mapEntry in tabControllerProvider.kwargsProviders[index].tableData) {
         kWarValues[mapEntry.key] = mapEntry.value;
       }
       var session = await connect(
-        _tabData[index].linkController.text,
-        _tabData[index].realmController.text,
-        _tabData[index].selectedSerializer,
+        tabControllerProvider.tabData[index].linkController.text,
+        tabControllerProvider.tabData[index].realmController.text,
+        tabControllerProvider.tabData[index].selectedSerializer,
       );
 
       var calls = await session.call(
-        _tabData[index].topicProcedureController.text,
+        tabControllerProvider.tabData[index].topicProcedureController.text,
         args: argsData,
         kwargs: kWarValues,
       );
