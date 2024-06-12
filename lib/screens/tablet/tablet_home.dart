@@ -25,22 +25,22 @@ class _TabletHomeScaffoldState extends State<TabletHomeScaffold> {
           ),
           body: tabControllerProvider.tabNames.isNotEmpty
               ? Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: TabBarView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: tabControllerProvider.tabController,
-              children: tabControllerProvider.tabContents
-                  .asMap()
-                  .entries
-                  .map(
-                    (entry) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 200),
-                  child: BuildMainTab(index: entry.key, tabControllerProvider: tabControllerProvider),
-                ),
-              )
-                  .toList(),
-            ),
-          )
+                  padding: const EdgeInsets.only(top: 10),
+                  child: TabBarView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: tabControllerProvider.tabController,
+                    children: tabControllerProvider.tabContents
+                        .asMap()
+                        .entries
+                        .map(
+                          (entry) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 200),
+                            child: BuildMainTab(index: entry.key, tabControllerProvider: tabControllerProvider),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                )
               : const Center(child: Text("No Tabs")),
         );
       },
