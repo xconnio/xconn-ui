@@ -18,6 +18,7 @@ import "package:wick_ui/utils/tab_data_class.dart";
 import "package:wick_ui/wamp_util.dart";
 import "package:xconn/exports.dart";
 
+
 class MobileHomeScaffold extends StatefulWidget {
   const MobileHomeScaffold({super.key});
 
@@ -321,7 +322,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                         Icons.arrow_drop_down,
                         color: Colors.white,
                       ),
-                    )))
+                    ),),),
         ],
       ),
     );
@@ -560,7 +561,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
-                  ))));
+                  ),),),);
     }
 
     switch (sendButton) {

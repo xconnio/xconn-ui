@@ -32,9 +32,12 @@ class _DesktopHomeScaffoldState extends State<DesktopHomeScaffold> {
                     children: tabControllerProvider.tabContents
                         .asMap()
                         .entries
-                        .map((entry) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 400),
-                        child: BuildMainTab(index: entry.key, tabControllerProvider: tabControllerProvider)))
+                        .map(
+                          (entry) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 400),
+                            child: BuildMainTab(index: entry.key, tabControllerProvider: tabControllerProvider),
+                          ),
+                        )
                         .toList(),
                   ),
                 )

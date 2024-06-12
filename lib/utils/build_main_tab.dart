@@ -64,8 +64,10 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
             widget.tabControllerProvider.tabData[widget.index].sendButtonText,
           ),
           const SizedBox(height: 20),
-          buildArgs(widget.tabControllerProvider.tabData[widget.index].sendButtonText,
-              widget.tabControllerProvider.argsProviders[widget.index]),
+          buildArgs(
+            widget.tabControllerProvider.tabData[widget.index].sendButtonText,
+            widget.tabControllerProvider.argsProviders[widget.index],
+          ),
           const SizedBox(height: 20),
           buildKwargs(
             widget.tabControllerProvider.tabData[widget.index].sendButtonText,
@@ -105,8 +107,13 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
               ),
             ),
           ),
-          sendButton(tabControllerProvider.tabData[index].sendButtonText, index, tabControllerProvider,
-              sessionStateProvider, context),
+          sendButton(
+            tabControllerProvider.tabData[index].sendButtonText,
+            index,
+            tabControllerProvider,
+            sessionStateProvider,
+            context,
+          ),
           Container(width: 1, height: 45, color: Colors.black),
           Container(
             height: 45,
@@ -325,8 +332,13 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     }
   }
 
-  Widget sendButton(String sendButton, int index, TabControllerProvider tabControllerProvider,
-      SessionStateProvider sessionStateProvider, BuildContext context) {
+  Widget sendButton(
+    String sendButton,
+    int index,
+    TabControllerProvider tabControllerProvider,
+    SessionStateProvider sessionStateProvider,
+    BuildContext context,
+  ) {
     Widget buildButton(String label, Future<void> Function() action) {
       return SizedBox(
         height: 45,
@@ -513,8 +525,12 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     });
   }
 
-  Future<void> _registerAndStoreResult(int index, TabControllerProvider tabControllerProvider,
-      SessionStateProvider sessionStateProvider, BuildContext context) async {
+  Future<void> _registerAndStoreResult(
+    int index,
+    TabControllerProvider tabControllerProvider,
+    SessionStateProvider sessionStateProvider,
+    BuildContext context,
+  ) async {
     List<String> argsData =
         tabControllerProvider.argsProviders[index].controllers.map((controller) => controller.text).toList();
     Map<String, String> kWarValues = {};
