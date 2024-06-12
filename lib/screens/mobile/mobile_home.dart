@@ -369,8 +369,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   bool _hasResults(int index, List<String> results) {
-    List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
-    return invocationRslt.isNotEmpty;
+    return results.where((result) => result.startsWith("$index:")).isNotEmpty;
   }
 
   Widget _buildTabActionDropdown(int index) {
