@@ -349,9 +349,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           const Divider(),
           Consumer3<InvocationProvider, EventProvider, ResultProvider>(
             builder: (context, invocationProvider, eventProvider, resultProvider, child) {
-              final hasInvocationResults = _hasInvocationResults(index, invocationProvider);
-              final hasEventsResults = _hasEventsResults(index, eventProvider);
-              final hasCallResults = _hasCallResults(index, resultProvider);
+              final hasInvocationResults = _hasResults(index, invocationProvider.invocations);
+              final hasEventsResults = _hasResults(index, eventProvider.events);
+              final hasCallResults = _hasResults(index, resultProvider.results);
               if (hasInvocationResults || hasEventsResults || hasCallResults) {
                 return resultText(_tabData[index].sendButtonText);
               } else {
@@ -368,22 +368,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
-  bool _hasInvocationResults(int index, InvocationProvider invocationProvider) {
-    List<String> results = invocationProvider.invocations;
+  bool _hasResults(int index, List<String> results) {
     List<String> invocationRslt = results.where((result) => result.startsWith("$index:")).toList();
     return invocationRslt.isNotEmpty;
-  }
-
-  bool _hasEventsResults(int index, EventProvider eventResult) {
-    List<String> results = eventResult.events;
-    List<String> eventRslt = results.where((result) => result.startsWith("$index:")).toList();
-    return eventRslt.isNotEmpty;
-  }
-
-  bool _hasCallResults(int index, ResultProvider callResult) {
-    List<String> results = callResult.results;
-    _tabData[index].callRslt = results.where((result) => result.startsWith("$index:")).toList();
-    return results.isNotEmpty;
   }
 
   Widget _buildTabActionDropdown(int index) {
