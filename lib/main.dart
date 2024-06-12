@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
       theme: themeProvider.themeData,
       home: const ResponsiveLayout(
         mobileScaffold: MobileHomeScaffold(),
-        tabletScaffold: TabletHomeScaffold(),
+        tabletScaffold: MobileHomeScaffold(),
         desktopScaffold: DesktopHomeScaffold(),
       ),
     );

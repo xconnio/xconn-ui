@@ -69,13 +69,26 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
             widget.tabControllerProvider.argsProviders[widget.index],
           ),
           const SizedBox(height: 20),
+          const Divider(),
           buildKwargs(
             widget.tabControllerProvider.tabData[widget.index].sendButtonText,
             widget.tabControllerProvider.kwargsProviders[widget.index],
           ),
-          if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" && widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
-          const SizedBox(height: 50),
-          resultText(widget.tabControllerProvider.tabData[widget.index].sendButtonText),
+        if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" && widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
+       const Divider(),
+          const Divider(),
+          Consumer3<InvocationProvider, EventProvider, ResultProvider>(
+            builder: (context, invocationProvider, eventProvider, resultProvider, child) {
+              final hasInvocationResults = _hasResults(widget.index, invocationProvider.invocations);
+              final hasEventsResults = _hasResults(widget.index, eventProvider.events);
+              final hasCallResults = _hasResults(widget.index, resultProvider.results);
+              if (hasInvocationResults || hasEventsResults || hasCallResults) {
+                return resultText(widget.tabControllerProvider.tabData[widget.index].sendButtonText);
+              } else {
+                return Container();
+              }
+            },
+          ),
           _buildInvocationResults(widget.index),
           _buildEventResults(widget.index),
           _buildCallResults(widget.index, widget.tabControllerProvider),
@@ -84,6 +97,13 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
       ),
     );
   }
+
+
+  bool _hasResults(int index, List<String> results) {
+    return results.where((result) => result.startsWith("$index:")).isNotEmpty;
+  }
+
+
 
   Widget _buildTabActionDropdown(int index, TabControllerProvider tabControllerProvider, BuildContext context) {
     return Padding(
@@ -319,14 +339,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
         args: argsData,
         kwargs: kWarValues,
       );
-      setState(() {
-        tabControllerProvider.tabData[index].linkController.clear();
-        tabControllerProvider.tabData[index].realmController.clear();
-        tabControllerProvider.tabData[index].topicProcedureController.clear();
-        tabControllerProvider.argsProviders[index].controllers.clear();
-        tabControllerProvider.kwargsProviders[index].tableData.clear();
-        tabControllerProvider.tabData[index].selectedSerializer = "";
-      });
+      setState(() {});
     } on Exception catch (e) {
       return Future.error(e);
     }
@@ -508,10 +521,6 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     await session?.unregister(reg);
     setState(() {
       tabControllerProvider.tabData[index].sendButtonText = "Register";
-      tabControllerProvider.tabData[index].selectedSerializer = "";
-      tabControllerProvider.tabData[index].selectedValue = "";
-      tabControllerProvider.tabData[index].topicProcedureController.clear();
-      invocationProvider.invocations.clear();
     });
   }
 
@@ -519,9 +528,6 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     await session?.unsubscribe(sub);
     setState(() {
       tabControllerProvider.tabData[index].sendButtonText = "Subscribe";
-      tabControllerProvider.tabData[index].selectedSerializer = "";
-      tabControllerProvider.tabData[index].selectedValue = "";
-      eventProvider.events.clear();
     });
   }
 
@@ -560,11 +566,6 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
       setState(() {
         var unregister = tabControllerProvider.tabData[index].sendButtonText = "UnRegister";
         sendButton(unregister, index, tabControllerProvider, sessionStateProvider, context);
-        tabControllerProvider.tabData[index].linkController.clear();
-        tabControllerProvider.tabData[index].realmController.clear();
-        tabControllerProvider.tabData[index].selectedSerializer = "";
-        tabControllerProvider.argsProviders[index].controllers.clear();
-        tabControllerProvider.kwargsProviders[index].tableData.clear();
       });
     } on Exception catch (error) {
       throw Exception(error);
@@ -591,9 +592,6 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
       setState(() {
         var unsubscribe = tabControllerProvider.tabData[index].sendButtonText = "UnSubscribe";
         sendButton(unsubscribe, index, tabControllerProvider, sessionStateProvider, context);
-        tabControllerProvider.tabData[index].linkController.clear();
-        tabControllerProvider.tabData[index].realmController.clear();
-        tabControllerProvider.tabData[index].selectedSerializer = "";
       });
     } on Exception catch (error) {
       throw Exception(error);
@@ -623,12 +621,6 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
       resultProvider.results.clear();
       String result = "$index: args=${calls.args}, kwargs=${calls.kwargs}";
       resultProvider.addResult(result);
-
-      tabControllerProvider.tabData[index].linkController.clear();
-      tabControllerProvider.tabData[index].realmController.clear();
-      tabControllerProvider.tabData[index].selectedSerializer = "";
-      tabControllerProvider.argsProviders[index].controllers.clear();
-      tabControllerProvider.kwargsProviders[index].tableData.clear();
     } on Exception catch (error) {
       throw Exception(error);
     }
