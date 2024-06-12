@@ -166,43 +166,45 @@ class _TableWidgetState extends State<TableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Table(
-      border: TableBorder.all(color: Colors.grey),
-      columnWidths: const {
-        0: FixedColumnWidth(150),
-        1: FixedColumnWidth(150),
-        2: FixedColumnWidth(50),
-      },
-      children: [
-        TableRow(
-          children: [
-            _buildTableCell(
-              const Text(
-                "Key",
-                style: TextStyle(fontWeight: FontWeight.bold),
+    return widget.tableData.isNotEmpty
+        ? Table(
+            border: TableBorder.all(color: Colors.grey),
+            columnWidths: const {
+              0: FixedColumnWidth(150),
+              1: FixedColumnWidth(150),
+              2: FixedColumnWidth(50),
+            },
+            children: [
+              TableRow(
+                children: [
+                  _buildTableCell(
+                    const Text(
+                      "Key",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  _buildTableCell(
+                    const Text(
+                      "Value",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  _buildTableCell(
+                    const Text(
+                      "",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            _buildTableCell(
-              const Text(
-                "Value",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            _buildTableCell(
-              const Text(
-                "",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        ...widget.tableData.asMap().entries.map(
-              (entry) => _buildTableRow(
-                entry.value,
-                entry.key,
-              ),
-            ),
-      ],
-    );
+              ...widget.tableData.asMap().entries.map(
+                    (entry) => _buildTableRow(
+                      entry.value,
+                      entry.key,
+                    ),
+                  ),
+            ],
+          )
+        : Container();
   }
 }
