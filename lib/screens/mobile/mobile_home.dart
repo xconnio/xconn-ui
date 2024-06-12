@@ -396,36 +396,53 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           ),
           sendButton(_tabData[index].sendButtonText, index),
           Container(width: 1, height: 45, color: Colors.black),
-          Container(
-            height: 45,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(10),
-                bottomRight: Radius.circular(10),
+          if (_tabData[index].sendButtonText == "UnRegister" || _tabData[index].sendButtonText == "UnSubscribe")
+            Container(
+              padding: const EdgeInsets.all(8),
+              height: 45,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+                color: Colors.grey,
               ),
-              color: Colors.blue,
-            ),
-            child: PopupMenuButton<String>(
-              onSelected: (String newValue) {
-                setState(() {
-                  _tabData[index].selectedValue = newValue;
-                  _tabData[index].sendButtonText = newValue;
-                });
-              },
-              itemBuilder: (BuildContext context) {
-                return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
-                  return PopupMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList();
-              },
-              icon: const Icon(
+              child: const Icon(
                 Icons.arrow_drop_down,
                 color: Colors.white,
               ),
+            )
+          else
+            Container(
+              height: 45,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+                color: Colors.blue,
+              ),
+              child: PopupMenuButton<String>(
+                onSelected: (String newValue) {
+                  setState(() {
+                    _tabData[index].selectedValue = newValue;
+                    _tabData[index].sendButtonText = newValue;
+                  });
+                },
+                itemBuilder: (BuildContext context) {
+                  return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                    return PopupMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList();
+                },
+                icon: const Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
