@@ -34,7 +34,7 @@ class _DesktopHomeScaffoldState extends State<DesktopHomeScaffold> {
                         .entries
                         .map(
                           (entry) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 400),
+                            padding: const EdgeInsets.symmetric(horizontal: 300),
                             child: BuildMainTab(index: entry.key, tabControllerProvider: tabControllerProvider),
                           ),
                         )

@@ -14,6 +14,7 @@ import "package:wick_ui/providers/theme_provider.dart";
 import "package:wick_ui/responsive/responsive_layout.dart";
 import "package:wick_ui/screens/desktop/desktop_home.dart";
 import "package:wick_ui/screens/mobile/mobile_home.dart";
+import "package:wick_ui/screens/tablet/tablet_home.dart";
 import "package:wick_ui/utils/shared_pref.dart";
 
 void main() async {
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
       theme: themeProvider.themeData,
       home: const ResponsiveLayout(
         mobileScaffold: MobileHomeScaffold(),
-        tabletScaffold: MobileHomeScaffold(),
+        tabletScaffold: TabletHomeScaffold(),
         desktopScaffold: DesktopHomeScaffold(),
       ),
     );

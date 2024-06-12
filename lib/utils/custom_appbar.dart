@@ -220,6 +220,16 @@ class _CustomAppBarState extends State<CustomAppBar> {
               );
             },
           ),
+        if (widget.tabNames.isEmpty)
+          IconButton(
+            onPressed: widget.addTab,
+            icon: const Icon(
+              Icons.add_circle,
+              size: 25,
+            ),
+          )
+        else
+          const SizedBox(),
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: IconButton(
@@ -235,31 +245,35 @@ class _CustomAppBarState extends State<CustomAppBar> {
       bottom: widget.tabNames.isNotEmpty
           ? PreferredSize(
               preferredSize: const Size.fromHeight(kToolbarHeight),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TabBar(
-                      controller: widget.tabController,
-                      isScrollable: true,
-                      indicatorWeight: 1,
-                      tabs: widget.tabNames
-                          .asMap()
-                          .entries
-                          .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
-                          .toList(),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: IconButton(
-                      onPressed: widget.addTab,
-                      icon: const Icon(
-                        Icons.add_circle,
-                        size: 25,
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      TabBar(
+                        controller: widget.tabController,
+                        isScrollable: true,
+                        indicatorWeight: 1,
+                        tabs: widget.tabNames
+                            .asMap()
+                            .entries
+                            .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
+                            .toList(),
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: IconButton(
+                          onPressed: widget.addTab,
+                          icon: const Icon(
+                            Icons.add_circle,
+                            size: 25,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             )
           : null,
