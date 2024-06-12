@@ -344,7 +344,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           const SizedBox(height: 20),
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
           const SizedBox(height: 20),
+          const Divider(),
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
+          const Divider(),
           Consumer3<InvocationProvider, EventProvider, ResultProvider>(
             builder: (context, invocationProvider, eventProvider, resultProvider, child) {
               final hasInvocationResults = _hasInvocationResults(index, invocationProvider);
@@ -608,14 +610,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         args: argsData,
         kwargs: kWarValues,
       );
-      setState(() {
-        _tabData[index].linkController.clear();
-        _tabData[index].realmController.clear();
-        _tabData[index].topicProcedureController.clear();
-        _argsProviders[index].controllers.clear();
-        _kwargsProviders[index].tableData.clear();
-        _tabData[index].selectedSerializer = "";
-      });
+      setState(() {});
     } on Exception catch (e) {
       return Future.error(e);
     }
@@ -784,9 +779,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     await session?.unregister(reg);
     setState(() {
       _tabData[index].sendButtonText = "Register";
-      _tabData[index].selectedSerializer = "";
-      _tabData[index].selectedValue = "";
-      _tabData[index].topicProcedureController.clear();
       Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
     });
   }
@@ -795,8 +787,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     await session?.unsubscribe(sub);
     setState(() {
       _tabData[index].sendButtonText = "Subscribe";
-      _tabData[index].selectedSerializer = "";
-      _tabData[index].selectedValue = "";
       Provider.of<EventProvider>(context, listen: false).events.clear();
     });
   }
@@ -831,11 +821,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       setState(() {
         var unregister = _tabData[index].sendButtonText = "UnRegister";
         sendButton(unregister, index);
-        _tabData[index].linkController.clear();
-        _tabData[index].realmController.clear();
-        _tabData[index].selectedSerializer = "";
-        _argsProviders[index].controllers.clear();
-        _kwargsProviders[index].tableData.clear();
       });
     } on Exception catch (error) {
       throw Exception(error);
@@ -863,9 +848,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       setState(() {
         var unsubscribe = _tabData[index].sendButtonText = "UnSubscribe";
         sendButton(unsubscribe, index);
-        _tabData[index].linkController.clear();
-        _tabData[index].realmController.clear();
-        _tabData[index].selectedSerializer = "";
       });
     } on Exception catch (error) {
       throw Exception(error);
@@ -895,12 +877,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       resultProvider.results.clear();
       String result = "$index: args=${calls.args}, kwargs=${calls.kwargs}";
       resultProvider.addResult(result);
-
-      _tabData[index].linkController.clear();
-      _tabData[index].realmController.clear();
-      _tabData[index].selectedSerializer = "";
-      _argsProviders[index].controllers.clear();
-      _kwargsProviders[index].tableData.clear();
     } on Exception catch (error) {
       throw Exception(error);
     }
