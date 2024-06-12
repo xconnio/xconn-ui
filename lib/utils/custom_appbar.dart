@@ -40,10 +40,10 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _CustomAppBarState extends State<CustomAppBar> {
   Future<void> _showRouterDialog(
-    BuildContext context,
-    RouterToggleSwitchProvider routerResult,
-    ScaffoldMessengerState scaffoldMessenger,
-  ) async {
+      BuildContext context,
+      RouterToggleSwitchProvider routerResult,
+      ScaffoldMessengerState scaffoldMessenger,
+      ) async {
     try {
       await showDialog(
         context: context,
@@ -61,11 +61,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Future<void> _showCloseRouterDialog(
-    BuildContext context,
-    RouterStateProvider routerProvider,
-    RouterToggleSwitchProvider routerResult,
-    ScaffoldMessengerState scaffoldMessenger,
-  ) async {
+      BuildContext context,
+      RouterStateProvider routerProvider,
+      RouterToggleSwitchProvider routerResult,
+      ScaffoldMessengerState scaffoldMessenger,
+      ) async {
     try {
       await showDialog(
         context: context,
@@ -174,12 +174,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
     return AppBar(
       title: isMobile
           ? const Text(
-              "Wick",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            )
+        "Wick",
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      )
           : const SizedBox(),
       actions: [
         if (!kIsWeb)
@@ -220,12 +220,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
               );
             },
           ),
-        IconButton(
-          onPressed: widget.addTab,
-          icon: const Icon(
-            Icons.add_box_sharp,
-          ),
-        ),
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: IconButton(
@@ -240,7 +234,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
       ],
       bottom: widget.tabNames.isNotEmpty
           ? PreferredSize(
-              preferredSize: const Size.fromHeight(kToolbarHeight),
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Row(
+          children: [
+            Expanded(
               child: TabBar(
                 controller: widget.tabController,
                 isScrollable: true,
@@ -251,7 +248,20 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
                     .toList(),
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: IconButton(
+                onPressed: widget.addTab,
+                icon: const Icon(
+                  Icons.add_circle,
+                  size: 25,
+                ),
+              ),
+            ),
+          ],
+        ),
+      )
           : null,
     );
   }
