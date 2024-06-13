@@ -397,19 +397,29 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           sendButton(_tabData[index].sendButtonText, index),
           Container(width: 1, height: 45, color: Colors.black),
           if (_tabData[index].sendButtonText == "UnRegister" || _tabData[index].sendButtonText == "UnSubscribe")
-            Container(
-              padding: const EdgeInsets.all(8),
-              height: 45,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
+            InkWell(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Please ${_tabData[index].sendButtonText} first"),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                height: 45,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  color: Colors.blue,
                 ),
-                color: Colors.grey,
-              ),
-              child: const Icon(
-                Icons.arrow_drop_down,
-                color: Colors.white,
+                child: const Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.white,
+                ),
               ),
             )
           else
