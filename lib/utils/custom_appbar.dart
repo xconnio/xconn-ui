@@ -247,11 +247,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: Align(
                 alignment: Alignment.topLeft,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      TabBar(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TabBar(
                         controller: widget.tabController,
                         isScrollable: true,
                         indicatorWeight: 1,
@@ -261,18 +260,18 @@ class _CustomAppBarState extends State<CustomAppBar> {
                             .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
                             .toList(),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: IconButton(
-                          onPressed: widget.addTab,
-                          icon: const Icon(
-                            Icons.add_circle,
-                            size: 25,
-                          ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: IconButton(
+                        onPressed: widget.addTab,
+                        icon: const Icon(
+                          Icons.add_circle,
+                          size: 25,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             )

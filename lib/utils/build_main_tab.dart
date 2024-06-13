@@ -98,12 +98,9 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     );
   }
 
-
   bool _hasResults(int index, List<String> results) {
     return results.where((result) => result.startsWith("$index:")).isNotEmpty;
   }
-
-
 
   Widget _buildTabActionDropdown(int index, TabControllerProvider tabControllerProvider, BuildContext context) {
     return Padding(
