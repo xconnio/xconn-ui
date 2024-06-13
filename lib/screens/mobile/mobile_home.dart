@@ -1,4 +1,4 @@
-import "package:flutter/foundation.dart" show kIsWeb;
+import "package:flutter/foundation.dart" show DiagnosticPropertiesBuilder, DiagnosticsProperty, kIsWeb;
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:wick_ui/constants.dart";
@@ -128,6 +128,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     );
   }
 
+  final formkey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
@@ -214,12 +215,15 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             : null,
       ),
       body: _tabNames.isNotEmpty
-          ? Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: TabBarView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _tabController,
-                children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
+          ? Form(
+              key: formkey,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: _tabController,
+                  children: _tabContents.asMap().entries.map((entry) => _buildTab(entry.key)).toList(),
+                ),
               ),
             )
           : const Center(child: Text("No Tabs")),
@@ -391,6 +395,18 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   ),
                   contentPadding: EdgeInsets.all(10),
                 ),
+                validator: (value) {
+                  // Define your URL validation logic here
+                  if (value == null || value.isEmpty) {
+                    return "URL cannot be empty";
+                  }
+                  const urlPattern = r"^(ws|wss):\/\/[^\s$.?#].[^\s]*$";
+                  final result = RegExp(urlPattern, caseSensitive: false).hasMatch(value);
+                  if (!result) {
+                    return "Enter a valid WebSocket URL";
+                  }
+                  return null; // return null if the validation passes
+                },
               ),
             ),
           ),
@@ -499,6 +515,16 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 ),
                 contentPadding: const EdgeInsets.all(10),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Realm cannot be empty";
+                }
+                const regexPattern = r"^([^\s\.#]+\.)*([^\s\.#]+)$";
+                if (!RegExp(regexPattern).hasMatch(value)) {
+                  return "Enter a valid realm";
+                }
+                return null;
+              },
             ),
           ),
         ],
@@ -639,15 +665,19 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         width: 145,
         child: ElevatedButton(
           onPressed: () async {
-            try {
-              await action();
-            } on Exception catch (error) {
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text("$sendButton Error: $error"),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
+            if (formkey.currentState?.validate() ?? false) {
+              try {
+                await action();
+              } on Exception catch (error) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Send Button Error: $error"),
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
             }
           },
           style: ElevatedButton.styleFrom(
@@ -913,6 +943,20 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           ),
           contentPadding: const EdgeInsets.all(10),
         ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
+                ? "Topic cannot be empty"
+                : "Procedure cannot be empty";
+          }
+          const regexPattern = r"^([^\s.#]+\.)*([^\s.#]+)$";
+          if (!RegExp(regexPattern).hasMatch(value)) {
+            return sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
+                ? "Enter a valid topic"
+                : "Enter a valid procedure";
+          }
+          return null;
+        },
       ),
     );
   }
@@ -929,5 +973,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             kWargSendButton.contains("Register")
         ? DynamicKeyValuePairs(provider: kwargsProvider)
         : Container();
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<GlobalKey<FormState>>("formkey", formkey));
   }
 }
