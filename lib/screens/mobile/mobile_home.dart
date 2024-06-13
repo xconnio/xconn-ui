@@ -414,7 +414,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                     topRight: Radius.circular(10),
                     bottomRight: Radius.circular(10),
                   ),
-                  color: Colors.blue,
+                  color: Colors.grey,
                 ),
                 child: const Icon(
                   Icons.arrow_drop_down,
