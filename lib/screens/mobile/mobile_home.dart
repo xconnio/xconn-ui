@@ -400,7 +400,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   if (value == null || value.isEmpty) {
                     return "URL cannot be empty";
                   }
-                  const urlPattern = r"^(ws|wss):\/\/[^\s$.?#].[^\s]*$";
+                  const urlPattern = r"^(ws|wss):\/\/[^\s$.?#]+(\.[^\s$.?#]+)*(:\d+)?(\/[^\s]*)?$";
                   final result = RegExp(urlPattern, caseSensitive: false).hasMatch(value);
                   if (!result) {
                     return "Enter a valid WebSocket URL";
@@ -944,13 +944,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           contentPadding: const EdgeInsets.all(10),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) {
-            return sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
-                ? "Topic cannot be empty"
-                : "Procedure cannot be empty";
+          if (value?.isEmpty ?? true) {
+            return "${sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe") ? "Topic" : "Procedure"} cannot be empty";
           }
           const regexPattern = r"^([^\s.#]+\.)*([^\s.#]+)$";
-          if (!RegExp(regexPattern).hasMatch(value)) {
+          if (!RegExp(regexPattern).hasMatch(value!)) {
             return sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
                 ? "Enter a valid topic"
                 : "Enter a valid procedure";
