@@ -674,7 +674,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
         height: buttonHeight,
         child: ElevatedButton(
           onPressed: () async {
-            if (formkey.currentState?.validate() ?? false) {
+            if (label == "UnRegister" || label == "UnSubscribe" || (formkey.currentState?.validate() ?? false)) {
               try {
                 await action();
               } on Exception catch (error) {
@@ -701,7 +701,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              label,
+              _tabData[index].sendButtonText,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
