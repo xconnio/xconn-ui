@@ -64,26 +64,31 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       _tabData.add(TabData());
       _argsProviders.add(ArgsProvider());
       _kwargsProviders.add(KwargsProvider());
-      _updateTabController();
-      _tabController.index = newIndex;
+      _updateTabController(newIndex);
     });
   }
 
   void _removeTab(int index) {
     setState(() {
+      int newIndex = _tabController.index;
       _tabNames.removeAt(index);
       _tabContents.removeAt(index);
       _tabData[index].disposeControllers();
       _tabData.removeAt(index);
       _argsProviders.removeAt(index);
       _kwargsProviders.removeAt(index);
-      _updateTabController();
+      if (newIndex >= _tabNames.length) {
+        newIndex = _tabNames.length - 1;
+      }
+
+      _updateTabController(newIndex);
     });
   }
 
-  void _updateTabController() {
+  void _updateTabController(int targetIndex) {
     if (_tabController.length != _tabNames.length) {
       _initializeTabController();
+      _tabController.index = targetIndex;
     }
   }
 
