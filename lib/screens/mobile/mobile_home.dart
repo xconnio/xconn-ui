@@ -129,6 +129,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   final formkey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
@@ -348,9 +349,11 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           const SizedBox(height: 20),
           buildArgs(_tabData[index].sendButtonText, _argsProviders[index]),
           const SizedBox(height: 20),
-          const Divider(),
+          if (_tabData[index].sendButtonText != "Subscribe" && _tabData[index].sendButtonText != "UnSubscribe")
+            const Divider(),
           buildKwargs(_tabData[index].sendButtonText, _kwargsProviders[index]),
-          const Divider(),
+          if (_tabData[index].sendButtonText != "Subscribe" && _tabData[index].sendButtonText != "UnSubscribe")
+            const Divider(),
           Consumer3<InvocationProvider, EventProvider, ResultProvider>(
             builder: (context, invocationProvider, eventProvider, resultProvider, child) {
               final hasInvocationResults = _hasResults(index, invocationProvider.invocations);
@@ -380,6 +383,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Padding(
@@ -478,6 +482,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -658,11 +663,15 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Widget sendButton(String sendButton, int index) {
     var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-
+    double baseWidth = 145;
+    double baseHeight = 45;
+    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
+    double buttonWidth = baseWidth / pixelDensity;
+    double buttonHeight = baseHeight / pixelDensity;
     Widget buildButton(String label, Future<void> Function() action) {
       return SizedBox(
-        height: 45,
-        width: 145,
+        height: buttonHeight,
+        width: buttonWidth,
         child: ElevatedButton(
           onPressed: () async {
             if (formkey.currentState?.validate() ?? false) {
@@ -670,7 +679,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                 await action();
               } on Exception catch (error) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  scaffoldMessenger.showSnackBar(
                     SnackBar(
                       content: Text("Send Button Error: $error"),
                       duration: const Duration(seconds: 3),
