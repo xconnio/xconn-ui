@@ -104,7 +104,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
 
   Widget _buildTabActionDropdown(int index, TabControllerProvider tabControllerProvider, BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(
         children: [
           Expanded(
@@ -350,9 +350,15 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     BuildContext context,
   ) {
     Widget buildButton(String label, Future<void> Function() action) {
+      double baseWidth = 145;
+      double baseHeight = 45;
+      double pixelDensity = MediaQuery.of(context).devicePixelRatio;
+      double buttonWidth = baseWidth / pixelDensity;
+      double buttonHeight = baseHeight / pixelDensity;
+
       return SizedBox(
-        height: 45,
-        width: 145,
+        height: buttonHeight,
+        width: buttonWidth,
         child: ElevatedButton(
           onPressed: () async {
             try {
