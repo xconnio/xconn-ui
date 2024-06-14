@@ -699,7 +699,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             _tabData[index].sendButtonText,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
           ),
