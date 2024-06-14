@@ -663,22 +663,22 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Widget sendButton(String sendButton, int index) {
     var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    double baseWidth = 145;
     double baseHeight = 45;
+    double baseWidth = 150;
     double pixelDensity = MediaQuery.of(context).devicePixelRatio;
-    double buttonWidth = baseWidth / pixelDensity;
     double buttonHeight = baseHeight / pixelDensity;
+    double buttonWidth = baseWidth / pixelDensity;
     Widget buildButton(String label, Future<void> Function() action) {
       return SizedBox(
-        height: buttonHeight,
         width: buttonWidth,
+        height: buttonHeight,
         child: ElevatedButton(
           onPressed: () async {
             if (formkey.currentState?.validate() ?? false) {
               try {
                 await action();
               } on Exception catch (error) {
-                if (mounted) {
+                if (context.mounted) {
                   scaffoldMessenger.showSnackBar(
                     SnackBar(
                       content: Text("Send Button Error: $error"),
@@ -692,15 +692,21 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                bottomLeft: Radius.circular(10),
+              ),
             ),
           ),
-          child: Text(
-            _tabData[index].sendButtonText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
