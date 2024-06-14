@@ -659,6 +659,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
       return Future.error(e);
     }
   }
+
   Widget sendButton(String sendButton, int index) {
     var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
