@@ -400,7 +400,6 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
                   contentPadding: EdgeInsets.all(10),
                 ),
                 validator: (value) {
-                  // Define your URL validation logic here
                   if (value == null || value.isEmpty) {
                     return "URL cannot be empty";
                   }
