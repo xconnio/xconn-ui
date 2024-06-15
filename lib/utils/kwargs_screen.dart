@@ -101,15 +101,21 @@ class TableWidget extends StatefulWidget {
 }
 
 class _TableWidgetState extends State<TableWidget> {
-  TableRow _buildTableRow(MapEntry<String, String> rowData, int index) {
+  TableRow _buildTableRow(
+    MapEntry<String, String> rowData,
+    int index,
+  ) {
     return TableRow(
       children: [
         _buildTableCell(
           TextFormField(
             initialValue: rowData.key,
             onChanged: (newValue) {
-              final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
-              widget.kwargsProvider.updateRow(index, updatedEntry);
+              setState(() {
+                final updatedEntry = MapEntry<String, String>(rowData.value, newValue);
+                widget.tableData[index] = updatedEntry;
+                widget.kwargsProvider.updateRow(index, updatedEntry);
+              });
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -121,8 +127,11 @@ class _TableWidgetState extends State<TableWidget> {
           TextFormField(
             initialValue: rowData.value,
             onChanged: (newValue) {
-              final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
-              widget.kwargsProvider.updateRow(index, updatedEntry);
+              setState(() {
+                final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
+                widget.tableData[index] = updatedEntry;
+                widget.kwargsProvider.updateRow(index, updatedEntry);
+              });
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -138,7 +147,7 @@ class _TableWidgetState extends State<TableWidget> {
             ),
             onPressed: () {
               setState(() {
-                widget.kwargsProvider.removeRow(index);
+                widget.tableData.removeAt(index);
               });
             },
           ),
@@ -190,7 +199,12 @@ class _TableWidgetState extends State<TableWidget> {
                   ),
                 ],
               ),
-              ...widget.tableData.asMap().entries.map((entry) => _buildTableRow(entry.value, entry.key)),
+              ...widget.tableData.asMap().entries.map(
+                    (entry) => _buildTableRow(
+                      entry.value,
+                      entry.key,
+                    ),
+                  ),
             ],
           )
         : Container();
