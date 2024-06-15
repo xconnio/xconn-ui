@@ -83,10 +83,10 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
 }
 
 class TableWidget extends StatefulWidget {
-  const TableWidget(this.tableData, this.provider, {super.key});
+  const TableWidget(this.tableData, this.kwargsProvider, {super.key});
 
   final List<MapEntry<String, String>> tableData;
-  final KwargsProvider provider;
+  final KwargsProvider kwargsProvider;
 
   @override
   State<TableWidget> createState() => _TableWidgetState();
@@ -96,7 +96,7 @@ class TableWidget extends StatefulWidget {
     super.debugFillProperties(properties);
     properties
       ..add(IterableProperty<MapEntry<String, String>>("tableData", tableData))
-      ..add(DiagnosticsProperty<KwargsProvider>("provider", provider));
+      ..add(DiagnosticsProperty<KwargsProvider>("kwargsProvider", kwargsProvider));
   }
 }
 
@@ -111,10 +111,8 @@ class _TableWidgetState extends State<TableWidget> {
           TextFormField(
             initialValue: rowData.key,
             onChanged: (newValue) {
-              setState(() {
-                final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
-                widget.tableData[index] = updatedEntry;
-              });
+              final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
+              widget.tableData[index] = updatedEntry;
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -126,10 +124,8 @@ class _TableWidgetState extends State<TableWidget> {
           TextFormField(
             initialValue: rowData.value,
             onChanged: (newValue) {
-              setState(() {
-                final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
-                widget.tableData[index] = updatedEntry;
-              });
+              final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
+              widget.tableData[index] = updatedEntry;
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -145,7 +141,7 @@ class _TableWidgetState extends State<TableWidget> {
             ),
             onPressed: () {
               setState(() {
-                widget.provider.removeRow(index);
+                widget.kwargsProvider.removeRow(index);
               });
             },
           ),

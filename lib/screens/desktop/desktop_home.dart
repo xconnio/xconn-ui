@@ -27,7 +27,7 @@ class _DesktopHomeScaffoldState extends State<DesktopHomeScaffold> {
               ? LayoutBuilder(
                   builder: (context, constraints) {
                     double screenWidth = constraints.maxWidth;
-                    double horizontalPadding = screenWidth > 1300 ? (screenWidth - 800) / 2 : 20.0;
+                    double horizontalPadding = screenWidth > 1300 ? (screenWidth - 1200) / 2 : 20.0;
 
                     return Padding(
                       padding: const EdgeInsets.only(top: 30),
@@ -36,7 +36,7 @@ class _DesktopHomeScaffoldState extends State<DesktopHomeScaffold> {
                           duration: const Duration(milliseconds: 300),
                           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                           child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 800, minWidth: 300),
+                            constraints: const BoxConstraints(maxWidth: 1200, minWidth: 300),
                             child: TabBarView(
                               physics: const NeverScrollableScrollPhysics(),
                               controller: tabControllerProvider.tabController,

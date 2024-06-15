@@ -5,6 +5,7 @@ import "package:provider/provider.dart";
 import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
+import "package:wick_ui/providers/theme_provider.dart";
 import "package:wick_ui/screens/mobile/router_dialogbox.dart";
 import "package:wick_ui/screens/mobile/settings_screen.dart";
 
@@ -231,17 +232,32 @@ class _CustomAppBarState extends State<CustomAppBar> {
           )
         else
           const SizedBox(),
-        Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: IconButton(
-            onPressed: () async {
-              await _showPopupMenu(context);
-            },
-            icon: const Icon(
-              Icons.more_vert,
+        if (!kIsWeb)
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: IconButton(
+              onPressed: () async {
+                await _showPopupMenu(context);
+              },
+              icon: const Icon(
+                Icons.more_vert,
+              ),
+            ),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              icon: Icon(
+                Provider.of<MyThemeProvider>(context).themeData == ThemeData.light()
+                    ? Icons.dark_mode
+                    : Icons.light_mode,
+              ),
+              onPressed: () async {
+                await Provider.of<MyThemeProvider>(context, listen: false).toggleTheme();
+              },
             ),
           ),
-        ),
       ],
       bottom: widget.tabNames.isNotEmpty
           ? PreferredSize(
