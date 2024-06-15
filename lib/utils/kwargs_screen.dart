@@ -101,10 +101,7 @@ class TableWidget extends StatefulWidget {
 }
 
 class _TableWidgetState extends State<TableWidget> {
-  TableRow _buildTableRow(
-    MapEntry<String, String> rowData,
-    int index,
-  ) {
+  TableRow _buildTableRow(MapEntry<String, String> rowData, int index) {
     return TableRow(
       children: [
         _buildTableCell(
@@ -112,7 +109,7 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.key,
             onChanged: (newValue) {
               final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
-              widget.tableData[index] = updatedEntry;
+              widget.kwargsProvider.updateRow(index, updatedEntry);
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -125,7 +122,7 @@ class _TableWidgetState extends State<TableWidget> {
             initialValue: rowData.value,
             onChanged: (newValue) {
               final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
-              widget.tableData[index] = updatedEntry;
+              widget.kwargsProvider.updateRow(index, updatedEntry);
             },
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -193,12 +190,7 @@ class _TableWidgetState extends State<TableWidget> {
                   ),
                 ],
               ),
-              ...widget.tableData.asMap().entries.map(
-                    (entry) => _buildTableRow(
-                      entry.value,
-                      entry.key,
-                    ),
-                  ),
+              ...widget.tableData.asMap().entries.map((entry) => _buildTableRow(entry.value, entry.key)),
             ],
           )
         : Container();

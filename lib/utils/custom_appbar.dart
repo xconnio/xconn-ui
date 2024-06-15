@@ -1,3 +1,4 @@
+import "dart:io" show Platform;
 import "dart:ui";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
@@ -232,7 +233,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
           )
         else
           const SizedBox(),
-        if (!kIsWeb)
+        if (!kIsWeb && !Platform.isLinux && !Platform.isWindows)
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: IconButton(
