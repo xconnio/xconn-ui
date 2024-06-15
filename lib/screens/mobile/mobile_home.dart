@@ -380,6 +380,9 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   }
 
   Widget _buildTabActionDropdown(int index) {
+    double baseHeight = 60;
+    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
+    double buttonHeight = baseHeight / pixelDensity;
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
       child: Row(
@@ -388,34 +391,36 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(right: 10),
-              child: TextFormField(
-                controller: _tabData[index].linkController,
-                decoration: const InputDecoration(
-                  hintText: "ws://localhost:8080/ws",
-                  hintStyle: TextStyle(fontWeight: FontWeight.w200),
-                  labelText: "Enter URL here",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+              child: SizedBox(
+                height: buttonHeight,
+                child: TextFormField(
+                  controller: _tabData[index].linkController,
+                  decoration: const InputDecoration(
+                    hintText: "ws://localhost:8080/ws",
+                    hintStyle: TextStyle(fontWeight: FontWeight.w200),
+                    labelText: "Enter URL here",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    contentPadding: EdgeInsets.all(25),
                   ),
-                  contentPadding: EdgeInsets.all(10),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "URL cannot be empty";
+                    }
+                    const urlPattern = r"^(ws|wss):\/\/[^\s$.?#]+(\.[^\s$.?#]+)*(:\d+)?(\/[^\s]*)?$";
+                    final result = RegExp(urlPattern, caseSensitive: false).hasMatch(value);
+                    if (!result) {
+                      return "Enter a valid WebSocket URL";
+                    }
+                    return null; // return null if the validation passes
+                  },
                 ),
-                validator: (value) {
-                  // Define your URL validation logic here
-                  if (value == null || value.isEmpty) {
-                    return "URL cannot be empty";
-                  }
-                  const urlPattern = r"^(ws|wss):\/\/[^\s$.?#]+(\.[^\s$.?#]+)*(:\d+)?(\/[^\s]*)?$";
-                  final result = RegExp(urlPattern, caseSensitive: false).hasMatch(value);
-                  if (!result) {
-                    return "Enter a valid WebSocket URL";
-                  }
-                  return null; // return null if the validation passes
-                },
               ),
             ),
           ),
           sendButton(_tabData[index].sendButtonText, index),
-          Container(width: 1, height: 45, color: Colors.black),
+          Container(width: 1, height: buttonHeight, color: Colors.black),
           if (_tabData[index].sendButtonText == "UnRegister" || _tabData[index].sendButtonText == "UnSubscribe")
             InkWell(
               onTap: () {
@@ -428,7 +433,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
-                height: 45,
+                height: buttonHeight,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(10),
@@ -444,7 +449,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
             )
           else
             Container(
-              height: 45,
+              height: buttonHeight,
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(10),
@@ -663,7 +668,7 @@ class _MobileHomeScaffoldState extends State<MobileHomeScaffold> with TickerProv
   Widget sendButton(String sendButton, int index) {
     var sessionStateProvider = Provider.of<SessionStateProvider>(context, listen: false);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    double baseHeight = 45;
+    double baseHeight = 60;
     double baseWidth = 150;
     double pixelDensity = MediaQuery.of(context).devicePixelRatio;
     double buttonHeight = baseHeight / pixelDensity;
