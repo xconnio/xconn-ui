@@ -5,7 +5,6 @@ import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/args_provider.dart";
 import "package:wick_ui/providers/event_provider.dart";
 import "package:wick_ui/providers/invocation_provider.dart";
-import "package:wick_ui/providers/kwargs_provider.dart";
 import "package:wick_ui/providers/result_provider.dart";
 import "package:wick_ui/providers/session_states_provider.dart";
 import "package:wick_ui/providers/tab_provider.dart";
@@ -72,7 +71,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
           const Divider(),
           buildKwargs(
             widget.tabControllerProvider.tabData[widget.index].sendButtonText,
-            widget.tabControllerProvider.kwargsProviders[widget.index],
+            widget.index,
           ),
         if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" && widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
        const Divider(),
@@ -524,6 +523,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     await session?.unregister(reg);
     setState(() {
       tabControllerProvider.tabData[index].sendButtonText = "Register";
+      Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
     });
   }
 
@@ -531,6 +531,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     await session?.unsubscribe(sub);
     setState(() {
       tabControllerProvider.tabData[index].sendButtonText = "Subscribe";
+      Provider.of<EventProvider>(context, listen: false).events.clear();
     });
   }
 
@@ -657,11 +658,15 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
         : Container();
   }
 
-  Widget buildKwargs(String kWargSendButton, KwargsProvider kwargsProvider) {
+  Widget buildKwargs(String kWargSendButton, int index) {
+    var tabController = Provider.of<TabControllerProvider>(context, listen: false);
     return kWargSendButton.contains("Publish") ||
             kWargSendButton.contains("Call") ||
             kWargSendButton.contains("Register")
-        ? DynamicKeyValuePairs(provider: kwargsProvider)
+        ? ChangeNotifierProvider.value(
+            value: tabController.kwargsProviders[index],
+            child: DynamicKeyValuePairs(kwargsProvider: tabController.kwargsProviders[index]),
+          )
         : Container();
   }
 
