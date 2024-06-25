@@ -14,10 +14,11 @@ import "package:wick_ui/wamp_util.dart";
 import "package:xconn/exports.dart";
 
 class BuildMainTab extends StatefulWidget {
-  const BuildMainTab({required this.index, required this.tabControllerProvider, super.key});
+  const BuildMainTab({required this.index, required this.tabControllerProvider, this.formKey, super.key});
 
   final int index;
   final TabControllerProvider tabControllerProvider;
+  final GlobalKey<FormState>? formKey;
 
   @override
   State<BuildMainTab> createState() => _BuildMainTabState();
@@ -27,7 +28,8 @@ class BuildMainTab extends StatefulWidget {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty<TabControllerProvider>("tabControllerProvider", tabControllerProvider))
-      ..add(IntProperty("index", index));
+      ..add(IntProperty("index", index))
+      ..add(DiagnosticsProperty<GlobalKey<FormState>>("formKey", formKey));
   }
 }
 
@@ -37,6 +39,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
   late InvocationProvider invocationProvider;
   late EventProvider eventProvider;
   late ResultProvider resultProvider;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   void didChangeDependencies() {
@@ -68,14 +71,13 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
             widget.tabControllerProvider.argsProviders[widget.index],
           ),
           const SizedBox(height: 20),
-          const Divider(),
-          buildKwargs(
-            widget.tabControllerProvider.tabData[widget.index].sendButtonText,
-            widget.index,
-          ),
-        if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" && widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
-       const Divider(),
-          const Divider(),
+          if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" &&
+              widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
+            const Divider(),
+          buildKwargs(widget.tabControllerProvider.tabData[widget.index].sendButtonText, widget.index),
+          if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" &&
+              widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
+            const Divider(),
           Consumer3<InvocationProvider, EventProvider, ResultProvider>(
             builder: (context, invocationProvider, eventProvider, resultProvider, child) {
               final hasInvocationResults = _hasResults(widget.index, invocationProvider.invocations);
@@ -88,6 +90,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
               }
             },
           ),
+          const SizedBox(height: 50),
           _buildInvocationResults(widget.index),
           _buildEventResults(widget.index),
           _buildCallResults(widget.index, widget.tabControllerProvider),
@@ -103,8 +106,9 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
 
   Widget _buildTabActionDropdown(int index, TabControllerProvider tabControllerProvider, BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Padding(
@@ -120,47 +124,96 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
                   ),
                   contentPadding: EdgeInsets.all(10),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "URL cannot be empty";
+                  }
+                  const urlPattern = r"^(ws|wss):\/\/[^\s$.?#]+(\.[^\s$.?#]+)*(:\d+)?(\/[^\s]*)?$";
+                  final result = RegExp(urlPattern, caseSensitive: false).hasMatch(value);
+                  if (!result) {
+                    return "Enter a valid WebSocket URL";
+                  }
+                  return null; // return null if the validation passes
+                },
               ),
             ),
           ),
-          sendButton(
-            tabControllerProvider.tabData[index].sendButtonText,
-            index,
-            tabControllerProvider,
-            sessionStateProvider,
-            context,
-          ),
+          sendButton(tabControllerProvider.tabData[index].sendButtonText, index, tabControllerProvider, context),
           Container(width: 1, height: 45, color: Colors.black),
-          Container(
-            height: 45,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-              color: Colors.blue,
-            ),
-            child: PopupMenuButton<String>(
-              onSelected: (String newValue) {
-                setState(() {
-                  tabControllerProvider.tabData[index].selectedValue = newValue;
-                  tabControllerProvider.tabData[index].sendButtonText = newValue;
-                });
+          if (widget.tabControllerProvider.tabData[index].sendButtonText == "UnRegister" ||
+              widget.tabControllerProvider.tabData[index].sendButtonText == "UnSubscribe")
+            InkWell(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Please ${widget.tabControllerProvider.tabData[index].sendButtonText} first"),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
               },
-              itemBuilder: (BuildContext context) {
-                return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
-                  return PopupMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList();
-              },
-              icon: const Icon(
-                Icons.arrow_drop_down,
-                color: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                height: 45,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  color: Colors.grey,
+                ),
+                child: const Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          else
+            Container(
+              height: 45,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+                color: Colors.blue,
+              ),
+              child: PopupMenuButton<String>(
+                onSelected: (String newValue) {
+                  setState(() {
+                    widget.tabControllerProvider.tabData[index].selectedValue = newValue;
+                    widget.tabControllerProvider.tabData[index].sendButtonText = newValue;
+                  });
+                },
+                itemBuilder: (BuildContext context) {
+                  return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                    return PopupMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList();
+                },
+                child: PopupMenuButton<String>(
+                  onSelected: (String newValue) {
+                    setState(() {
+                      tabControllerProvider.tabData[index].selectedValue = newValue;
+                      tabControllerProvider.tabData[index].sendButtonText = newValue;
+                    });
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return ["Register", "Subscribe", "Call", "Publish"].map((String value) {
+                      return PopupMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList();
+                  },
+                  icon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -170,6 +223,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -209,6 +263,16 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
                 ),
                 contentPadding: const EdgeInsets.all(10),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Realm cannot be empty";
+                }
+                const regexPattern = r"^([^\s\.#]+\.)*([^\s\.#]+)$";
+                if (!RegExp(regexPattern).hasMatch(value)) {
+                  return "Enter a valid realm";
+                }
+                return null;
+              },
             ),
           ),
         ],
@@ -341,48 +405,54 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
     }
   }
 
-  Widget sendButton(
-    String sendButton,
-    int index,
-    TabControllerProvider tabControllerProvider,
-    SessionStateProvider sessionStateProvider,
-    BuildContext context,
-  ) {
+  Widget sendButton(String sendButton, int index, TabControllerProvider tabControllerProvider, BuildContext context) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    double baseHeight = 45;
+    double baseWidth = 150;
+    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
+    double buttonHeight = baseHeight / pixelDensity;
+    double buttonWidth = baseWidth / pixelDensity;
     Widget buildButton(String label, Future<void> Function() action) {
-      double baseWidth = 145;
-      double baseHeight = 45;
-      double pixelDensity = MediaQuery.of(context).devicePixelRatio;
-      double buttonWidth = baseWidth / pixelDensity;
-      double buttonHeight = baseHeight / pixelDensity;
-
       return SizedBox(
-        height: buttonHeight,
         width: buttonWidth,
+        height: buttonHeight,
         child: ElevatedButton(
           onPressed: () async {
-            try {
-              await action();
-            } on Exception catch (error) {
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text("$sendButton Error: $error"),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
+            if (label == "UnRegister" ||
+                label == "UnSubscribe" ||
+                (widget.formKey?.currentState?.validate() ?? false)) {
+              try {
+                await action();
+              } on Exception catch (error) {
+                if (context.mounted) {
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(
+                      content: Text("Send Button Error: $error"),
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
             }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                bottomLeft: Radius.circular(10),
+              ),
             ),
           ),
-          child: Text(
-            tabControllerProvider.tabData[index].sendButtonText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              widget.tabControllerProvider.tabData[index].sendButtonText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -412,7 +482,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
       case "Subscribe":
         return buildButton(sendButton, () async {
           try {
-            await _subscribe(index, tabControllerProvider);
+            await _subscribe(index, tabControllerProvider, context);
             scaffoldMessenger.showSnackBar(
               const SnackBar(
                 content: Text("Subscribe Successful"),
@@ -522,16 +592,16 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
   Future<void> _unRegister(int index, Session? session, var reg, TabControllerProvider tabControllerProvider) async {
     await session?.unregister(reg);
     setState(() {
-      tabControllerProvider.tabData[index].sendButtonText = "Register";
-      Provider.of<InvocationProvider>(context, listen: false).invocations.clear();
+      widget.tabControllerProvider.tabData[index].sendButtonText = "Register";
+      invocationProvider.invocations.clear();
     });
   }
 
   Future<void> _unSubscribe(int index, Session? session, var sub, TabControllerProvider tabControllerProvider) async {
     await session?.unsubscribe(sub);
     setState(() {
-      tabControllerProvider.tabData[index].sendButtonText = "Subscribe";
-      Provider.of<EventProvider>(context, listen: false).events.clear();
+      widget.tabControllerProvider.tabData[index].sendButtonText = "Subscribe";
+      eventProvider.events.clear();
     });
   }
 
@@ -568,15 +638,15 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
         ..setSessionUnRegister(session)
         ..setUnregister(registration);
       setState(() {
-        var unregister = tabControllerProvider.tabData[index].sendButtonText = "UnRegister";
-        sendButton(unregister, index, tabControllerProvider, sessionStateProvider, context);
+        var unregister = widget.tabControllerProvider.tabData[index].sendButtonText = "UnRegister";
+        sendButton(unregister, index, tabControllerProvider, context);
       });
     } on Exception catch (error) {
       throw Exception(error);
     }
   }
 
-  Future<void> _subscribe(int index, TabControllerProvider tabControllerProvider) async {
+  Future<void> _subscribe(int index, TabControllerProvider tabControllerProvider, BuildContext context) async {
     try {
       var session = await connect(
         tabControllerProvider.tabData[index].linkController.text,
@@ -594,8 +664,8 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
         ..setSessionUnSubscribe(session)
         ..setUnSubscribe(subscription);
       setState(() {
-        var unsubscribe = tabControllerProvider.tabData[index].sendButtonText = "UnSubscribe";
-        sendButton(unsubscribe, index, tabControllerProvider, sessionStateProvider, context);
+        var unsubscribe = widget.tabControllerProvider.tabData[index].sendButtonText = "UnSubscribe";
+        sendButton(unsubscribe, index, tabControllerProvider, context);
       });
     } on Exception catch (error) {
       throw Exception(error);
@@ -648,6 +718,18 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
           ),
           contentPadding: const EdgeInsets.all(10),
         ),
+        validator: (value) {
+          if (value?.isEmpty ?? true) {
+            return "${sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe") ? "Topic" : "Procedure"} cannot be empty";
+          }
+          const regexPattern = r"^([^\s.#]+\.)*([^\s.#]+)$";
+          if (!RegExp(regexPattern).hasMatch(value!)) {
+            return sendButtonText.contains("Publish") || sendButtonText.contains("Subscribe")
+                ? "Enter a valid topic"
+                : "Enter a valid procedure";
+          }
+          return null;
+        },
       ),
     );
   }
@@ -659,13 +741,12 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
   }
 
   Widget buildKwargs(String kWargSendButton, int index) {
-    var tabController = Provider.of<TabControllerProvider>(context, listen: false);
     return kWargSendButton.contains("Publish") ||
             kWargSendButton.contains("Call") ||
             kWargSendButton.contains("Register")
         ? ChangeNotifierProvider.value(
-            value: tabController.kwargsProviders[index],
-            child: DynamicKeyValuePairs(kwargsProvider: tabController.kwargsProviders[index]),
+            value: widget.tabControllerProvider.kwargsProviders[index],
+            child: DynamicKeyValuePairs(kwargsProvider: widget.tabControllerProvider.kwargsProviders[index]),
           )
         : Container();
   }
@@ -678,6 +759,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
       ..add(DiagnosticsProperty<ScaffoldMessengerState>("scaffoldMessenger", scaffoldMessenger))
       ..add(DiagnosticsProperty<InvocationProvider>("invocationProvider", invocationProvider))
       ..add(DiagnosticsProperty<EventProvider>("eventProvider", eventProvider))
-      ..add(DiagnosticsProperty<ResultProvider>("resultProvider", resultProvider));
+      ..add(DiagnosticsProperty<ResultProvider>("resultProvider", resultProvider))
+      ..add(DiagnosticsProperty<GlobalKey<FormState>>("formKey", formKey));
   }
 }
