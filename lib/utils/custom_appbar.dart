@@ -174,144 +174,154 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     var routerProvider = Provider.of<RouterStateProvider>(context, listen: false);
     bool isMobile = MediaQuery.of(context).size.width < 600;
-    return AppBar(
-      title: isMobile
-          ? const Text(
-              "Wick",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            )
-          : const SizedBox(),
-      actions: [
-        if (!kIsWeb)
-          Consumer<RouterToggleSwitchProvider>(
-            builder: (context, routerResult, _) {
-              var scaffoldMessenger = ScaffoldMessenger.of(context);
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
-                child: Row(
-                  children: [
-                    const Text(
-                      "Router",
-                      style: TextStyle(fontSize: iconSize),
+    bool isMobile2 = MediaQuery.of(context).size.height < 100;
+    return isMobile2
+        ? Container()
+        : AppBar(
+            title: isMobile
+                ? const Text(
+                    "Wick",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(width: 5),
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Switch(
-                        activeColor: blueAccentColor,
-                        value: routerResult.isSelected,
-                        onChanged: (value) async {
-                          try {
-                            if (value) {
-                              await _showRouterDialog(context, routerResult, scaffoldMessenger);
-                            } else {
-                              await _showCloseRouterDialog(context, routerProvider, routerResult, scaffoldMessenger);
-                            }
-                          } on Exception catch (e) {
-                            scaffoldMessenger.showSnackBar(
-                              SnackBar(content: Text("An error occurred: ${e.runtimeType} - $e. Please try again.")),
-                            );
-                          }
-                        },
+                  )
+                : const SizedBox(),
+            actions: [
+              if (!kIsWeb)
+                Consumer<RouterToggleSwitchProvider>(
+                  builder: (context, routerResult, _) {
+                    var scaffoldMessenger = ScaffoldMessenger.of(context);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: horizontalPadding),
+                      child: Row(
+                        children: [
+                          const Text(
+                            "Router",
+                            style: TextStyle(fontSize: iconSize),
+                          ),
+                          const SizedBox(width: 5),
+                          Transform.scale(
+                            scale: 0.7,
+                            child: Switch(
+                              activeColor: blueAccentColor,
+                              value: routerResult.isSelected,
+                              onChanged: (value) async {
+                                try {
+                                  if (value) {
+                                    await _showRouterDialog(context, routerResult, scaffoldMessenger);
+                                  } else {
+                                    await _showCloseRouterDialog(
+                                      context,
+                                      routerProvider,
+                                      routerResult,
+                                      scaffoldMessenger,
+                                    );
+                                  }
+                                } on Exception catch (e) {
+                                  scaffoldMessenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text("An error occurred: ${e.runtimeType} - $e. Please try again."),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        if (widget.tabNames.isEmpty)
-          IconButton(
-            onPressed: widget.addTab,
-            icon: const Icon(
-              Icons.add_circle,
-              size: 25,
-            ),
-          )
-        else
-          const SizedBox(),
-        if (!kIsWeb && !Platform.isLinux && !Platform.isWindows)
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: IconButton(
-              onPressed: () async {
-                await _showPopupMenu(context);
-              },
-              icon: const Icon(
-                Icons.more_vert,
-              ),
-            ),
-          )
-        else
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: IconButton(
-              icon: Icon(
-                Provider.of<MyThemeProvider>(context).themeData == ThemeData.light()
-                    ? Icons.dark_mode
-                    : Icons.light_mode,
-              ),
-              onPressed: () async {
-                await Provider.of<MyThemeProvider>(context, listen: false).toggleTheme();
-              },
-            ),
-          ),
-      ],
-      bottom: widget.tabNames.isNotEmpty
-          ? PreferredSize(
-              preferredSize: const Size.fromHeight(0),
-              child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(
-                  scrollbars: true,
-                  overscroll: false,
-                  physics: const ClampingScrollPhysics(),
-                  dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
+                    );
                   },
                 ),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Stack(
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
+              if (widget.tabNames.isEmpty)
+                IconButton(
+                  onPressed: widget.addTab,
+                  icon: const Icon(
+                    Icons.add_circle,
+                    size: 25,
+                  ),
+                )
+              else
+                const SizedBox(),
+              if (!kIsWeb && !Platform.isLinux && !Platform.isWindows)
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: IconButton(
+                    onPressed: () async {
+                      await _showPopupMenu(context);
+                    },
+                    icon: const Icon(
+                      Icons.more_vert,
+                    ),
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: IconButton(
+                    icon: Icon(
+                      Provider.of<MyThemeProvider>(context).themeData == ThemeData.light()
+                          ? Icons.dark_mode
+                          : Icons.light_mode,
+                    ),
+                    onPressed: () async {
+                      await Provider.of<MyThemeProvider>(context, listen: false).toggleTheme();
+                    },
+                  ),
+                ),
+            ],
+            bottom: widget.tabNames.isNotEmpty
+                ? PreferredSize(
+                    preferredSize: const Size.fromHeight(0),
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        scrollbars: true,
+                        overscroll: false,
+                        physics: const ClampingScrollPhysics(),
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                        },
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Stack(
                           children: [
-                            TabBar(
-                              controller: widget.tabController,
-                              isScrollable: true,
-                              indicatorWeight: 1,
-                              tabs: widget.tabNames
-                                  .asMap()
-                                  .entries
-                                  .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
-                                  .toList(),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  TabBar(
+                                    controller: widget.tabController,
+                                    isScrollable: true,
+                                    indicatorWeight: 1,
+                                    tabs: widget.tabNames
+                                        .asMap()
+                                        .entries
+                                        .map((entry) => _buildTabWithDeleteButton(entry.key, entry.value))
+                                        .toList(),
+                                  ),
+                                  const SizedBox(width: 50), // Add some space for the add button
+                                ],
+                              ),
                             ),
-                            const SizedBox(width: 50), // Add some space for the add button
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: IconButton(
+                                onPressed: widget.addTab,
+                                icon: const Icon(
+                                  Icons.add_circle,
+                                  size: 25,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: IconButton(
-                          onPressed: widget.addTab,
-                          icon: const Icon(
-                            Icons.add_circle,
-                            size: 25,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-          : null,
-    );
+                    ),
+                  )
+                : null,
+          );
   }
 }

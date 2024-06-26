@@ -63,25 +63,29 @@ class TabControllerProvider with ChangeNotifier {
   }
 
   void removeTab(int index) {
+    int newIndex = _tabController.index;
     _tabNames.removeAt(index);
     _tabContents.removeAt(index);
     _tabData[index].disposeControllers();
     _tabData.removeAt(index);
     _argsProviders.removeAt(index);
     _kwargsProviders.removeAt(index);
-    _updateTabController();
+    if (newIndex >= _tabNames.length) {
+      newIndex = _tabNames.length - 1;
+    }
+
+    _updateTabController(newIndex);
     notifyListeners();
   }
 
-  void _updateTabController() {
+  void _updateTabController(int targetIndex) {
     final int currentLength = _tabController.length;
     final int newLength = _tabNames.length;
-
     if (currentLength != newLength) {
       if (newLength > 0) {
         _tabController.dispose();
         _initializeTabController();
-        _tabController.index = 0;
+        _tabController.index = targetIndex;
       }
     }
   }
