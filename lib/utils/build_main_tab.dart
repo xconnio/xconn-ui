@@ -75,8 +75,10 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
           if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" &&
               widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
             const Divider(),
-          buildKwargs(widget.tabControllerProvider.tabData[widget.index].sendButtonText,
-              widget.tabControllerProvider.kwargsProviders[widget.index]),
+          buildKwargs(
+            widget.tabControllerProvider.tabData[widget.index].sendButtonText,
+            widget.tabControllerProvider.kwargsProviders[widget.index],
+          ),
           if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" &&
               widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
             const Divider(),
@@ -92,7 +94,6 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
               }
             },
           ),
-          const SizedBox(height: 50),
           _buildInvocationResults(widget.index),
           _buildEventResults(widget.index),
           _buildCallResults(widget.index, widget.tabControllerProvider),

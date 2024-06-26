@@ -114,6 +114,7 @@ class _TableWidgetState extends State<TableWidget> {
               setState(() {
                 final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
                 widget.tableData[index] = updatedEntry;
+                widget.provider.updateRow(index, updatedEntry);
               });
             },
             decoration: const InputDecoration(
@@ -129,6 +130,7 @@ class _TableWidgetState extends State<TableWidget> {
               setState(() {
                 final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
                 widget.tableData[index] = updatedEntry;
+                widget.provider.updateRow(index, updatedEntry);
               });
             },
             decoration: const InputDecoration(
@@ -145,7 +147,8 @@ class _TableWidgetState extends State<TableWidget> {
             ),
             onPressed: () {
               setState(() {
-                widget.provider.removeRow(index);
+                widget.provider.tableData.removeAt(index);
+                // widget.provider.removeRow(index);
               });
             },
           ),

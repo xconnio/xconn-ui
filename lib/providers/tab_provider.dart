@@ -53,11 +53,12 @@ class TabControllerProvider with ChangeNotifier {
     _tabData.add(TabData());
     _argsProviders.add(ArgsProvider());
     _kwargsProviders.add(KwargsProvider());
-    _tabController = TabController(length: _tabNames.length, vsync: _tickerProvider);
-    _tabController
-      ..addListener(_handleTabSelection)
-      ..index = newIndex;
-
+    if (_tabController.length != _tabNames.length) {
+      _tabController.dispose();
+      _tabController = TabController(length: _tabNames.length, vsync: _tickerProvider);
+      _tabController.addListener(_handleTabSelection);
+    }
+    _tabController.index = newIndex;
     notifyListeners();
   }
 
