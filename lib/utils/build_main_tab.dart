@@ -13,6 +13,7 @@ import "package:wick_ui/utils/args_screen.dart";
 import "package:wick_ui/utils/kwargs_screen.dart";
 import "package:wick_ui/wamp_util.dart";
 import "package:xconn/exports.dart";
+import "dart:io" show Platform;
 
 class BuildMainTab extends StatefulWidget {
   const BuildMainTab({required this.index, required this.tabControllerProvider, this.formKey, super.key});
@@ -41,7 +42,26 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
   late EventProvider eventProvider;
   late ResultProvider resultProvider;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  double _textFieldHeight = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateTextFieldHeight();
+    });
+  }
+
+  void _updateTextFieldHeight() {
+    final keyContext = _formKey.currentContext;
+    if (keyContext != null) {
+      final box = keyContext.findRenderObject()! as RenderBox;
+      setState(() {
+        _textFieldHeight = box.size.height;
+      });
+    }
+  }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -108,6 +128,18 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
   }
 
   Widget _buildTabActionDropdown(int index, TabControllerProvider tabControllerProvider, BuildContext context) {
+    double baseWidth;
+    if (kIsWeb) {
+      baseWidth = 50;
+    } else {
+      if (Platform.isLinux) {
+        baseWidth = 50;
+      } else {
+        baseWidth = 100;
+      }
+    }
+    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
+    double buttonWidth = baseWidth / pixelDensity;
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
       child: Row(
@@ -116,33 +148,38 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(right: 10),
-              child: TextFormField(
-                controller: tabControllerProvider.tabData[index].linkController,
-                decoration: const InputDecoration(
-                  hintText: "ws://localhost:8080/ws",
-                  hintStyle: TextStyle(fontWeight: FontWeight.w200),
-                  labelText: "Enter URL here",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  contentPadding: EdgeInsets.all(10),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "URL cannot be empty";
-                  }
-                  const urlPattern = r"^(ws|wss):\/\/[^\s$.?#]+(\.[^\s$.?#]+)*(:\d+)?(\/[^\s]*)?$";
-                  final result = RegExp(urlPattern, caseSensitive: false).hasMatch(value);
-                  if (!result) {
-                    return "Enter a valid WebSocket URL";
-                  }
-                  return null; // return null if the validation passes
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  return TextFormField(
+                    key: _formKey,
+                    controller: tabControllerProvider.tabData[index].linkController,
+                    decoration: const InputDecoration(
+                      hintText: "ws://localhost:8080/ws",
+                      hintStyle: TextStyle(fontWeight: FontWeight.w200),
+                      labelText: "Enter URL here",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      contentPadding: EdgeInsets.all(10),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "URL cannot be empty";
+                      }
+                      const urlPattern = r"^(ws|wss):\/\/[^\s$.?#]+(\.[^\s$.?#]+)*(:\d+)?(\/[^\s]*)?$";
+                      final result = RegExp(urlPattern, caseSensitive: false).hasMatch(value);
+                      if (!result) {
+                        return "Enter a valid WebSocket URL";
+                      }
+                      return null; // return null if the validation passes
+                    },
+                  );
                 },
               ),
             ),
           ),
           sendButton(tabControllerProvider.tabData[index].sendButtonText, index, tabControllerProvider, context),
-          Container(width: 1, height: 45, color: Colors.black),
+          Container(width: 1, height: _textFieldHeight, color: Colors.black),
           if (widget.tabControllerProvider.tabData[index].sendButtonText == "UnRegister" ||
               widget.tabControllerProvider.tabData[index].sendButtonText == "UnSubscribe")
             InkWell(
@@ -156,7 +193,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
-                height: 45,
+                height: _textFieldHeight,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(10),
@@ -172,7 +209,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
             )
           else
             Container(
-              height: 45,
+              height: _textFieldHeight,
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(10),
@@ -410,15 +447,21 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
 
   Widget sendButton(String sendButton, int index, TabControllerProvider tabControllerProvider, BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    double baseHeight = 45;
-    double baseWidth = 150;
+    double getBaseSize(isHeight) {
+      double size = isHeight ? 55 : 150;
+      if (!kIsWeb && !Platform.isLinux) {
+        size = isHeight ? 120 : 320;
+      }
+      return size;
+    }
+
+    double baseWidth = getBaseSize(false);
     double pixelDensity = MediaQuery.of(context).devicePixelRatio;
-    double buttonHeight = baseHeight / pixelDensity;
     double buttonWidth = baseWidth / pixelDensity;
     Widget buildButton(String label, Future<void> Function() action) {
       return SizedBox(
         width: buttonWidth,
-        height: buttonHeight,
+        height: _textFieldHeight,
         child: ElevatedButton(
           onPressed: () async {
             if (label == "UnRegister" ||
