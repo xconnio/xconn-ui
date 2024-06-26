@@ -5,8 +5,8 @@ class KwargsProvider extends ChangeNotifier {
 
   List<MapEntry<String, String>> get tableData => _tableData;
 
-  void addRow(String key, String value) {
-    _tableData.add(MapEntry(key, value));
+  void addRow(MapEntry<String, String> rowData) {
+    _tableData.add(rowData);
     notifyListeners();
   }
 

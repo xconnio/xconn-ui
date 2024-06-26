@@ -4,9 +4,9 @@ import "package:provider/provider.dart";
 import "package:wick_ui/providers/kwargs_provider.dart";
 
 class DynamicKeyValuePairs extends StatefulWidget {
-  const DynamicKeyValuePairs({required this.kwargsProvider, super.key});
+  const DynamicKeyValuePairs({required this.provider, super.key});
 
-  final KwargsProvider kwargsProvider;
+  final KwargsProvider provider;
 
   @override
   State<DynamicKeyValuePairs> createState() => _DynamicKeyValuePairsState();
@@ -14,105 +14,139 @@ class DynamicKeyValuePairs extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<KwargsProvider>("kwargsProvider", kwargsProvider));
+    properties.add(DiagnosticsProperty<KwargsProvider>("provider", provider));
   }
 }
 
 class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<KwargsProvider>(
+      builder: (context, tableProvider, _) {
+        Map<String, String> kWarValues = {};
+        for (final mapEntry in tableProvider.tableData) {
+          if (mapEntry.key.isNotEmpty) {
+            kWarValues[mapEntry.key] = mapEntry.value;
+          }
+        }
+
+        return SingleChildScrollView(
+          child: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Kwargs",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Kwargs",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.provider.addRow(const MapEntry("", ""));
+                        });
+                      },
+                      icon: const Icon(
+                        Icons.add_box_sharp,
+                        size: 24,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              IconButton(
-                onPressed: () async {
-                  await _showAddDialog(context);
-                },
-                icon: const Icon(
-                  Icons.add_box_sharp,
-                  size: 24,
-                ),
-              ),
+              TableWidget(widget.provider.tableData, widget.provider),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<KwargsProvider>("provider", widget.provider));
+  }
+}
+
+class TableWidget extends StatefulWidget {
+  const TableWidget(this.tableData, this.provider, {super.key});
+
+  final List<MapEntry<String, String>> tableData;
+  final KwargsProvider provider;
+
+  @override
+  State<TableWidget> createState() => _TableWidgetState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(IterableProperty<MapEntry<String, String>>("tableData", tableData))
+      ..add(DiagnosticsProperty<KwargsProvider>("provider", provider));
+  }
+}
+
+class _TableWidgetState extends State<TableWidget> {
+  TableRow _buildTableRow(
+    MapEntry<String, String> rowData,
+    int index,
+  ) {
+    return TableRow(
+      children: [
+        _buildTableCell(
+          TextFormField(
+            initialValue: rowData.key,
+            onChanged: (newValue) {
+              setState(() {
+                final updatedEntry = MapEntry<String, String>(newValue, rowData.value);
+                widget.tableData[index] = updatedEntry;
+              });
+            },
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(8),
+            ),
+          ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Consumer<KwargsProvider>(
-            builder: (context, provider, child) {
-              return provider.tableData.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: DataTable(
-                        columnSpacing: 50,
-                        border: TableBorder.all(color: Colors.grey, borderRadius: BorderRadius.circular(8)),
-                        columns: const [
-                          DataColumn(
-                            label: Text("Key"),
-                            tooltip: "Key",
-                          ),
-                          DataColumn(
-                            label: Text("Value"),
-                            tooltip: "Value",
-                          ),
-                          DataColumn(
-                            label: Text("Actions"),
-                            tooltip: "Actions",
-                          ),
-                        ],
-                        rows: provider.tableData
-                            .asMap()
-                            .entries
-                            .map(
-                              (entry) => DataRow(
-                                cells: [
-                                  DataCell(
-                                    SizedBox(
-                                      width: 150,
-                                      child: Text(entry.value.key),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    SizedBox(
-                                      width: 150,
-                                      child: Text(entry.value.value),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.redAccent,
-                                      ),
-                                      onPressed: () {
-                                        provider.removeRow(entry.key);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    )
-                  : Container();
+        _buildTableCell(
+          TextFormField(
+            initialValue: rowData.value,
+            onChanged: (newValue) {
+              setState(() {
+                final updatedEntry = MapEntry<String, String>(rowData.key, newValue);
+                widget.tableData[index] = updatedEntry;
+              });
+            },
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(8),
+            ),
+          ),
+        ),
+        _buildTableCell(
+          IconButton(
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              setState(() {
+                widget.provider.removeRow(index);
+              });
             },
           ),
         ),
@@ -120,56 +154,57 @@ class _DynamicKeyValuePairsState extends State<DynamicKeyValuePairs> {
     );
   }
 
-  Future<void> _showAddDialog(BuildContext context) async {
-    String key = "";
-    String value = "";
-
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Add kwargs"),
-          content: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                TextField(
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: "Key",
-                  ),
-                  onChanged: (newValue) {
-                    key = newValue; // Update key variable
-                  },
-                ),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: "Value",
-                  ),
-                  onChanged: (newValue) {
-                    value = newValue; // Update value variable
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text("Add"),
-              onPressed: () {
-                widget.kwargsProvider.addRow(key, value);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+  TableCell _buildTableCell(Widget child) {
+    return TableCell(
+      child: Container(
+        alignment: Alignment.center,
+        height: 50,
+        child: child,
+      ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.tableData.isNotEmpty
+        ? Table(
+            border: TableBorder.all(color: Colors.grey),
+            columnWidths: const {
+              0: FixedColumnWidth(150),
+              1: FixedColumnWidth(150),
+              2: FixedColumnWidth(50),
+            },
+            children: [
+              TableRow(
+                children: [
+                  _buildTableCell(
+                    const Text(
+                      "Key",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  _buildTableCell(
+                    const Text(
+                      "Value",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  _buildTableCell(
+                    const Text(
+                      "",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              ...widget.tableData.asMap().entries.map(
+                    (entry) => _buildTableRow(
+                      entry.value,
+                      entry.key,
+                    ),
+                  ),
+            ],
+          )
+        : Container();
   }
 }

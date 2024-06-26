@@ -5,6 +5,7 @@ import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/args_provider.dart";
 import "package:wick_ui/providers/event_provider.dart";
 import "package:wick_ui/providers/invocation_provider.dart";
+import "package:wick_ui/providers/kwargs_provider.dart";
 import "package:wick_ui/providers/result_provider.dart";
 import "package:wick_ui/providers/session_states_provider.dart";
 import "package:wick_ui/providers/tab_provider.dart";
@@ -74,7 +75,8 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
           if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" &&
               widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
             const Divider(),
-          buildKwargs(widget.tabControllerProvider.tabData[widget.index].sendButtonText, widget.index),
+          buildKwargs(widget.tabControllerProvider.tabData[widget.index].sendButtonText,
+              widget.tabControllerProvider.kwargsProviders[widget.index]),
           if (widget.tabControllerProvider.tabData[widget.index].sendButtonText != "Subscribe" &&
               widget.tabControllerProvider.tabData[widget.index].sendButtonText != "UnSubscribe")
             const Divider(),
@@ -740,14 +742,11 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
         : Container();
   }
 
-  Widget buildKwargs(String kWargSendButton, int index) {
+  Widget buildKwargs(String kWargSendButton, KwargsProvider kwargsProvider) {
     return kWargSendButton.contains("Publish") ||
             kWargSendButton.contains("Call") ||
             kWargSendButton.contains("Register")
-        ? ChangeNotifierProvider.value(
-            value: widget.tabControllerProvider.kwargsProviders[index],
-            child: DynamicKeyValuePairs(kwargsProvider: widget.tabControllerProvider.kwargsProviders[index]),
-          )
+        ? DynamicKeyValuePairs(provider: kwargsProvider)
         : Container();
   }
 
