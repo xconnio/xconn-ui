@@ -10,6 +10,11 @@ class KwargsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateRow(int index, MapEntry<String, String> newRowData) {
+    _tableData[index] = newRowData;
+    notifyListeners();
+  }
+
   void removeRow(int index) {
     _tableData.removeAt(index);
     notifyListeners();

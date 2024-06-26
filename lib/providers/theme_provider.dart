@@ -18,6 +18,14 @@ class MyThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> toggleTheme() async {
+    if (_themeData == ThemeData.light()) {
+      await setThemeData(ThemeData.dark());
+    } else {
+      await setThemeData(ThemeData.light());
+    }
+  }
+
   dynamic _loadThemeData() async {
     bool? isLightTheme = SharedPref.instance.preferences.getBool(_themePreferenceKey);
     _themeData = isLightTheme != null && isLightTheme ? ThemeData.light() : ThemeData.dark();
