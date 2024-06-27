@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+
 import "package:wick_ui/utils/shared_pref.dart";
 
 class MyThemeProvider extends ChangeNotifier {
