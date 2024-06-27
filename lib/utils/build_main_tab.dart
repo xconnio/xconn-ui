@@ -1,3 +1,4 @@
+import "dart:io" show Platform;
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -13,7 +14,6 @@ import "package:wick_ui/utils/args_screen.dart";
 import "package:wick_ui/utils/kwargs_screen.dart";
 import "package:wick_ui/wamp_util.dart";
 import "package:xconn/exports.dart";
-import "dart:io" show Platform;
 
 class BuildMainTab extends StatefulWidget {
   const BuildMainTab({required this.index, required this.tabControllerProvider, this.formKey, super.key});
@@ -62,6 +62,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
       });
     }
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -193,6 +194,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
+                width: buttonWidth,
                 height: _textFieldHeight,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
@@ -209,6 +211,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
             )
           else
             Container(
+              width: buttonWidth,
               height: _textFieldHeight,
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -447,15 +450,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
 
   Widget sendButton(String sendButton, int index, TabControllerProvider tabControllerProvider, BuildContext context) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    double getBaseSize(isHeight) {
-      double size = isHeight ? 55 : 150;
-      if (!kIsWeb && !Platform.isLinux) {
-        size = isHeight ? 120 : 320;
-      }
-      return size;
-    }
-
-    double baseWidth = getBaseSize(false);
+    double baseWidth = (kIsWeb || Platform.isLinux) ? 180 : 350;
     double pixelDensity = MediaQuery.of(context).devicePixelRatio;
     double buttonWidth = baseWidth / pixelDensity;
     Widget buildButton(String label, Future<void> Function() action) {
