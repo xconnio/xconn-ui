@@ -2,7 +2,9 @@ import "dart:io" show Platform;
 import "dart:ui";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
+
 import "package:provider/provider.dart";
+
 import "package:wick_ui/constants.dart";
 import "package:wick_ui/providers/router_state_provider.dart";
 import "package:wick_ui/providers/router_toggleswitch_provider.dart";
