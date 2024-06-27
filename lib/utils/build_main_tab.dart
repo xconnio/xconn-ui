@@ -42,7 +42,6 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
   late EventProvider eventProvider;
   late ResultProvider resultProvider;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   double _textFieldHeight = 0;
 
   @override
@@ -54,7 +53,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
   }
 
   void _updateTextFieldHeight() {
-    final keyContext = _formKey.currentContext;
+    final keyContext = formKey.currentContext;
     if (keyContext != null) {
       final box = keyContext.findRenderObject()! as RenderBox;
       setState(() {
@@ -130,15 +129,12 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
 
   Widget _buildTabActionDropdown(int index, TabControllerProvider tabControllerProvider, BuildContext context) {
     double baseWidth;
-    if (kIsWeb) {
+    if (kIsWeb || Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
       baseWidth = 50;
     } else {
-      if (Platform.isLinux) {
-        baseWidth = 50;
-      } else {
-        baseWidth = 100;
-      }
+      baseWidth = 100;
     }
+
     double pixelDensity = MediaQuery.of(context).devicePixelRatio;
     double buttonWidth = baseWidth / pixelDensity;
     return Padding(
@@ -152,7 +148,7 @@ class _BuildMainTabState extends State<BuildMainTab> with TickerProviderStateMix
               child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
                   return TextFormField(
-                    key: _formKey,
+                    key: formKey,
                     controller: tabControllerProvider.tabData[index].linkController,
                     decoration: const InputDecoration(
                       hintText: "ws://localhost:8080/ws",
