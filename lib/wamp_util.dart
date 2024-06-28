@@ -1,5 +1,5 @@
 import "package:wick_ui/constants.dart";
-import "package:xconn/exports.dart";
+import "package:xconn/xconn.dart";
 
 Serializer _getSerializer(String? serializerString) {
   switch (serializerString) {

@@ -13,7 +13,7 @@ import "package:wick_ui/providers/tab_provider.dart";
 import "package:wick_ui/utils/args_screen.dart";
 import "package:wick_ui/utils/kwargs_screen.dart";
 import "package:wick_ui/wamp_util.dart";
-import "package:xconn/exports.dart";
+import "package:xconn/xconn.dart";
 
 class BuildMainTab extends StatefulWidget {
   const BuildMainTab({required this.index, required this.tabControllerProvider, this.formKey, super.key});
